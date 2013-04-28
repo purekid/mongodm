@@ -40,19 +40,19 @@ How to Use
 	}
 
 
-### create model instance
+### Create model instance
 
 
 	$user = new User();
 	$user->name = "Michael";
 	$user->save();
 
-### create instance with data
+### Create instance with data
 	
 	$user_other = new User( array('name'=>"John") );
 	$user_other->save();
 
-### load one record
+### Load one record
 
 	$user = User::one( array('name'=>"michael" ) );
 
@@ -61,11 +61,11 @@ How to Use
 	$id = new \MongoId('517c850641da6da0ab000004'); // hah,both ok!
 	$user = User::id( $id );
 
-### load all records
+### Load all records
 
 	$users = User::all();
 
-### relationship 1:1
+### Lazyload a 1:1 relationship record
 
 	$book = new Book();
 	$book->name = "My Love";
@@ -81,5 +81,42 @@ How to Use
 	echo $user->book_fav->name;
 
 
-### relationship 1:x
+### Lazyload 1:x relationship records
+
+	$user = User::one();
+
+	$book1 = new Book();
+	$book1->name = "book1";
+	$book1->save();
+	
+	$book2 = new Book();
+	$book2->name = "book2";
+	$book2->save();
+
+	$user->books = array($book1,$book2);
+	//also you can
+	$user->books = ModelSet::make(array($book1,$book2));
+	$user->save();
+
+	//somewhere , load these books
+	$user = User::id($id);
+	$books = $user->books; 
+
+### let's continue,now is magic ModelSet.... 
+	
+	$user = User::id($id);
+	$books = $user->books; //now books is a instance of Mongodm\ModelSet
+	echo $books->count();     // of course it return "2"
+	
+	$book1 = $books->get(0);  // get a item by index from modelset
+	$book1_id = $book1->getId();
+	echo $books1->name;       // yeah,,it's "book1"
+	
+	$book1 = $book->get($book1_id);  // get a item by mongoid from modelset
+	
+	
+	
+
+	
+	
 
