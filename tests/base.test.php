@@ -33,6 +33,34 @@ class TestBase extends PHPUnit_Framework_TestCase {
 	
 	}
 	
+	public function testSetGet(){
+	
+		$user = User::one();
+		$id = $user->getId();
+		$this->assertInstanceOf("\MongoId", $user->getId());
+	
+		$book1 = new Book();
+		$book1->name = "book1";
+		$book1->save();
+	
+		$book2 = new Book();
+		$book2->name = "book2";
+		$book2->save();
+		$this->assertInstanceOf("\MongoId", $book1->getId());
+		$this->assertInstanceOf("\MongoId", $book2->getId());
+	
+		$user->books = ModelSet::make(array($book1,$book2));
+		$user->save();
+	
+		$user = User::id($id);
+		$books = $user->books;
+		$book = $books->get($book1->getId());
+	
+		$this->assertEquals("book1",$book->name);
+	
+	
+	}
+	
 	public function testAll(){
 	
 		$user = User::all();

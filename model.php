@@ -7,22 +7,8 @@ require_once 'mongodb.php';
 class Model {
 
 	public static $config = 'default';
-	
-	/**
-	 * Active collection
-	 *
-	 * @var string
-	 */
-	
 	public $references = array();
-	
-	/**
-	 * Indicates if the model has creation and update timestamps.
-	 *
-	 * @var bool
-	 */
 	public static $use_timestamps = false;
-	
 	public $vars = array();
 	public $dirtyData = array();
 	public $data = array();
