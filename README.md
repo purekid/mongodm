@@ -110,9 +110,15 @@ How to Use
 	
 	$book1 = $books->get(0);  // get a item by index from modelset
 	$book1_id = $book1->getId();
-	echo $books1->name;       // yeah,,it's "book1"
-	
+	//or 
 	$book1 = $book->get($book1_id);  // get a item by mongoid from modelset
+	
+	echo $books1->name;       
+	
+	//check item exists in a modelset
+	$books->has($book1_id); 
+	
+
 	
 	
 	
