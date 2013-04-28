@@ -125,7 +125,7 @@ class Model {
 	 * @param  array $fields
 	 * @return MongoDB Object
 	 */
-	static function find($params = array(), $fields = array(), $sort = array() , $limit = null , $skip = null)
+	static function find($params = array(), $sort = array(), $fields = array() , $limit = null , $skip = null)
 	{
 	
 		$results =  self::connection()->find(static::$collection, $params, $fields);
