@@ -41,24 +41,7 @@ class Model {
 		return null;
 	}
 
-	/**
-	 * Insert a document
-	 *
-	 * @param  array $insert
-	 * @param  bool  $options
-	 * @return MongoDB Object
-	 */
-	public function insert(array $insert, $options =  true)
-	{
-		return $this->_connection->insert(self::$collection(), $insert, $options);
-	}
 
-	/**
-	 * Delete a document
-	 *
-	 * @param  array $criteria
-	 * @return null
-	 */
 	public function delete($options = array())
 	{
 		$this->__beforeDelete();
@@ -80,7 +63,7 @@ class Model {
 	 */
 	public function set_index($keys)
 	{
-		return $this->_connection->ensure_index(self::$collection, $keys);
+		return $this->_connection->ensure_index($this->collectionName(), $keys);
 	}
 	
 	public function save($options = array()){
