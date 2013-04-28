@@ -120,8 +120,13 @@ How to Use
 	
 
 	
-	
-	
+Special thanks to
+-----------------
+
+[mikelbring](https://github.com/mikelbring)
+[Paul Hrimiuc](https://github.com/hpaul/)
+
+
 
 	
 	
