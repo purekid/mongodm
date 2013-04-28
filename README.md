@@ -24,6 +24,30 @@ Features
 How to Use
 ----------
 
+### Config database in   config/database.php
+	<?php
+		return array(
+	
+		   /* Configuration name */
+				
+			'default' => array(
+				'connection' => array(
+					/** hostnames, separate multiple hosts by commas **/
+					'hostnames' => 'localhost',
+						
+					/** database to connect to **/
+					'database'  => 'dbname',
+						
+					/** authentication **/
+						
+		// 			'username'  => '',
+				
+		// 			'password'  => '',
+		
+				)
+			)
+		);
+
 ### Define a model
 
 	<?php
