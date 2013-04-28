@@ -9,15 +9,19 @@ a PHP MongoDb ODM
 create
 ------
 
-  $user = new User();
+	$user = new User();
 	$user->name = "Michael";
 	$user->save();
 
-	//[create with data]
+create with data
+------
+	
 	$user_other = new User( array('name'=>"John") );
 	$user_other->save();
 
-	//[load one record]
+load one record
+------
+
 	$user = User::one( array('name'=>"michael" ) );
 
 	//[load one record by MongoId]
@@ -25,10 +29,12 @@ create
 	$id = new \MongoId('517c850641da6da0ab000004'); // hah,both ok!
 	$user = User::id( $id );
 
-	//[load all records]
+load all records
+------
 	$users = User::all();
 
-	/* [relationship 1:1]*/
+relationship 1:1
+------
 
 	$book = new Book();
 	$book->name = "My Love";
@@ -44,4 +50,5 @@ create
 	echo $user->book_fav->name;
 
 
-	/* [relationship 1:x]*/
+relationship 1:x
+------
