@@ -10,7 +10,7 @@ return array(
 			'hostnames' => 'localhost',
 				
 			/** database to connect to **/
-			'database'  => 'laravel',
+			'database'  => 'youlin',
 				
 			/** authentication **/
 				

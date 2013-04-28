@@ -94,6 +94,19 @@ class Model {
 		
 	}
 	
+	static function count($params = array()){
+	
+		$count = self::connection()->count(self::collectionName(),$params);
+		return $count;
+	
+	}
+	
+	static function toArray(){
+		
+		return $this->data;
+		
+	}
+	
 	static function id($id){
 		
 		if($id){

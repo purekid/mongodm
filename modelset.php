@@ -47,6 +47,16 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable {
 		return null;
 	}
 	
+	static function toArray(){
+	
+		$array = array();
+		foreach($this->_items as $item){
+			$array[] = $item->toArray();
+		}
+		return $array;
+	
+	}
+	
 	public function remove($index){
 		
 		$item = $this->get($index);
