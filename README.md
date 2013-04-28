@@ -6,9 +6,25 @@ a PHP MongoDb ODM
 
 ======
 
+Requirements
+------------
+- PHP 5.3 or greater
+- Mongodb 1.3 or greater
+- PHP Mongo extension 
 
-base Model
-------
+Features
+--------
+
+- ORM
+- Simple and flexible
+- Support for references (lazy loaded)
+- Support for inheritance
+
+
+How to Use
+----------
+
+### Define a model
 
 	<?php
 
@@ -23,21 +39,20 @@ base Model
 
 	}
 
-create
-------
+
+### create model instance
+
 
 	$user = new User();
 	$user->name = "Michael";
 	$user->save();
 
-create with data
-------
+### create instance with data
 	
 	$user_other = new User( array('name'=>"John") );
 	$user_other->save();
 
-load one record
-------
+### load one record
 
 	$user = User::one( array('name'=>"michael" ) );
 
@@ -46,12 +61,11 @@ load one record
 	$id = new \MongoId('517c850641da6da0ab000004'); // hah,both ok!
 	$user = User::id( $id );
 
-load all records
-------
+### load all records
+
 	$users = User::all();
 
-relationship 1:1
-------
+### relationship 1:1
 
 	$book = new Book();
 	$book->name = "My Love";
@@ -67,5 +81,5 @@ relationship 1:1
 	echo $user->book_fav->name;
 
 
-relationship 1:x
-------
+### relationship 1:x
+
