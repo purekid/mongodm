@@ -1,7 +1,7 @@
 mongodm
 =======
 
-a PHP MongoDb ODM 
+a PHP MongoDb ORM 
 
 
 ======

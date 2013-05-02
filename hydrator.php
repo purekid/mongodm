@@ -1,4 +1,14 @@
-<?php namespace Mongodm;
+<?php
+/**
+ * Mongodm - A PHP Mongodb ORM
+ *
+ * @package  Mongodm
+ * @version  1.0.0
+ * @author   Michael Gan <gc1108960@gmail.com>
+ * @link     http://blog.missyi.com
+ */
+
+namespace Mongodm;
 
 class Hydrator {
 
@@ -26,11 +36,11 @@ class Hydrator {
 	private static function pack($class,$result){
 		
 		$model = new $class;
-		$model->data = (array) $result;
+		$model->cleanData = (array) $result;
 		$model->exists = true;
-		if (isset($model->data['$id']))
+		if (isset($model->cleanData['$id']))
 		{
-			$id = (string) $model->data['$id'];
+			$id = (string) $model->cleanData['$id'];
 		
 		}
 		return $model;

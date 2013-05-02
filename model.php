@@ -1,7 +1,14 @@
 <?php 
+/**
+ * Mongodm - A PHP Mongodb ORM
+ *
+ * @package  Mongodm
+ * @version  1.0.0
+ * @author   Michael Gan <gc1108960@gmail.com>
+ * @link     http://blog.missyi.com
+ */
 
 namespace Mongodm;
-
 require_once 'mongodb.php';
 
 class Model {
@@ -11,32 +18,32 @@ class Model {
 	public static $use_timestamps = false;
 	public $vars = array();
 	public $dirtyData = array();
-	public $data = array();
+	public $cleanData = array();
 	public $ignoreData = array();
 	public $exists = false;
 	
 	private $_connection = null;
 	
 	
-	public function __construct($data = array())
+	public function __construct($cleanData = array())
 	{
 		if (is_null($this->_connection))
 		{
 			$this->_connection = MongoDB::instance(self::$config);
 		}
-		$this->update($data);
+		$this->update($cleanData);
 	}
 	
-	public function update($data){
-		foreach($data as $key => $value){
+	public function update($cleanData){
+		foreach($cleanData as $key => $value){
 			$this->$key = $value;
 		}
 		return true;
 	}
 	
 	public function getId(){
-		if(isset($this->data['_id'])){
-			return new \MongoId($this->data['_id']);
+		if(isset($this->cleanData['_id'])){
+			return new \MongoId($this->cleanData['_id']);
 		}
 		return null;
 	}
@@ -82,9 +89,9 @@ class Model {
 		}
 		else
 		{
-			$insert = $this->_connection->insert($this->collectionName(), $this->data, $options);
+			$insert = $this->_connection->insert($this->collectionName(), $this->cleanData, $options);
 	
-			$success = !is_null($this->data['$id'] = $insert['_id']);
+			$success = !is_null($this->cleanData['$id'] = $insert['_id']);
 		}
 	
 		$this->exists = true ;
@@ -101,9 +108,9 @@ class Model {
 	
 	}
 	
-	static function toArray(){
+	public function toArray(){
 		
-		return $this->data;
+		return $this->cleanData;
 		
 	}
 	
@@ -213,12 +220,12 @@ class Model {
 	 */
 	public function __get($key)
 	{
-		if (array_key_exists($key, $this->data))
+		if (array_key_exists($key, $this->cleanData))
 		{
 			if(isset($this->references[$key])){
 				$value = $this->loadRef($key);
 			}else{
-				$value = $this->data[$key];
+				$value = $this->cleanData[$key];
 			}
 			
 			return $value;
@@ -233,7 +240,7 @@ class Model {
 	public function loadRef($key){
 		
 		$reference = $this->references[$key];
-		$value = $this->data[$key];
+		$value = $this->cleanData[$key];
 		$model = $reference['model'];
 		$type = $reference['type'];
 		
@@ -309,7 +316,7 @@ class Model {
 			$value = $this->setRef($key,$value);
 		}
 				
-		$this->data[$key] = $value;
+		$this->cleanData[$key] = $value;
 		$this->dirtyData[$key] = $value;
 		
 	}

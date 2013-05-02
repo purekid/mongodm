@@ -1,4 +1,12 @@
 <?php 
+/**
+ * Mongodm - A PHP Mongodb ORM
+ *
+ * @package  Mongodm
+ * @version  1.0.0
+ * @author   Michael Gan <gc1108960@gmail.com>
+ * @link     http://blog.missyi.com
+ */
 
 namespace Mongodm;
 
