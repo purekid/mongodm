@@ -1,0 +1,7 @@
+<phpunit bootstrap="./tests/Bootstrap.php" colors="true">
+    <testsuites>
+        <testsuite name="Mongodm Test Suite">
+            <directory>./tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
