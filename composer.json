@@ -4,6 +4,6 @@
     "license": "MIT License",
     "homepage": "https://github.com/puregan/mongodm",
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.3.3"
     }
 }
