@@ -1,0 +1,9 @@
+{
+    "name": "puregan/Mongodm",
+    "description": "A PHP mongodb ORM",
+    "license": "MIT License",
+    "homepage": "https://github.com/puregan/mongodm",
+    "require": {
+        "php": ">=5.3.3",
+    }
+}
