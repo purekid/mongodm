@@ -55,11 +55,11 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable {
 		return null;
 	}
 	
-	static function toArray(){
+	public function toArray(){
 	
 		$array = array();
 		foreach($this->_items as $item){
-			$array[] = $item->toArray();
+			$array[] = $item;
 		}
 		return $array;
 	
@@ -112,14 +112,17 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable {
 		if($item && $item instanceof \Mongodm\Model){
 			$id = (string) $item->getId();
 			$this->_items[$id] = $item;
+			
 		}else if(is_array($item)){
 			foreach($item as $obj){
 				if($obj instanceof \Mongodm\Model){
 					$this->add($obj);
 				}
 			}
+		}else if($item instanceof self){
+			$this->add($item->toArray());
 		}
-		return true;
+		return $this;
 		
 	}
 	
