@@ -1,7 +1,8 @@
 Mongodm
+=======
+
 [![Build Status](https://secure.travis-ci.org/puregan/mongodm.png?branch=master)](http://travis-ci.org/puregan/mongodm)
 
-=======
 
 a PHP MongoDb ORM 
 
