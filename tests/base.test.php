@@ -113,6 +113,35 @@ class TestBase extends PHPUnit_Framework_TestCase {
 	
 	}
 	
+	public function testSetFunction(){
+	
+		$book1 = new Book();
+		$book1->name = "book1";
+		$book1->price = 5;
+		$book1->save();
+		
+		$book2 = new Book();
+		$book2->name = "book2";
+		$book2->price = 10;
+		$book2->save();
+		
+		$book3 = new Book();
+		$book3->name = "book3";
+		$book3->price = 15;
+		$book3->save();
+		
+		
+		$books = Book::find(array('price'=>5));
+		$books_count = $books->count();
+		$books2 = Book::find(array('price'=>array('$gt'=>5)));
+		$books2_count = $books2->count();
+		
+		$books3 = $books->add($books2);
+		
+		$this->assertEquals($books3->count(), $books_count + $books2_count);		
+	
+	}
+	
 	public function testRelation1TO1(){
 	
 		$user = User::one();
