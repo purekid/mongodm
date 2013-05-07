@@ -138,7 +138,7 @@ class TestBase extends PHPUnit_Framework_TestCase {
 		
 		$books3 = $books->add($books2);
 		
-		$this->assertEquals($books3->count()+100, $books_count + $books2_count);		
+		$this->assertEquals($books3->count(), $books_count + $books2_count);		
 	
 	}
 	
