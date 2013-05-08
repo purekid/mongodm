@@ -6,23 +6,21 @@ return array(
 		
 	'default' => array(
 		'connection' => array(
-			/** hostnames, separate multiple hosts by commas **/
+			//'hostnames' => 'localhost,192.168.1.2',
 			'hostnames' => 'localhost',
-				
-			/** database to connect to **/
 			'database'  => 'youlin',
-				
-			/** authentication **/
-				
 // 			'username'  => '',
-		
 // 			'password'  => '',
 
 		)
 	),
-	'development' => array(
-
-			//... put connection config here
-			
+	'test' => array(
+		'connection' => array(
+			'hostnames' => 'localhost',
+			'database'  => 'test',
+// 			'username'  => '',
+// 			'password'  => '',
+		)
 	)
 );
+

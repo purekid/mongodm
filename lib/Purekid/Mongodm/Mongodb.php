@@ -88,7 +88,6 @@ class MongoDB
 		$this->_name = $name;
 
 		$this->_config = $config;
-
 		/* Store the database instance */
 		MongoDB::$instances[$name] = $this;
 	}

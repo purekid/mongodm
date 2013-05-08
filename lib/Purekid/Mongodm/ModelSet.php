@@ -45,6 +45,7 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable
 				return	current(array_slice ($this->_items , $index , 1)) ;
 			}
 		}else{
+		
 			if($index instanceof \MongoId){
 				$index = (string) $index;
 			}

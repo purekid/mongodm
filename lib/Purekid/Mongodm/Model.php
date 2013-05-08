@@ -28,9 +28,14 @@ abstract class Model
 	{
 		if (is_null($this->_connection))
 		{
-			$this->_connection = MongoDB::instance(self::$config);
+			if(isset($this::$config)){
+				$config = $this::$config;
+			}else{
+				$config = self::config;
+			}
+			$this->_connection = MongoDB::instance($config);
 		}
-		$this->update($cleanData);
+ 		$this->update($cleanData);
 	}
 	
 	public function update($cleanData)
@@ -203,7 +208,13 @@ abstract class Model
 	
 	private static function connection()
 	{
-		return MongoDB::instance(self::$config);
+		$class = get_called_class();
+		if(isset($class::$config)){
+			$config = $class::$config;
+		}else{
+			$config = self::config;
+		}
+		return MongoDB::instance($config);
 	}
 	
 	/**
@@ -333,16 +344,15 @@ abstract class Model
 	
 	private function dbName()
 	{
-		$class = get_called_class();
-		if(isset($class::$config)){
-			$config = $class::$config;
+		$dbName = "unknown";
+		if(isset($this::$config)){
+			$config = $this::$config;
 		}else{
 			$config = self::$config;
 		}
 		$configs = MongoDB::config($config);
 		if($configs){
 			$dbName = $configs['connection']['database'];
-		}else{
 		}
 		
 		return $dbName;

@@ -6,6 +6,7 @@ class User extends \Purekid\Mongodm\Model
 {
 
 	static $collection = "user";
+ 	public static $config = 'test';
 	
 	public $references = array(
 			

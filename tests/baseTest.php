@@ -17,7 +17,6 @@ class TestBase extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf("\MongoId", $user->getId());
 		
 	}
-	
 	public function testCreateWithData()
 	{
 		
@@ -46,7 +45,8 @@ class TestBase extends PHPUnit_Framework_TestCase {
 	
 		$user->books = ModelSet::make(array($book1,$book2));
 		$user->save();
-	
+		
+		
 		$user = User::id($id);
 		$books = $user->books;
 		$book = $books->get($book1->getId());
