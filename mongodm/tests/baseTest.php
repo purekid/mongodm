@@ -1,21 +1,15 @@
 <?php
 
-use Mongodm\ModelSet;
-use Mongodm\Test\Model\Book;
-use Mongodm\Test\Model\User;
-
-require_once __DIR__.'/../model.php' ;
-require_once __DIR__.'/../hydrator.php' ;
-require_once __DIR__.'/../mongodb.php' ;
-require_once __DIR__.'/../modelset.php' ;
-require_once __DIR__.'/model/user.php';
-require_once __DIR__.'/model/book.php';
-
+use Purekid\Mongodm\Test\Model\Book;
+use Purekid\Mongodm\Test\Model\User;
+use Purekid\Mongodm\ModelSet;
 
 class TestBase extends PHPUnit_Framework_TestCase {
 
+	
 	public function testCreate()
-	{
+	{ 
+		
 		$user = new User();
 		$user->name = "michael";
 		$user->save();
@@ -26,6 +20,7 @@ class TestBase extends PHPUnit_Framework_TestCase {
 	
 	public function testCreateWithData()
 	{
+		
 		$user = new User(array("name"=>"John"));
 		$user->save();
 		$this->assertEquals("John", $user->name);

@@ -1,21 +1,20 @@
 <?php 
+
+namespace Purekid\Mongodm;
+
 /**
  * Mongodm - A PHP Mongodb ORM
  *
  * @package  Mongodm
  * @version  1.0.0
  * @author   Michael Gan <gc1108960@gmail.com>
- * @link     http://blog.missyi.com
+ * @link     http://github.com/purekid
  */
-
-namespace Mongodm;
-require_once 'mongodb.php';
-
-class Model {
-
+abstract class Model 
+{
 	public static $config = 'default';
-	public $references = array();
 	public static $use_timestamps = false;
+	public $references = array();
 	public $vars = array();
 	public $dirtyData = array();
 	public $cleanData = array();
@@ -34,14 +33,16 @@ class Model {
 		$this->update($cleanData);
 	}
 	
-	public function update($cleanData){
+	public function update($cleanData)
+	{
 		foreach($cleanData as $key => $value){
 			$this->$key = $value;
 		}
 		return true;
 	}
 	
-	public function getId(){
+	public function getId()
+	{
 		if(isset($this->cleanData['_id'])){
 			return new \MongoId($this->cleanData['_id']);
 		}
@@ -73,7 +74,8 @@ class Model {
 		return $this->_connection->ensure_index($this->collectionName(), $keys);
 	}
 	
-	public function save($options = array()){
+	public function save($options = array())
+	{
 	
 		$this->__beforeSave();
 		
@@ -101,20 +103,23 @@ class Model {
 		
 	}
 	
-	static function count($params = array()){
+	static function count($params = array())
+	{
 	
 		$count = self::connection()->count(self::collectionName(),$params);
 		return $count;
 	
 	}
 	
-	public function toArray(){
+	public function toArray()
+	{
 		
 		return $this->cleanData;
 		
 	}
 	
-	static function id($id){
+	static function id($id)
+	{
 		
 		if($id){
 			$id = new \MongoId($id);
@@ -158,7 +163,8 @@ class Model {
 	
 	}
 	
-	static function all( $sort = array() , $fields = array()){
+	static function all( $sort = array() , $fields = array())
+	{
 	
 		return self::find(array(),$fields,$sort);
 	
@@ -188,13 +194,15 @@ class Model {
 		if ( ! $this->exists ) $this->vars['create_time'] = $this->vars['update_time'];
 	}
 	
-	private static function collectionName(){
+	private static function collectionName()
+	{
 		$class = get_called_class();
 		$collection = $class::$collection;
 		return $collection;
 	}
 	
-	private static function connection(){
+	private static function connection()
+	{
 		return MongoDB::instance(self::$config);
 	}
 	
@@ -202,7 +210,8 @@ class Model {
 	 * create mongodb reference data
 	 * @return array()
 	 */
-	public function makeRef(){
+	public function makeRef()
+	{
 	
 		$model = get_called_class();
 		$ref = \MongoDBRef::create($this->collectionName(), $this->getId(),$this->dbName());
@@ -237,7 +246,8 @@ class Model {
 	
 	}
 	
-	public function loadRef($key){
+	public function loadRef($key)
+	{
 		
 		$reference = $this->references[$key];
 		$value = $this->cleanData[$key];
@@ -321,7 +331,8 @@ class Model {
 		
 	}
 	
-	private function dbName(){
+	private function dbName()
+	{
 		$class = get_called_class();
 		if(isset($class::$config)){
 			$config = $class::$config;
@@ -331,15 +342,19 @@ class Model {
 		$configs = MongoDB::config($config);
 		if($configs){
 			$dbName = $configs['connection']['database'];
+		}else{
 		}
+		
 		return $dbName;
 	}
 	
-	protected function __beforeDelete(){
+	protected function __beforeDelete()
+	{
 		
 	}
 	
-	protected function __beforeSave(){
+	protected function __beforeSave()
+	{
 	
 	}
 

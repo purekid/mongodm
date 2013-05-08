@@ -1,0 +1,17 @@
+{
+    "name": "purekid/mongodm",
+    "description": "A PHP Mongodb ORM",
+    "keywords": ["mongodm","orm","mongodb"],
+    "license": "MIT Licence",
+    "authors": [
+        {
+            "name": "Michael.Gan",
+            "homepage": "http://github.com/purekid"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "Purekid\\Mongodm\\": "lib/"
+        }
+    }
+}

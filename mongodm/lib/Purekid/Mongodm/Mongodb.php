@@ -1,4 +1,7 @@
 <?php 
+
+namespace Purekid\Mongodm;
+
 /**
  * Mongodm - A PHP Mongodb ORM
  *
@@ -7,10 +10,8 @@
  * @author   Michael Gan <gc1108960@gmail.com>
  * @link     http://blog.missyi.com
  */
-
-namespace Mongodm;
-
-class MongoDB {
+class MongoDB 
+{
 
 	/**
 	 * Database instances
@@ -471,15 +472,17 @@ class MongoDB {
 	}
 	
 	static function config($config_block){
-		$path = __DIR__;
-		$config = $path . DIRECTORY_SEPARATOR . "config" .  DIRECTORY_SEPARATOR . "database.php";
-		if(file_exists($config)){
-			$config = (require $config);
+		$config_file = "database.php";
+		$path = __DIR__ . "/../../../config/" .$config_file;
+		if(file_exists($path)){
+			$config = (require $path); 
 			if(isset($config[$config_block])){
 				return $config[$config_block];
 			}
 			
 			return $config['default'];
+		}else{
+			
 		}
 		
 	}

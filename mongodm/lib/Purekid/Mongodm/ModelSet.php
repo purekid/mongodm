@@ -1,24 +1,25 @@
 <?php 
+
+namespace Purekid\Mongodm;
+
 /**
  * Mongodm - A PHP Mongodb ORM
  *
  * @package  Mongodm
  * @version  1.0.0
  * @author   Michael Gan <gc1108960@gmail.com>
- * @link     http://blog.missyi.com
+ * @link     http://github.com/purekid
  */
-
-namespace Mongodm;
-
-
-class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable {
+class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable 
+{
 	
 	private $_items = array();
 	private $_items_id = array();
 	
 	private $_count = 0;
 	
-	public function __construct($models){
+	public function __construct($models)
+	{
 		
 		if(empty($models)) return array();
 		
@@ -34,7 +35,8 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable {
 		
 	}
 	
-	public function get($index = 0 ){
+	public function get($index = 0 )
+	{
 		
 		if(is_int($index)){ 
 			if($index + 1 > $this->_count){
@@ -55,7 +57,8 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable {
 		return null;
 	}
 	
-	public function toArray(){
+	public function toArray()
+	{
 	
 		$array = array();
 		foreach($this->_items as $item){
@@ -65,7 +68,8 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable {
 	
 	}
 	
-	public function remove($index){
+	public function remove($index)
+	{
 		
 		$item = $this->get($index);
 		if($item){
@@ -79,7 +83,8 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable {
 		
 	}
 	
-	public function has( $model = null){
+	public function has( $model = null)
+	{
 		
 		if(is_object($model)){
 			$id = (string) $model->getId() ;
@@ -93,29 +98,33 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable {
 				
 	}
 	
-	static function make($models){
+	static function make($models)
+	{
 		
 		return new self($models);	
 		
 	}
 	
-	public function first(){
+	public function first()
+	{
 		return current($this->_items);
 	}
 	
-	public function last(){
+	public function last()
+	{
 		return array_pop($this->_items);
 	}
 	
-	public function add($item){
+	public function add($item)
+	{
 		
-		if($item && $item instanceof \Mongodm\Model){
+		if($item && $item instanceof \Purekid\Mongodm\Model){
 			$id = (string) $item->getId();
 			$this->_items[$id] = $item;
 			
 		}else if(is_array($item)){
 			foreach($item as $obj){
-				if($obj instanceof \Mongodm\Model){
+				if($obj instanceof \Purekid\Mongodm\Model){
 					$this->add($obj);
 				}
 			}
@@ -126,18 +135,21 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable {
 		
 	}
 	
-	public function count(){
+	public function count()
+	{
 		
 		$this->_count = count($this->_items);
 		return $this->_count;
 		
 	}
 	
-	public function getIterator() {
+	public function getIterator() 
+	{
 		return new \ArrayIterator($this->_items);
 	}
 	
-	public function makeRef(){
+	public function makeRef()
+	{
 	
 		$data = array();
 		foreach($this->_items as $item){
@@ -147,22 +159,26 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable {
 	
 	}
 	
-	public function offsetExists($key) {
+	public function offsetExists($key) 
+	{
 		if(is_integer($key) && $key + 1 <= $this->count()){
 			return true;
 		}
 		return $this->has($key);
 	}
 
-	public function offsetGet($key) {
+	public function offsetGet($key) 
+	{
 		return $this->get($key);
 	}
 	
-	public function offsetSet($offset, $value) {
+	public function offsetSet($offset, $value) 
+	{
 		throw new \Exception('cannot change the set by using []');
 	}
 
-	public function offsetUnset($index) {
+	public function offsetUnset($index) 
+	{
 		$this->remove($index);
 	}
 

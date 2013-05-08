@@ -1,4 +1,7 @@
 <?php
+
+namespace Purekid\Mongodm;
+
 /**
  * Mongodm - A PHP Mongodb ORM
  *
@@ -7,10 +10,8 @@
  * @author   Michael Gan <gc1108960@gmail.com>
  * @link     http://blog.missyi.com
  */
-
-namespace Mongodm;
-
-class Hydrator {
+class Hydrator 
+{
 
 	public static function hydrate($class, $results,$type = "set")
 	{
@@ -33,7 +34,8 @@ class Hydrator {
 		
 	}
 	
-	private static function pack($class,$result){
+	private static function pack($class,$result)
+	{
 		
 		$model = new $class;
 		$model->cleanData = (array) $result;
