@@ -2,7 +2,7 @@
     "name": "purekid/mongodm",
     "description": "a PHP MongoDb ORM",
     "keywords": ["mongodm", "orm", "mongodb"],
-    "license": "The MIT Licence",
+    "license": "MIT",
     "authors": [
         {
             "name": "Michael.Gan",
@@ -11,7 +11,7 @@
     ],
     "autoload": {
         "psr-0": {
-            "Purekid\\Mongodm\\": "lib/"
+            "Purekid\\Mongodm\\": "lib"
         }
     }
 }
