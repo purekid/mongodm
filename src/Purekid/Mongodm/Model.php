@@ -256,6 +256,20 @@ abstract class Model
 	}
 	
 	/**
+	 * retrieve a record by MongoRef
+	 * @param mixed $ref
+	 * @return Purekid\Mongodm\Model 
+	 */
+	public static function ref( $ref ){
+		if(isset($ref['$id'])){
+			if($ref['$ref'] == self::collectionName()){
+				return self::id($ref['$id']);
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 * Create a Mongodb reference 
 	 * @return MongoRef Object
 	 */
@@ -267,6 +281,7 @@ abstract class Model
 		return $ref;
 	
 	}
+	
 	
 	/****************************************************
 	 *	Magic Methods
@@ -306,7 +321,6 @@ abstract class Model
 		if( isset($reference['record']) ){
 			return $reference['record'];
 		}else{
-		
 			if(class_exists($model)){
 				if($type == "one"){
 					if(\MongoDBRef::isRef($value)){
