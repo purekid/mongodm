@@ -24,7 +24,7 @@ abstract class Model
 	private $_connection = null;
 	
 	
-	public function __construct($cleanData = array())
+	public function __construct($data = array())
 	{
 		if (is_null($this->_connection))
 		{
@@ -35,9 +35,14 @@ abstract class Model
 			}
 			$this->_connection = MongoDB::instance($config);
 		}
- 		$this->update($cleanData);
+ 		$this->update($data);
 	}
 	
+	/**
+	 * Update data by a array
+	 * @param array $cleanData
+	 * @return MongoId Object
+	 */
 	public function update($cleanData)
 	{
 		foreach($cleanData as $key => $value){
@@ -46,6 +51,11 @@ abstract class Model
 		return true;
 	}
 	
+	/**
+	 * get MongoId of this record
+	 *
+	 * @return MongoId Object
+	 */
 	public function getId()
 	{
 		if(isset($this->cleanData['_id'])){
@@ -54,7 +64,12 @@ abstract class Model
 		return null;
 	}
 
-
+	/**
+	 * Delete this record
+	 *
+	 * @param  array $options
+	 * @return boolean 
+	 */
 	public function delete($options = array())
 	{
 		$this->__beforeDelete();
@@ -116,6 +131,11 @@ abstract class Model
 	
 	}
 	
+	/**
+	 * Export datas to array
+	 *
+	 * @return array
+	 */
 	public function toArray()
 	{
 		
@@ -123,6 +143,11 @@ abstract class Model
 		
 	}
 	
+	/**
+	 * Find a record by MongoId
+	 * @param mixed $id 
+	 * @return Model
+	 */
 	static function id($id)
 	{
 		
@@ -136,11 +161,31 @@ abstract class Model
 	}
 	
 	/**
-	 * Find documents
+	 * Find a record
 	 *
-	 * @param  array $query
+	 * @param  array $params
 	 * @param  array $fields
-	 * @return MongoDB Object
+	 * @return Model
+	 */
+	static function one($params = array(),$fields = array())
+	{
+		$result =  self::connection()->find_one(static::$collection, $params , $fields);
+		if($result){
+			return  Hydrator::hydrate(get_called_class(), $result ,"one");
+		}
+	
+		return null;
+	}
+	
+	/**
+	 * Find records
+	 *
+	 * @param  array $params
+	 * @param  array $sort
+	 * @param  array $fields
+	 * @param  int $limit
+	 * @param  int $skip
+	 * @return ModelSet Object
 	 */
 	static function find($params = array(), $sort = array(), $fields = array() , $limit = null , $skip = null)
 	{
@@ -168,21 +213,18 @@ abstract class Model
 	
 	}
 	
+	/**
+	 * Find records
+	 *
+	 * @param  array $sort
+	 * @param  array $fields
+	 * @return ModelSet Object
+	 */
 	static function all( $sort = array() , $fields = array())
 	{
 	
 		return self::find(array(),$fields,$sort);
 	
-	}
-	
-	static function one($params = array(),$fields = array())
-	{
-		$result =  self::connection()->find_one(static::$collection, $params , $fields);
-		if($result){
-			return  Hydrator::hydrate(get_called_class(), $result ,"one");
-		}
-	
-		return null;
 	}
 	
 	/**
@@ -218,8 +260,8 @@ abstract class Model
 	}
 	
 	/**
-	 * create mongodb reference data
-	 * @return array()
+	 * Create a Mongodb reference 
+	 * @return MongoRef Object
 	 */
 	public function makeRef()
 	{

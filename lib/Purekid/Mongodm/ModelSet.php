@@ -2,6 +2,8 @@
 
 namespace Purekid\Mongodm;
 
+use Purekid\Mongodm\Model;
+
 /**
  * Mongodm - A PHP Mongodb ORM
  *
@@ -18,7 +20,12 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable
 	
 	private $_count = 0;
 	
-	public function __construct($models)
+	/**
+	 * Make a set from a arrry of Model
+	 *
+	 * @param  array $models
+	 */
+	public function __construct($models = array())
 	{
 		
 		if(empty($models)) return array();
@@ -26,15 +33,22 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable
 		$items = array();
 		
 		foreach($models as $model){
+			if(! ($model instanceof Model)) continue;
 			$id = (string) $model->getId(); 	
 			$items[$id] = $model;
 		}
-		$this->_items = $items;		
 		
+		$this->_items = $items;		
 		$this->_count = count($items);
 		
 	}
 	
+	/**
+	 * Get item by numeric index or MongoId 
+	 *
+	 * @param  array $models
+	 * @return Purekid\Mongodm\Model
+	 */
 	public function get($index = 0 )
 	{
 		
@@ -58,6 +72,11 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable
 		return null;
 	}
 	
+	/**
+	 * Export all items to a Array
+	 *
+	 * @return array 
+	 */
 	public function toArray()
 	{
 	
@@ -99,6 +118,12 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable
 				
 	}
 	
+	/**
+	 * Make a set from a arrry of Model
+	 *
+	 * @param  array $models
+	 * @return Purekid\Mongodm\ModelSet
+	 */
 	static function make($models)
 	{
 		
@@ -116,21 +141,27 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable
 		return array_pop($this->_items);
 	}
 	
-	public function add($item)
+	/**
+	 * Add a model item or model array or ModelSet to this set
+	 *
+	 * @param  mixed $items
+	 * @return $this
+	 */
+	public function add($items)
 	{
 		
-		if($item && $item instanceof \Purekid\Mongodm\Model){
-			$id = (string) $item->getId();
-			$this->_items[$id] = $item;
+		if($items && $items instanceof \Purekid\Mongodm\Model){
+			$id = (string) $items->getId();
+			$this->_itemss[$id] = $items;
 			
-		}else if(is_array($item)){
-			foreach($item as $obj){
+		}else if(is_array($items)){
+			foreach($items as $obj){
 				if($obj instanceof \Purekid\Mongodm\Model){
 					$this->add($obj);
 				}
 			}
-		}else if($item instanceof self){
-			$this->add($item->toArray());
+		}else if($items instanceof self){
+			$this->add($items->toArray());
 		}
 		return $this;
 		
@@ -149,6 +180,12 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable
 		return new \ArrayIterator($this->_items);
 	}
 	
+	/**
+	 * make a  MongoRefs array of items
+	 *
+	 * @param  mixed $items
+	 * @return $this
+	 */
 	public function makeRef()
 	{
 	
