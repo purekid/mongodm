@@ -241,7 +241,7 @@ abstract class Model
 		if ( ! $this->exists ) $this->vars['create_time'] = $this->vars['update_time'];
 	}
 	
-	private static function collectionName()
+	public static function collectionName()
 	{
 		$class = get_called_class();
 		$collection = $class::$collection;
@@ -251,11 +251,7 @@ abstract class Model
 	private static function connection()
 	{
 		$class = get_called_class();
-		if(isset($class::$config)){
-			$config = $class::$config;
-		}else{
-			$config = self::config;
-		}
+		$config = $class::$config;
 		return MongoDB::instance($config);
 	}
 	
@@ -386,12 +382,9 @@ abstract class Model
 	
 	private function dbName()
 	{
+		
 		$dbName = "unknown";
-		if(isset($this::$config)){
-			$config = $this::$config;
-		}else{
-			$config = self::$config;
-		}
+		$config = $this::$config;
 		$configs = MongoDB::config($config);
 		if($configs){
 			$dbName = $configs['connection']['database'];
