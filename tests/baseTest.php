@@ -130,10 +130,8 @@ class TestBase extends PHPUnit_Framework_TestCase {
 		$books_count = $books->count();
 		$books2 = Book::find(array('price'=>array('$gt'=>5)));
 		$books2_count = $books2->count();
-		
-		$books3 = $books->add($books2);
-		
-		$this->assertEquals($books3->count(), $books_count + $books2_count);		
+		$books->add($books2);
+		$this->assertEquals($books->count(), $books_count + $books2_count);		
 	
 	}
 	

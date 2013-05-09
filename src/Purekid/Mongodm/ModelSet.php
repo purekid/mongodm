@@ -152,7 +152,7 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable
 		
 		if($items && $items instanceof \Purekid\Mongodm\Model){
 			$id = (string) $items->getId();
-			$this->_itemss[$id] = $items;
+			$this->_items[$id] = $items;
 			
 		}else if(is_array($items)){
 			foreach($items as $obj){
@@ -169,10 +169,8 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable
 	
 	public function count()
 	{
-		
 		$this->_count = count($this->_items);
 		return $this->_count;
-		
 	}
 	
 	public function getIterator() 
