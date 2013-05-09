@@ -50,7 +50,7 @@ How to Use
 
 	<?php
 
-	class User extends \Mongodm\Model{
+	class User extends  \Purekid\Mongodm\Model{
 
 		static $collection = "user";
 		
