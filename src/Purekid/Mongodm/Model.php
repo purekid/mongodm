@@ -293,13 +293,17 @@ abstract class Model
 	 */
 	public function __get($key)
 	{
-		if (array_key_exists($key, $this->cleanData))
+		if(isset($this->references[$key])){
+			
+			$value = $this->loadRef($key);
+			return $value;
+			
+		}
+		else if (array_key_exists($key, $this->cleanData))
 		{
-			if(isset($this->references[$key])){
-				$value = $this->loadRef($key);
-			}else{
-				$value = $this->cleanData[$key];
-			}
+			
+			$value = $this->cleanData[$key];
+			
 			
 			return $value;
 		}
@@ -314,10 +318,14 @@ abstract class Model
 	{
 		
 		$reference = $this->references[$key];
-		$value = $this->cleanData[$key];
+		if(isset($this->cleanData[$key])){
+			$value = $this->cleanData[$key];
+		}else{
+			$value = null;
+		}
+		
 		$model = $reference['model'];
 		$type = $reference['type'];
-		
 		if( isset($reference['record']) ){
 			return $reference['record'];
 		}else{
@@ -331,10 +339,12 @@ abstract class Model
 					return null;
 				}else if($type == "many"){
 					$res = array();
-					foreach($value as $item){
-						$record = $model::id($item['$id']);
-						if($record){
-							$res[] = $record;
+					if(!empty($value)){
+						foreach($value as $item){
+							$record = $model::id($item['$id']);
+							if($record){
+								$res[] = $record;
+							}
 						}
 					}
 					$set =  ModelSet::make($res);

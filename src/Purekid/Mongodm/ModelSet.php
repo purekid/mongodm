@@ -28,8 +28,6 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable
 	public function __construct($models = array())
 	{
 		
-		if(empty($models)) return array();
-		
 		$items = array();
 		
 		foreach($models as $model){
@@ -149,11 +147,9 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable
 	 */
 	public function add($items)
 	{
-		
 		if($items && $items instanceof \Purekid\Mongodm\Model){
 			$id = (string) $items->getId();
 			$this->_items[$id] = $items;
-			
 		}else if(is_array($items)){
 			foreach($items as $obj){
 				if($obj instanceof \Purekid\Mongodm\Model){
