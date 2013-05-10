@@ -72,15 +72,20 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable
 	
 	/**
 	 * Export all items to a Array
-	 *
+	 * @param boolean $is_numeric_index
 	 * @return array 
 	 */
-	public function toArray()
+	public function toArray( $is_numeric_index = true)
 	{
 	
 		$array = array();
 		foreach($this->_items as $item){
-			$array[] = $item;
+			if(!$is_numeric_index){
+				$id = (string) $item->getId();
+				$array[$id] = $item;
+			}else{
+				$array[] = $item;
+			}
 		}
 		return $array;
 	
