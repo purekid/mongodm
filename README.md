@@ -21,7 +21,7 @@ Features
 How to Use
 ----------
 
-### setup database in   config/database.php
+### Setup database in   config/database.php
 
 		return array(
 			'default' => array(
