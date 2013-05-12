@@ -71,6 +71,11 @@ How to Use
 ### Create instance with data
 	$user = new User( array('name'=>"John") );
 	$user->save();
+	
+### update data by array
+	$user->update( array('age'=>18,'hobbies'=>array('music','game') ) ); 
+	$user->save();
+	
 ### Load one record
 	$user = User::one( array('name'=>"michael" ) );
 	//[load one record by MongoId]
