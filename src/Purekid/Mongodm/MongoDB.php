@@ -142,16 +142,14 @@ class MongoDB
 		}
 
 		/* Create connection object, attempt to connect */
-		$options['connect'] = FALSE;
-
+		$options['connect'] = false;
 		$this->_connection = new \Mongo($config['hostnames'], $options);
-
 		/* Try connect */
 		try
 		{
 			$this->_connection->connect();
 		}
-		catch (MongoConnectionException $e)
+		catch (\MongoConnectionException $e)
 		{
 			throw new \Exception('Unable to connect to MongoDB server at ' . $config['hostnames']);
 		}
@@ -160,10 +158,10 @@ class MongoDB
 		{
 			throw new \Exception('No database specified in MangoDB Config');
 		}
-
 		$this->_db = $this->_connection->selectDB($config['database']);
-
-		return $this->_connected = TRUE;
+		
+		$this->_connected = $this->_connection->connected;
+		return true;
 	}
 
 	public function getRef(array $ref){
@@ -335,8 +333,12 @@ class MongoDB
 
 	public function gridFS( $arg1 = NULL, $arg2 = NULL)
 	{
-		$this->_connected OR $this->connect();
-
+		try{
+			$this->_connected OR $this->connect();
+		}catch(\Exception $e){
+			die($e->getMessage());
+		}
+		
 		if ( ! isset($arg1))
 		{
 			$arg1 = isset($this->_config['gridFS']['arg1'])
@@ -396,8 +398,12 @@ class MongoDB
 	/* Run Command */
 	protected function _call($command, array $arguments = array(), array $values = NULL)
 	{
-		$this->_connected OR $this->connect();
-
+		try{
+			$this->_connected OR $this->connect();
+		}catch(\Exception $e){
+			die($e->getMessage());
+		}
+		
 		extract($arguments);
 
 		if (isset($collection_name))
