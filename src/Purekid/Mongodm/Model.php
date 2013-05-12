@@ -12,17 +12,16 @@ namespace Purekid\Mongodm;
  */
 abstract class Model 
 {
-	public static $config = 'default';
-	public static $use_timestamps = false;
-	public $references = array();
-	public $vars = array();
-	public $dirtyData = array();
 	public $cleanData = array();
-	public $ignoreData = array();
 	public $exists = false;
 	
+	protected static $config = 'default';
+	protected static $use_timestamps = false;
+	protected static $attrs = array();
+	protected $dirtyData = array();
+	protected $ignoreData = array();
 	private $_connection = null;
-	
+	private $_cache = array();
 	
 	public function __construct($data = array())
 	{
@@ -35,7 +34,9 @@ abstract class Model
 			}
 			$this->_connection = MongoDB::instance($config);
 		}
- 		$this->update($data);
+		
+ 		$this->update($data,true);
+ 		$this->initAttrs();
 	}
 	
 	/**
@@ -43,10 +44,14 @@ abstract class Model
 	 * @param array $cleanData
 	 * @return MongoId Object
 	 */
-	public function update($cleanData)
+	public function update($cleanData,$isInit = false)
 	{
 		foreach($cleanData as $key => $value){
-			$this->$key = $value;
+			if($isInit){
+				$this->cleanData[$key] = $value;
+			}else{
+				$this->$key = $value;
+			}
 		}
 		return true;
 	}
@@ -112,7 +117,6 @@ abstract class Model
 		else
 		{
 			$insert = $this->_connection->insert($this->collectionName(), $this->cleanData, $options);
-	
 			$success = !is_null($this->cleanData['$id'] = $insert['_id']);
 		}
 	
@@ -143,6 +147,18 @@ abstract class Model
 		
 	}
 	
+	/**
+	 * determine exist in the database
+	 */
+	public function exist(){
+		return $this->exists;
+	}
+	
+	/**
+	 * 
+	 *
+	 * @return array
+	 */
 	/**
 	 * Find a record by MongoId
 	 * @param mixed $id 
@@ -227,19 +243,6 @@ abstract class Model
 	
 	}
 	
-	/**
-	 * Set the creation and update timestamps on the model.
-	 *
-	 * Uses the time() method
-	 *
-	 * @return void
-	 */
-	private function timestamp()
-	{
-		$this->vars['update_time'] = time();
-	
-		if ( ! $this->exists ) $this->vars['create_time'] = $this->vars['update_time'];
-	}
 	
 	public static function collectionName()
 	{
@@ -248,12 +251,7 @@ abstract class Model
 		return $collection;
 	}
 	
-	private static function connection()
-	{
-		$class = get_called_class();
-		$config = $class::$config;
-		return MongoDB::instance($config);
-	}
+	
 	
 	/**
 	 * retrieve a record by MongoRef
@@ -282,87 +280,123 @@ abstract class Model
 	
 	}
 	
+
 	
-	/****************************************************
-	 *	Magic Methods
-	****************************************************/
-	
-	/**
-	 * @param  $key
-	 * @return mixed
-	 */
-	public function __get($key)
-	{
-		if(isset($this->references[$key])){
-			
-			$value = $this->loadRef($key);
-			return $value;
-			
-		}
-		else if (array_key_exists($key, $this->cleanData))
-		{
-			
-			$value = $this->cleanData[$key];
-			
-			
-			return $value;
-		}
-		elseif (array_key_exists($key, $this->ignoreData))
-		{
-			return $this->ignoreData[$key];
+	protected function initAttrs(){
+		$attrs = self::getAttrs();
+		foreach($attrs as $key => $attr){
+			if(! isset($attr['default'])) continue;
+			if( !isset($this->cleanData[$key])){
+				$this->$key = $attr['default'];
+			}
 		}
 	
 	}
 	
-	public function loadRef($key)
-	{
-		
-		$reference = $this->references[$key];
-		if(isset($this->cleanData[$key])){
-			$value = $this->cleanData[$key];
+	protected static function getAttrs(){
+	
+		$baseClass =  __CLASS__;
+		$class = get_called_class();
+		$parent = get_parent_class($class);
+		if($parent){
+			$attrs_parent = $parent::getAttrs();
+			$attrs = array_merge($attrs_parent,$class::$attrs);
 		}else{
-			$value = null;
+			$attrs = $class::$attrs;
 		}
-		
-		$model = $reference['model'];
-		$type = $reference['type'];
-		if( isset($reference['record']) ){
-			return $reference['record'];
-		}else{
-			if(class_exists($model)){
-				if($type == "one"){
-					if(\MongoDBRef::isRef($value)){
-						$object = $model::id($value['$id']);
-						$this->references[$key]['record'] = $object;
-						return $object;
-					}
-					return null;
-				}else if($type == "many"){
-					$res = array();
-					if(!empty($value)){
-						foreach($value as $item){
-							$record = $model::id($item['$id']);
-							if($record){
-								$res[] = $record;
-							}
+		return $attrs;
+			
+	}
+	
+	/**
+	 * Set the creation and update timestamps on the model.
+	 *
+	 * Uses the time() method
+	 *
+	 * @return void
+	 */
+	private function timestamp()
+	{
+		$this->_cache['update_time'] = time();
+	
+		if ( ! $this->exists ) $this->_cache['create_time'] = $this->_cache['update_time'];
+	}
+	
+	private static function connection()
+	{
+		$class = get_called_class();
+		$config = $class::$config;
+		return MongoDB::instance($config);
+	}
+	
+	/**
+	 * get current database name
+	 * @return string
+	 */
+	private function dbName()
+	{
+	
+		$dbName = "unknown";
+		$config = $this::$config;
+		$configs = MongoDB::config($config);
+		if($configs){
+			$dbName = $configs['connection']['database'];
+		}
+	
+		return $dbName;
+	}
+	
+	private function parseValue($key,$value){
+		$attrs = $this->getAttrs();
+	
+		if( isset($attrs[$key]) && isset($attrs[$key]['type'])){
+			$type = $attrs[$key]['type'];
+			$type_defined = array('integer','double','timestamp','boolean','array','object');
+			if(in_array($type, $type_defined)){
+				switch($type){
+					case "integer":
+						$value = intval($value);
+					break;
+					case "double":
+						$value = floatval($value);
+						break;
+					case "timestamp":
+						if(! ($value instanceof \MongoTimestamp)){
+							$value = new \MongoTimestamp($value);
 						}
-					}
-					$set =  ModelSet::make($res);
-					$this->references[$key]['record'] = $set;
-					return $set;
+						break;
+					case "boolean":
+						$value = (boolean) $value;
+						break;
+					case "object":
+						if(!empty($value) && !is_object($value)){
+							throw new \Exception("[$key] is not a object");
+						}
+						$value = (object) $value;
+						break;
+					case "array":
+						if(!empty($value) && !is_array($value)){
+							throw new \Exception("[$key] is not a array");
+						}
+						$value = (array) $value;
+						break;
 				}
 			}
 		}
-		
+		return $value;
+	
 	}
 	
-	public function setRef($key,$value)
+	private function setRef($key,$value)
 	{
-		$reference = $this->references[$key];
+		$attrs = $this->getAttrs();
+		$cache = &$this->_cache;
+		$reference = $attrs[$key];
 		$model = $reference['model'];
 		$type = $reference['type'];
-		
-		if($type == "one"){
+		// 		$return = null;
+	
+		if($type == "reference"){
 			$model = $reference['model'];
 			$type = $reference['type'];
 			if($value instanceof $model){
@@ -371,8 +405,8 @@ abstract class Model
 			}else{
 				throw new \Exception ("{$key} is not instance of '$model'");
 			}
-			$this->references[$key]['record'] = $value;
-		}else if($type == "many"){
+				
+		}else if($type == "references"){
 			$arr = array();
 			if(is_array($value)){
 				foreach($value as $item){
@@ -385,9 +419,89 @@ abstract class Model
 			}else{
 				throw new \Exception ("{$key} is not instance of '$model'");
 			}
-			$this->references[$key]['record'] = $value;
 		}
+	
+		$cache[$key] = $value;
 		return $return;
+	}
+	
+	private function loadRef($key)
+	{
+		$attrs = $this->getAttrs();
+		$reference = $attrs[$key];
+		$cache = &$this->_cache;
+		if(isset($this->cleanData[$key])){
+			$value = $this->cleanData[$key];
+		}else{
+			$value = null;
+		}
+	
+		$model = $reference['model'];
+		$type = $reference['type'];
+		if( isset($cache[$key]) ){
+			return $cache[$key];
+		}else{
+			if(class_exists($model)){
+				if($type == "reference"){
+					if(\MongoDBRef::isRef($value)){
+						$object = $model::id($value['$id']);
+						$cache[$key] = $object;
+						return $object;
+					}
+					return null;
+				}else if($type == "references"){
+					$res = array();
+					if(!empty($value)){
+						foreach($value as $item){
+							$record = $model::id($item['$id']);
+							if($record){
+								$res[] = $record;
+							}
+						}
+					}
+					$set =  ModelSet::make($res);
+					$cache[$key] = $set;
+					return $set;
+				}
+			}
+		}
+	}
+	
+	/* Hooks */
+	protected function __beforeDelete()
+	{
+	
+	}
+	
+	protected function __beforeSave()
+	{
+	
+	}
+	
+	/* Magic methods*/
+	
+	/**
+	 * @param  $key
+	 * @return mixed
+	 */
+	public function __get($key)
+	{
+		$attrs = $this->getAttrs();
+	    if( isset($attrs[$key]) && isset($attrs[$key]['type']) 
+	    	&& ( $attrs[$key]['type'] == 'reference' or $attrs[$key]['type'] == 'references' )){
+			$value = $this->loadRef($key);
+			return $value;
+		}
+		else if (array_key_exists($key, $this->cleanData))
+		{
+			$value = $this->parseValue($key,$this->cleanData[$key]);
+			return $value;
+		}
+		elseif (array_key_exists($key, $this->ignoreData))
+		{
+			return $this->ignoreData[$key];
+		}
+	
 	}
 	
 	/**
@@ -395,36 +509,17 @@ abstract class Model
 	 */
 	public function __set($key, $value)
 	{
-		if(isset($this->references[$key])){
+		$attrs = $this->getAttrs();
+		if(isset($attrs[$key]) && isset($attrs[$key]['type']) 
+	    	&& ( $attrs[$key]['type'] == 'reference' or $attrs[$key]['type'] == 'references' )){
 			$value = $this->setRef($key,$value);
-		}
-				
+		} 
+		
+		$this->parseValue($key,$value);
+		
 		$this->cleanData[$key] = $value;
 		$this->dirtyData[$key] = $value;
 		
-	}
-	
-	private function dbName()
-	{
-		
-		$dbName = "unknown";
-		$config = $this::$config;
-		$configs = MongoDB::config($config);
-		if($configs){
-			$dbName = $configs['connection']['database'];
-		}
-		
-		return $dbName;
-	}
-	
-	protected function __beforeDelete()
-	{
-		
-	}
-	
-	protected function __beforeSave()
-	{
-	
 	}
 
 }

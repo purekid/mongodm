@@ -17,6 +17,36 @@ class TestBase extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf("\MongoId", $user->getId());
 		
 	}
+	
+	public function testDefaultAttr(){
+		
+		$user = new User();
+		$user->name = "michael";
+		$this->assertEquals((int)16, $user->age);
+		$this->assertEquals((float) 20.0, $user->money);
+		$user->save();
+		$id = $user->getId();
+		
+		$user = User::id($id);
+		
+		$this->assertEquals((int) 16, $user->age);
+		$this->assertEquals((float) 20.0, $user->money);
+		
+	}
+	
+	public function testAttrType(){
+		
+		$user = new User();
+		$user->name = "michael";
+		$family = (object) array('mum'=>"Lisa",'Dad'=>'Bob');
+		$user->family = $family;
+		$user->save();
+		$this->assertObjectHasAttribute("mum", $user->family);
+		$this->assertEquals("Lisa", $user->family->mum);
+		
+	}
+	
+	
 	public function testCreateWithData()
 	{
 		
@@ -32,7 +62,6 @@ class TestBase extends PHPUnit_Framework_TestCase {
 		$user = User::one();
 		$id = $user->getId();
 		$this->assertInstanceOf("\MongoId", $user->getId());
-	
 		$book1 = new Book();
 		$book1->name = "book1";
 		$book1->save();
@@ -42,11 +71,10 @@ class TestBase extends PHPUnit_Framework_TestCase {
 		$book2->save();
 		$this->assertInstanceOf("\MongoId", $book1->getId());
 		$this->assertInstanceOf("\MongoId", $book2->getId());
-	
-		$user->books = ModelSet::make(array($book1,$book2));
+		
+		$user->name = "abcd";
+		$user->books = array($book1,$book2);
 		$user->save();
-		
-		
 		$user = User::id($id);
 		$books = $user->books;
 		$book = $books->get($book1->getId());
@@ -86,14 +114,14 @@ class TestBase extends PHPUnit_Framework_TestCase {
 		$name = $user->name;
 		$newName = $name."_new";
 		
-		$user->array = array(1);
+		$user->test_data = array(1);
 		
 		$user->name = $newName;
 		$user->save();
 		
 		$user = User::id($id);
 		$this->assertEquals($newName, $user->name);
-		$this->assertEquals(array(1), $user->array);
+		$this->assertEquals(array(1), $user->test_data);
 		
 	}
 	

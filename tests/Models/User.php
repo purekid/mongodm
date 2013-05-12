@@ -8,10 +8,14 @@ class User extends \Purekid\Mongodm\Model
 	static $collection = "user";
  	public static $config = 'test';
 	
-	public $references = array(
+	protected static $attrs = array(
 			
-		'book_fav' => array('model'=>'Purekid\Mongodm\Test\Model\Book','type'=>'one'),
-		'books' => array('model'=>'Purekid\Mongodm\Test\Model\Book','type'=>'many'),
+		'book_fav' => array('model'=>'Purekid\Mongodm\Test\Model\Book','type'=>'reference'),
+		'books' => array('model'=>'Purekid\Mongodm\Test\Model\Book','type'=>'references'),
+		'age' => array('default'=>16,'type'=>'integer'),
+		'money' => array('default'=>20.0,'type'=>'double'),
+		'hobbies' => array('default'=>array('love'),'type'=>'array'),
+		'family'=>array('type'=>'object')
 			
 	);
 

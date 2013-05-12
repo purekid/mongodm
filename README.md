@@ -35,15 +35,35 @@ How to Use
 		);
 
 ### Define a model
-	use Purekid\Mongodm\Model;
+    use Purekid\Mongodm\Model;
         
-	class User extends Model {
-		static $collection = "user";
-		public $references = array(			
-			'book_fav' => array('model'=>'Mongodm\Test\Model\Book','type'=>'one'),
-			'books' => array('model'=>'Mongodm\Test\Model\Book','type'=>'many'),			
-		);
-	}
+    class User extends Model 
+    {
+    
+        static $collection = "user";
+        public static $config = 'test';
+        
+        protected static $attrs = array(
+                
+             // 1 to 1 reference
+            'book_fav' => array('model'=>'Purekid\Mongodm\Test\Model\Book','type'=>'reference'),
+             // 1 to many references
+            'books' => array('model'=>'Purekid\Mongodm\Test\Model\Book','type'=>'references'),
+            // you can define default value for attribute
+            'age' => array('default'=>16,'type'=>'integer'),
+            'money' => array('default'=>20.0,'type'=>'double'),
+            'hobbies' => array('default'=>array('love'),'type'=>'array'),
+            'born_time => array('type'=>'timestamp'),
+            'family'=>array('type'=>'object')
+                
+        );
+    
+    }
+    
+### Type supported for attribute
+
+    'reference','references','integer','double','timestamp','boolean','array','object'
+    
 ### Create model instance
 	$user = new User();
 	$user->name = "Michael";

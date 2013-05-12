@@ -37,8 +37,7 @@ class Hydrator
 	private static function pack($class,$result)
 	{
 		
-		$model = new $class;
-		$model->cleanData = (array) $result;
+		$model = new $class((array) $result);
 		$model->exists = true;
 		if (isset($model->cleanData['$id']))
 		{

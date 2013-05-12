@@ -17,7 +17,6 @@ class ModelSet  implements \IteratorAggregate,\ArrayAccess, \Countable
 	
 	private $_items = array();
 	private $_items_id = array();
-	
 	private $_count = 0;
 	
 	/**
