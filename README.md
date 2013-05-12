@@ -35,7 +35,7 @@ How to Use
 		);
 
 ### Define a model
-        use Purekid\Mongodm\Model;
+	use Purekid\Mongodm\Model;
         
 	class User extends Model {
 		static $collection = "user";
