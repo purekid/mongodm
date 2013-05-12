@@ -18,10 +18,23 @@ Features
 - Support for references (lazy loaded)
 - Support for inheritance
 
+Installation
+--------
+(1) setup in composer.json: 
+ 
+{
+    "require": {
+        "purekid/mongodm": "dev-master",
+    }
+}
+
+(2) php composer.phar install
+
+
 How to Use
 ----------
 
-### setup database in   config/database.php
+### Setup database in   config/database.php
 
 		return array(
 			'default' => array(
@@ -43,6 +56,7 @@ How to Use
         static $collection = "user";
         public static $config = 'test';
         
+        /* specific definition for attributes, not necessary. */
         protected static $attrs = array(
                 
              // 1 to 1 reference
@@ -71,6 +85,11 @@ How to Use
 ### Create instance with data
 	$user = new User( array('name'=>"John") );
 	$user->save();
+	
+### Update data by array
+	$user->update( array('age'=>18,'hobbies'=>array('music','game') ) ); 
+	$user->save();
+	
 ### Load one record
 	$user = User::one( array('name'=>"michael" ) );
 	//[load one record by MongoId]
