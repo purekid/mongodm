@@ -20,7 +20,7 @@ Features
 
 Installation
 --------
-config in composer.json: 
+1.  setup in composer.json: 
  
 {
     "require": {
@@ -29,7 +29,7 @@ config in composer.json:
 }
 
 
-php composer.phar install
+2.  php composer.phar install
 
 
 How to Use
