@@ -18,6 +18,20 @@ Features
 - Support for references (lazy loaded)
 - Support for inheritance
 
+Installation
+--------
+config in composer.json: 
+ 
+{
+    "require": {
+        "purekid/mongodm": "dev-master",
+    }
+}
+
+
+php composer.phar install
+
+
 How to Use
 ----------
 
