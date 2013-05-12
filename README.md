@@ -2,7 +2,7 @@ Mongodm
 ======= 
 [![Build Status](https://secure.travis-ci.org/purekid/mongodm.png?branch=master)](http://travis-ci.org/purekid/mongodm)
 
-a PHP MongoDb ORM
+a PHP MongoDb ORM ,  simple and flexible
 
 Requirements
 ------------
