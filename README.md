@@ -35,7 +35,9 @@ How to Use
 		);
 
 ### Define a model
-	class User extends \Purekid\Mongodm\Model{
+        use Purekid\Mongodm\Model;
+        
+	class User extends Model {
 		static $collection = "user";
 		public $references = array(			
 			'book_fav' => array('model'=>'Mongodm\Test\Model\Book','type'=>'one'),
