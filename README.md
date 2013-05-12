@@ -43,6 +43,7 @@ How to Use
         static $collection = "user";
         public static $config = 'test';
         
+        /* specific definition for attributes, not necessary. */
         protected static $attrs = array(
                 
              // 1 to 1 reference
