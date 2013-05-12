@@ -72,7 +72,7 @@ How to Use
 	$user = new User( array('name'=>"John") );
 	$user->save();
 	
-### update data by array
+### Update data by array
 	$user->update( array('age'=>18,'hobbies'=>array('music','game') ) ); 
 	$user->save();
 	
