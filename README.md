@@ -18,75 +18,51 @@ Features
 - Support for references (lazy loaded)
 - Support for inheritance
 
-
 How to Use
 ----------
 
-### Config database in   config/database.php
-	<?php
+### setupdatabase in   config/database.php
+
 		return array(
-	
-		   /* Configuration name */
-				
 			'default' => array(
 				'connection' => array(
-					/** hostnames, separate multiple hosts by commas **/
 					'hostnames' => 'localhost',
-						
-					/** database to connect to **/
-					'database'  => 'dbname',
-						
-					/** authentication **/
-						
+					'database'  => 'dbname',	
 		// 			'username'  => '',
-				
-		// 			'password'  => '',
-		
+		// 			'password'  => '',	
 				)
 			)
 		);
 
 ### Define a model
-
-	<?php
-
-	class User extends  \Purekid\Mongodm\Model{
-
+	class User extends \Purekid\Mongodm\Model{
 		static $collection = "user";
-		
 		public $references = array(			
 			'book_fav' => array('model'=>'Mongodm\Test\Model\Book','type'=>'one'),
 			'books' => array('model'=>'Mongodm\Test\Model\Book','type'=>'many'),			
 		);
-
 	}
-
-
 ### Create model instance
-
-
 	$user = new User();
 	$user->name = "Michael";
 	$user->save();
-
 ### Create instance with data
-	
-	$user_other = new User( array('name'=>"John") );
-	$user_other->save();
-
+	$user = new User( array('name'=>"John") );
+	$user->save();
 ### Load one record
-
 	$user = User::one( array('name'=>"michael" ) );
-
 	//[load one record by MongoId]
 	$id = "517c850641da6da0ab000004";
-	$id = new \MongoId('517c850641da6da0ab000004'); // hah,both ok!
+
+	$id = new \MongoId('517c850641da6da0ab000004'); //another way
 	$user = User::id( $id );
-
+### Load some records
+       // retrieve records that name is 'Michael' and acount  of owned  books equals 2
+       $params = array( 'name'=>'Michael','books'=>array('$size'=>2) );
+       $users = User::find($params);     // $users is instance of ModelSet
+       echo $users->count();
 ### Load all records
-
 	$users = User::all();
-
 ### Lazyload a 1:1 relationship record
 
 	$book = new Book();
@@ -101,7 +77,6 @@ How to Use
 	// now you can do this
 	$user = User::one( array('name'=>"michael" ) );
 	echo $user->book_fav->name;
-
 
 ### Lazyload 1:x relationship records
 
@@ -122,32 +97,57 @@ How to Use
 
 	//somewhere , load these books
 	$user = User::id($id);
-	$books = $user->books; 
+	$books = $user->books;      // $books is a instance of ModelSet
 
-### let's continue,now is magic ModelSet.... 
-	
-	$user = User::id($id);
-	$books = $user->books; //now books is a instance of Mongodm\ModelSet
-	echo $books->count();     // of course it return "2"
-	
-	$book1 = $books->get(0);  // get a item by index from modelset
-	$book1_id = $book1->getId();
-	//or 
-	$book1 = $books->get($book1_id);  // get a item by mongoid from modelset
-	
-	echo $books1->name;       
-	
-	//check item exists in a modelset
-	$books->has($book1_id); 
-	
+###  ModelSet , a set of models
 
+	// $users is instance of ModelSet
+	$users = User::find(  array( 'name'=>'Michael','books'=>array('$size'=>2) ) );    
+	$users_other = User::find(  array( 'name'=>'John','books'=>array('$size'=>2) ) );    
+	
+	$users->count(); // Count
+	
+	foreach($users as $user) { } // Iteration
+	
+	$users->has(0) // determine a record exists in the set by numeric index
+	
+	$users->has('518c6a242d12d3db0c000007') // determine a record exists in the set by MongoID
+	
+	$users->get(0) // get a record by numeric index
+	
+	$users->get('518c6a242d12d3db0c000007') // get a record by MongoID 
+	
+	$users->remove(0) // remove a record by numeric index
+	
+	$users->remove('518c6a242d12d3db0c000007') // remove a record  by MongoID 
+	
+	/* add a record */
+	$bob = new User( array("name"=>"Bob"));
+	$bob->save();
+	$users->add($bob);
+	
+	/* add records */
+	
+	$bob = new User( array("name"=>"Bob"));
+	$bob->save();
+	$lisa = new User( array("name"=>"Lisa"));
+	$lisa->save();
+	
+	$users->add(array($bob,$lisa)); // add some records
+	
+	/*  merge two set */
+	
+	$users->add($users_other);  // the set $users_other appends to end of $users 
+	
+	/*  export data to a array */
+	$users->toArray();
+	
 	
 Special thanks to
 -----------------
 
 [mikelbring](https://github.com/mikelbring)
 [Paul Hrimiuc](https://github.com/hpaul/)
-
 
 
 	
