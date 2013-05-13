@@ -44,7 +44,15 @@ How to Use
 		// 			'username'  => '',
 		// 			'password'  => '',	
 				)
-			)
+			),
+			'test' => array(
+                'connection' => array(
+                    'hostnames' => 'localhost',
+                    'database'  => 'test',    
+        //          'username'  => '',
+        //          'password'  => '',  
+                )
+            )
 		);
 
 ### Define a model
@@ -54,6 +62,7 @@ How to Use
     {
     
         static $collection = "user";
+        /* use the specific database config */
         public static $config = 'test';
         
         /* specific definition for attributes, not necessary. */

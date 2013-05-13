@@ -50,9 +50,17 @@ class TestBase extends PHPUnit_Framework_TestCase {
 	public function testCreateWithData()
 	{
 		
-		$user = new User(array("name"=>"John"));
+		$book = new Book(array("name"=>"Love"));
+		$book->save();
+		
+		$user = new User(array("age"=>40,"name"=>"John","book_fav"=>$book));
 		$user->save();
+		
+		$id = $user->getId();
+		
+		$user = User::id($id);
 		$this->assertEquals("John", $user->name);
+		$this->assertEquals("Love", $user->book_fav->name);
 		$this->assertInstanceOf("\MongoId", $user->getId());
 	
 	}
@@ -72,7 +80,6 @@ class TestBase extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf("\MongoId", $book1->getId());
 		$this->assertInstanceOf("\MongoId", $book2->getId());
 		
-		$user->name = "abcd";
 		$user->books = array($book1,$book2);
 		$user->save();
 		$user = User::id($id);
