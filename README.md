@@ -16,7 +16,7 @@ Features
 - ORM
 - Simple and flexible
 - Support for references (lazy loaded)
-- Support for inheritance
+- Support for multilevel inheritance
 
 Installation
 --------
@@ -38,18 +38,19 @@ How to Use
 
 ### Setup database in   config/database.php
 
-		return array(
-			'default' => array(
-				'connection' => array(
-					'hostnames' => 'localhost',
-					'database'  => 'dbname',	
-		// 			'username'  => '',
-		// 			'password'  => '',	
-				)
+	return array(
+		'default' => array(
+			'connection' => array(
+				'hostnames' => 'localhost',
+				'database'  => 'dbname',	
+	// 			'username'  => '',
+	// 			'password'  => '',	
 			)
-		);
+		)
+	);
 
 ### Define a model and enjoy it
+
     use Purekid\Mongodm\Model;
         
     class User extends Model 
@@ -80,12 +81,13 @@ Types Supported for model attr
 ----------   
 
 	$types = [
-	    'reference', // a reference to another model
+	  	'string',     // default type 
+	    'reference',  // a reference to another model
 	    'references', // references to another model
 	    'integer',  
-	    'double',   // float 
-	    'timestamp', // store as MongoTimestamp in Mongodb
-	    'boolean',   // true or false
+	    'double',     // float 
+	    'timestamp',  // store as MongoTimestamp in Mongodb
+	    'boolean',    // true or false
 	    'array',    
 	    'object'
 	]
@@ -179,6 +181,7 @@ $users is instance of ModelSet
 Count 
 
 	$users->count();  
+	
 Iteration	
 
 	foreach($users as $user) { }  
@@ -230,6 +233,74 @@ Export data to a array
 
 	$users->toArray();
 	
+Inheritance
+----------
+### Wonderful multilevel inheritance.
+	
+Define models:
+
+	use Purekid\Mongodm\Model;
+	namespace Demo;
+	
+	class Human extends Model{
+	
+		static $collection = "human";
+		
+		protected static $attrs = array(
+			'name' => array('default'=>'anonym','type'=>'string'),
+			'age' => array('type'=>'integer'),
+			'gender' => array('type'=>'string'),
+			'dad' =>  array('type'=>'reference','model'=>'Demo\Human'),
+			'mum' =>  array('type'=>'reference','model'=>'Demo\Human'),
+			'friends' => array('type'=>'references','model'=>'Demo\Human'),
+		)
+	
+	}
+
+	class Student extends Human{
+	
+		static $collection = "human";
+		
+		protected static $attrs = array(
+			'grade' => array('type'=>'string'),
+			'classmates' => array('type'=>'references','model'=>'Demo\Student'),
+		)
+		
+	}
+	
+To use:
+
+	$bob = new Student( array('name'=>'Bob','age'=> 17 ,'gender'=>'male' ) );
+	$bob->save();
+	
+	$john = new Student( array('name'=>'John','age'=> 16 ,'gender'=>'male' ) );
+	$john->save();
+	
+	$lily = new Student( array('name'=>'Lily','age'=> 16 ,'gender'=>'female' ) );
+	$lily->save();
+	
+	$lisa = new Human( array('name'=>'Lisa','age'=>41 ,'gender'=>'female' ) );
+	$lisa->save();
+	
+	$david = new Human( array('name'=>'David','age'=>42 ,'gender'=>'male') );
+	$david->save();
+	
+	$bob->dad = $david;
+	$bob->mum = $lisa;
+	$bob->classmates = array( $john, $lily );
+	$bob->save();
+	
+	
+Now you can:
+
+	$bob = Student::one( array("name"=>"Bob") );
+	echo $bob->dad->name;    // David
+	
+	$classmates = $bob->classmates;
+	echo $classmates->count(); // 2
+	var_dump($classmates->get(0)); // john	
+
+
 Hooks
 ---------- 
 	
