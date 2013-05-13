@@ -46,6 +46,14 @@ How to Use
 	// 			'username'  => '',
 	// 			'password'  => '',	
 			)
+		),
+		'test' => array(
+			'connection' => array(
+				'hostnames' => 'localhost',
+				'database'  => 'test',
+	// 			'username'  => '',
+	// 			'password'  => '',
+			)
 		)
 	);
 
