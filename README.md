@@ -20,13 +20,15 @@ Features
 
 Installation
 --------
+
 1. Setup in composer.json: 
  
-  {
-	    "require": {
-	        "purekid/mongodm": "dev-master",
-	    }
+	{
+		"require": {
+		"purekid/mongodm": "dev-master",
+		}
 	}
+
 
 2. Install by composer:
 
