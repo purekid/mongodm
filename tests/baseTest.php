@@ -73,7 +73,7 @@ class TestBase extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf("\MongoId", $book2->getId());
 		
 		$user->name = "abcd";
-		$user->books = [$book1,$book2];
+		$user->books = array($book1,$book2);
 		$user->save();
 		$user = User::id($id);
 		$books = $user->books;
