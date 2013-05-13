@@ -4,6 +4,7 @@ namespace Purekid\Mongodm;
 
 /**
  * Mongodm - A PHP Mongodb ORM
+ * This file is base on  mikelbring(https://github.com/mikelbring/Mongor)'s work and is inspired by https://github.com/Wouterrr/MangoDB
  *
  * @package  Mongodm
  * @version  1.0.0
