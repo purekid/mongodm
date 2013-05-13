@@ -20,15 +20,17 @@ Features
 
 Installation
 --------
-(1) setup in composer.json: 
+1. Setup in composer.json: 
  
-{
-    "require": {
-        "purekid/mongodm": "dev-master",
-    }
-}
+	{
+	    "require": {
+	        "purekid/mongodm": "dev-master",
+	    }
+	}
 
-(2) php composer.phar install
+2. Install by composer:
+
+	php composer.phar install
 
 
 How to Use
@@ -47,7 +49,7 @@ How to Use
 			)
 		);
 
-### Define a model
+### Define a model and enjoy it
     use Purekid\Mongodm\Model;
         
     class User extends Model 
@@ -56,7 +58,7 @@ How to Use
         static $collection = "user";
         public static $config = 'test';
         
-        /* specific definition for attributes, not necessary. */
+        /** specific definition for attributes, not necessary! **/
         protected static $attrs = array(
                 
              // 1 to 1 reference
@@ -74,36 +76,63 @@ How to Use
     
     }
     
-### Type supported for attribute
+Types Supported for model attr
+----------   
 
-    'reference','references','integer','double','timestamp','boolean','array','object'
-    
-### Create model instance
+	$types = [
+	    'reference', // a reference to another model
+	    'references', // references to another model
+	    'integer',  
+	    'double',   // float 
+	    'timestamp', // store as MongoTimestamp in Mongodb
+	    'boolean',   // true or false
+	    'array',    
+	    'object'
+	]
+
+CRUD
+---------- 
+
+### Create 
 	$user = new User();
 	$user->name = "Michael";
 	$user->save();
-### Create instance with data
+    
+    //Create with initial value
 	$user = new User( array('name'=>"John") );
 	$user->save();
-	
-### Update data by array
+
+### Update
+	$user->name = 20;
+	//Update attrs by array
 	$user->update( array('age'=>18,'hobbies'=>array('music','game') ) ); 
 	$user->save();
-	
-### Load one record
+
+### Retrieve single record
 	$user = User::one( array('name'=>"michael" ) );
 	//[load one record by MongoId]
 	$id = "517c850641da6da0ab000004";
 
 	$id = new \MongoId('517c850641da6da0ab000004'); //another way
 	$user = User::id( $id );
-### Load some records
+	
+### Retrieve records
        // retrieve records that name is 'Michael' and acount  of owned  books equals 2
        $params = array( 'name'=>'Michael','books'=>array('$size'=>2) );
        $users = User::find($params);     // $users is instance of ModelSet
        echo $users->count();
-### Load all records
+       
+### Retrieve all records
 	$users = User::all();
+
+### Delete record
+	$user = User::one();
+	$user->delete();	
+	
+
+
+Relationship
+---------- 
 ### Lazyload a 1:1 relationship record
 
 	$book = new Book();
@@ -119,7 +148,7 @@ How to Use
 	$user = User::one( array('name'=>"michael" ) );
 	echo $user->book_fav->name;
 
-### Lazyload 1:x relationship records
+### Lazyload 1:many relationship records
 
 	$user = User::one();
 
@@ -140,50 +169,79 @@ How to Use
 	$user = User::id($id);
 	$books = $user->books;      // $books is a instance of ModelSet
 
-###  ModelSet , a set of models
+###  ModelSet 
 
-	// $users is instance of ModelSet
+$users is instance of ModelSet
+
 	$users = User::find(  array( 'name'=>'Michael','books'=>array('$size'=>2) ) );    
-	$users_other = User::find(  array( 'name'=>'John','books'=>array('$size'=>2) ) );    
+	$users_other = User::find(  array( 'name'=>'John','books'=>array('$size'=>2) ) );   
 	
-	$users->count(); // Count
+Count 
+
+	$users->count();  
+Iteration	
+
+	foreach($users as $user) { }  
 	
-	foreach($users as $user) { } // Iteration
+Determine a record exists in the set by numeric index	
+
+	$users->has(0) 
 	
-	$users->has(0) // determine a record exists in the set by numeric index
+Determine a record exists in the set by MongoID	
+
+	$users->has('518c6a242d12d3db0c000007') 
+
+Get a record by numeric index
+
+	$users->get(0) 
+
+Get a record by MongoID 
+
+	$users->get('518c6a242d12d3db0c000007') 
+
+Remove a record by numeric index
+
+	$users->remove(0)  
+
+Remove a record  by MongoID
+
+	$users->remove('518c6a242d12d3db0c000007') 
 	
-	$users->has('518c6a242d12d3db0c000007') // determine a record exists in the set by MongoID
-	
-	$users->get(0) // get a record by numeric index
-	
-	$users->get('518c6a242d12d3db0c000007') // get a record by MongoID 
-	
-	$users->remove(0) // remove a record by numeric index
-	
-	$users->remove('518c6a242d12d3db0c000007') // remove a record  by MongoID 
-	
-	/* add a record */
+Add a single record to set
+
 	$bob = new User( array("name"=>"Bob"));
 	$bob->save();
 	$users->add($bob);
 	
-	/* add records */
+Add records to set
 	
 	$bob = new User( array("name"=>"Bob"));
 	$bob->save();
 	$lisa = new User( array("name"=>"Lisa"));
 	$lisa->save();
 	
-	$users->add(array($bob,$lisa)); // add some records
+	$users->add( array($bob,$lisa) ); 
 	
-	/*  merge two set */
+Merge two set 
 	
 	$users->add($users_other);  // the set $users_other appends to end of $users 
 	
-	/*  export data to a array */
+Export data to a array
+
 	$users->toArray();
 	
+Hooks
+---------- 
 	
+	__beforeDelete(){
+		// invoke before delete()
+	}
+	
+	__beforeSave(){
+		// invoke before save()
+	}
+
+
 Special thanks to
 -----------------
 
