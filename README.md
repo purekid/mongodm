@@ -67,6 +67,8 @@ How to Use
     {
     
         static $collection = "user";
+        
+        /** use specific config section **/
         public static $config = 'test';
         
         /** specific definition for attributes, not necessary! **/
