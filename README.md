@@ -67,7 +67,7 @@ How to Use
             'age' => array('default'=>16,'type'=>'integer'),
             'money' => array('default'=>20.0,'type'=>'double'),
             'hobbies' => array('default'=>array('love'),'type'=>'array'),
-            'born_time => array('type'=>'timestamp'),
+            'born_time' => array('type'=>'timestamp'),
             'family'=>array('type'=>'object')
                 
         );
