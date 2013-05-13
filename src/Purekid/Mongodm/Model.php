@@ -10,7 +10,7 @@ namespace Purekid\Mongodm;
  * @author   Michael Gan <gc1108960@gmail.com>
  * @link     http://github.com/purekid
  */
-abstract class Model 
+abstract class Model
 {
 	public $cleanData = array();
 	public $exists = false;
@@ -48,7 +48,13 @@ abstract class Model
 	{
 		foreach($cleanData as $key => $value){
 			if($isInit){
-				$this->cleanData[$key] = $value;
+				$attrs = $this->getAttrs();
+				if(($value instanceof Model) && isset($attrs[$key]) && isset($attrs[$key]['type']) 
+			    	&& ( $attrs[$key]['type'] == 'reference' or $attrs[$key]['type'] == 'references' )){
+					$value = $this->setRef($key,$value);
+				} 
+					$this->cleanData[$key] = $value;
+				
 			}else{
 				$this->$key = $value;
 			}
@@ -351,12 +357,15 @@ abstract class Model
 	
 		if( isset($attrs[$key]) && isset($attrs[$key]['type'])){
 			$type = $attrs[$key]['type'];
-			$type_defined = array('integer','double','timestamp','boolean','array','object');
+			$type_defined = array('reference','references','integer','string','double','timestamp','boolean','array','object');
 			if(in_array($type, $type_defined)){
 				switch($type){
 					case "integer":
 						$value = intval($value);
 					break;
+					case "string":
+						$value = (string) $value;
+						break;
 					case "double":
 						$value = floatval($value);
 						break;
@@ -380,7 +389,12 @@ abstract class Model
 						}
 						$value = (array) $value;
 						break;
+					default:
+						
+						break;
 				}
+			}else{
+				throw new \Exception("type {$type} is invalid！");
 			}
 		}
 		return $value;
@@ -410,6 +424,7 @@ abstract class Model
 			$arr = array();
 			if(is_array($value)){
 				foreach($value as $item){
+					if(! ( $item instanceof Model ) ) continue;
 					$arr[] = $item->makeRef();
 				}
 				$return = $arr;
