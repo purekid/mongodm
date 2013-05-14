@@ -313,16 +313,45 @@ Now you can:
 	var_dump($classmates->get(0)); // john	
 
 
-Hooks
----------- 
-	
-	__init();
+### Hooks
 
-	__beforeDelete();
-	
-	__beforeSave();
-    
-    __afterSave();
+The following hooks are available:
+
+##### __init()
+
+Executed after the constructor has finished
+
+##### __preInsert()
+
+Executed before saving a new record
+
+##### __postInsert()
+
+Executed after saving a new record
+
+##### __preUpdate()
+
+Executed before saving an existing record
+
+##### __postUpdate()
+
+Executed after saving an existing record
+
+##### __preSave()
+
+Executed before saving a record
+
+##### __postSave()
+
+Executed after saving a record
+
+##### __preDelete()
+
+Executed before deleting a record
+
+##### __postDelete()
+
+Executed after deleting a record
 
 
 Special thanks to

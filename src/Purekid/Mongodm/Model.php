@@ -84,7 +84,7 @@ abstract class Model
 	 */
 	public function delete($options = array())
 	{
-		$this->__beforeDelete();
+		$this->__preDelete();
 		
 		if($this->exists){
 			$deleted =  $this->_connection->remove($this->collectionName(), array("_id" => $this->getId() ), $options);
@@ -92,6 +92,7 @@ abstract class Model
 				$this->exists = false;
 			}
 		}
+		$this->__postDelete();
 		return true;
 	}
 
@@ -101,7 +102,7 @@ abstract class Model
 		/* if no changes then do nothing */
 		if ($this->exists and empty($this->dirtyData)) return true;
 	
-		$this->__beforeSave();
+		$this->__preSave();
 		
 		if($this->use_timestamps)
 		{
@@ -109,18 +110,23 @@ abstract class Model
 		}
 		if ($this->exists)
 		{
+			$this->__preUpdate();
 			$success = $this->_connection->update($this->collectionName(), array('_id' => $this->getId()), array('$set' => $this->dirtyData), $options);
+			$this->exists = true ;
+			$this->dirtyData = array();
+			$this->__postUpdate();
 		}
 		else
 		{
+			$this->__preInsert();
 			$insert = $this->_connection->insert($this->collectionName(), $this->cleanData, $options);
 			$success = !is_null($this->cleanData['$id'] = $insert['_id']);
+			$this->exists = true ;
+			$this->dirtyData = array();
+			$this->__postInsert();
 		}
 	
-		$this->exists = true ;
-		$this->dirtyData = array();
-	
-		$this->__afterSave();
+		$this->__postSave();
 		
 		return $success;
 		
@@ -512,17 +518,42 @@ abstract class Model
 		return true;
 	}
 	
-	protected function __beforeDelete()
+	protected function __preSave()
 	{
 		return true;
 	}
 	
-	protected function __beforeSave()
+	protected function __preUpdate()
 	{
 		return true;
 	}
 	
-	protected function __afterSave()
+	protected function __preInsert()
+	{
+		return true;
+	}
+	
+	protected function __preDelete()
+	{
+		return true;
+	}
+	
+	protected function __postSave()
+	{
+		return true;
+	}
+	
+	protected function __postUpdate()
+	{
+		return true;
+	}
+	
+	protected function __postInsert()
+	{
+		return true;
+	}
+	
+	protected function __postDelete()
 	{
 		return true;
 	}
