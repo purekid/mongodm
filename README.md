@@ -312,11 +312,13 @@ Now you can:
 	var_dump($classmates->get(0)); // john	
 	
 	
-	//get all student
+	//Get all human , toplevel class, queries without _type
+    $humans = Human::all();
+    
+	//Get all student , queries { "_type":"Student" }
 	$students = Student::all();
 	
-	//get all human
-	$humans = Human::all();
+	
 
 
 ### Hooks
