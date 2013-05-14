@@ -19,18 +19,18 @@ Features
 - Support for multilevel inheritance
 
 Installation
---------
+----------
 
-1. Setup in composer.json: 
+### 1. Setup in composer.json: 
  
 	{
 		"require": {
-		"purekid/mongodm": "dev-master",
+		    "purekid/mongodm": "dev-master",
 		}
 	}
 
 
-2. Install by composer:
+### 2. Install by composer:
 
 	php composer.phar install
 
