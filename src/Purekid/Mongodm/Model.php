@@ -239,7 +239,11 @@ abstract class Model
 	static function one($params = array(),$fields = array())
 	{
 		$class = get_called_class();
-		$params['_type'] = $class::get_class_name();
+		$types = $class::getModelTypes();
+		if(count($types) > 1){
+			$params['_type'] = $class::get_class_name();
+		}
+		
 		$result =  self::connection()->find_one(static::$collection, $params , $fields);
 		if($result){
 			return  Hydrator::hydrate(get_called_class(), $result ,"one");
@@ -262,7 +266,10 @@ abstract class Model
 	{
 	
 		$class = get_called_class();
-		$params['_type'] = $class::get_class_name();
+		$types = $class::getModelTypes();
+		if(count($types) > 1){
+			$params['_type'] = $class::get_class_name();
+		}
 		
 		$results =  self::connection()->find(static::$collection, $params, $fields);
 	
@@ -297,8 +304,11 @@ abstract class Model
 	static function all( $sort = array() , $fields = array())
 	{
 		$class = get_called_class();
+		$types = $class::getModelTypes();
 		$params = array();
-		$params['_type'] = $class::get_class_name();
+		if(count($types) > 1){
+			$params['_type'] = $class::get_class_name();
+		}
 		
 		return self::find($params,$fields,$sort);
 	

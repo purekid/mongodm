@@ -29,6 +29,14 @@ class TestInheritance extends PHPUnit_Framework_TestCase {
 		$this->assertEquals("A", $student->class);
 	
 	}
+	
+	public function testRetrieve()
+	{
+	
+		$pupils =  Pupil::all();
+		$pupil = $pupils->get(0);
+		$this->assertTrue($pupil instanceof Pupil);
+	}
 
 	public function testRelation1TO1(){
 	
