@@ -271,8 +271,6 @@ Define models:
 
 	class Student extends Human{
 	
-		static $collection = "human";
-		
 		protected static $attrs = array(
 			'grade' => array('type'=>'string'),
 			'classmates' => array('type'=>'references','model'=>'Demo\Student'),
@@ -309,8 +307,16 @@ Now you can:
 	echo $bob->dad->name;    // David
 	
 	$classmates = $bob->classmates;
+	
 	echo $classmates->count(); // 2
 	var_dump($classmates->get(0)); // john	
+	
+	
+	//get all student
+	$students = Student::all();
+	
+	//get all human
+	$humans = Human::all();
 
 
 ### Hooks
