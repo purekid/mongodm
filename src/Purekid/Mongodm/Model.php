@@ -36,6 +36,8 @@ abstract class Model
 		
  		$this->update($data,true);
  		$this->initAttrs();
+ 		$this->__init();
+ 		
 	}
 	
 	/**
@@ -96,21 +98,21 @@ abstract class Model
 	public function save($options = array())
 	{
 	
-		
+		/* if no changes then do nothing */
 		if ($this->exists and empty($this->dirtyData)) return true;
 	
+		$this->__beforeSave();
+		
 		if($this->use_timestamps)
 		{
 			$this->timestamp();
 		}
 		if ($this->exists)
 		{
-			$this->__beforeUpdate();
 			$success = $this->_connection->update($this->collectionName(), array('_id' => $this->getId()), array('$set' => $this->dirtyData), $options);
 		}
 		else
 		{
-			$this->__beforeInsert();
 			$insert = $this->_connection->insert($this->collectionName(), $this->cleanData, $options);
 			$success = !is_null($this->cleanData['$id'] = $insert['_id']);
 		}
@@ -118,6 +120,8 @@ abstract class Model
 		$this->exists = true ;
 		$this->dirtyData = array();
 	
+		$this->__afterSave();
+		
 		return $success;
 		
 	}
@@ -502,17 +506,23 @@ abstract class Model
 	}
 	
 	/* Hooks */
+	
+	protected function __init()
+	{
+		return true;
+	}
+	
 	protected function __beforeDelete()
 	{
 		return true;
 	}
 	
-	protected function __beforeUpdate()
+	protected function __beforeSave()
 	{
 		return true;
 	}
 	
-	protected function __beforeInsert()
+	protected function __afterSave()
 	{
 		return true;
 	}
