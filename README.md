@@ -20,13 +20,15 @@ Features
 
 Installation
 --------
+
 1. Setup in composer.json: 
  
-  {
-	    "require": {
-	        "purekid/mongodm": "dev-master",
-	    }
+	{
+		"require": {
+		"purekid/mongodm": "dev-master",
+		}
 	}
+
 
 2. Install by composer:
 
@@ -46,6 +48,14 @@ How to Use
 	// 			'username'  => '',
 	// 			'password'  => '',	
 			)
+		),
+		'test' => array(
+			'connection' => array(
+				'hostnames' => 'localhost',
+				'database'  => 'test',
+	// 			'username'  => '',
+	// 			'password'  => '',
+			)
 		)
 	);
 
@@ -57,6 +67,8 @@ How to Use
     {
     
         static $collection = "user";
+        
+        /** use specific config section **/
         public static $config = 'test';
         
         /** specific definition for attributes, not necessary! **/
