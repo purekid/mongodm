@@ -7,7 +7,6 @@ namespace Purekid\Mongodm;
  * This file is base on  mikelbring(https://github.com/mikelbring/Mongor)'s work and is inspired by https://github.com/Wouterrr/MangoDB
  *
  * @package  Mongodm
- * @version  1.0.0
  * @author   Michael Gan <gc1108960@gmail.com>
  * @link     http://blog.missyi.com
  */

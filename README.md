@@ -133,7 +133,7 @@ CRUD
 ### Retrieve records
        // retrieve records that name is 'Michael' and acount  of owned  books equals 2
        $params = array( 'name'=>'Michael','books'=>array('$size'=>2) );
-       $users = User::find($params);     // $users is instance of ModelSet
+       $users = User::find($params);     // $users is instance of Collection
        echo $users->count();
        
 ### Retrieve all records
@@ -176,16 +176,16 @@ Relationship
 
 	$user->books = array($book1,$book2);
 	//also you can
-	$user->books = ModelSet::make(array($book1,$book2));
+	$user->books = Collection::make(array($book1,$book2));
 	$user->save();
 
 	//somewhere , load these books
 	$user = User::id($id);
-	$books = $user->books;      // $books is a instance of ModelSet
+	$books = $user->books;      // $books is a instance of Collection
 
-###  ModelSet 
+###  Collection 
 
-$users is instance of ModelSet
+$users is instance of Collection
 
 	$users = User::find(  array( 'name'=>'Michael','books'=>array('$size'=>2) ) );    
 	$users_other = User::find(  array( 'name'=>'John','books'=>array('$size'=>2) ) );   
@@ -198,11 +198,11 @@ Iteration
 
 	foreach($users as $user) { }  
 	
-Determine a record exists in the set by numeric index	
+Determine a record exists in the collection by numeric index	
 
 	$users->has(0) 
 	
-Determine a record exists in the set by MongoID	
+Determine a record exists in the collection by MongoID	
 
 	$users->has('518c6a242d12d3db0c000007') 
 
@@ -222,13 +222,13 @@ Remove a record  by MongoID
 
 	$users->remove('518c6a242d12d3db0c000007') 
 	
-Add a single record to set
+Add a single record to collection
 
 	$bob = new User( array("name"=>"Bob"));
 	$bob->save();
 	$users->add($bob);
 	
-Add records to set
+Add records to collection
 	
 	$bob = new User( array("name"=>"Bob"));
 	$bob->save();
@@ -237,9 +237,9 @@ Add records to set
 	
 	$users->add( array($bob,$lisa) ); 
 	
-Merge two set 
+Merge two collection 
 	
-	$users->add($users_other);  // the set $users_other appends to end of $users 
+	$users->add($users_other);  // the collection $users_other appends to end of $users 
 	
 Export data to a array
 

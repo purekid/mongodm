@@ -2,7 +2,7 @@
 
 use Purekid\Mongodm\Test\Model\Book;
 use Purekid\Mongodm\Test\Model\User;
-use Purekid\Mongodm\ModelSet;
+use Purekid\Mongodm\Collection;
 
 class TestBase extends PHPUnit_Framework_TestCase {
 
@@ -208,7 +208,7 @@ class TestBase extends PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf("\MongoId", $book1->getId());
 		$this->assertInstanceOf("\MongoId", $book2->getId());
 	
-		$user->books = ModelSet::make(array($book1,$book2));
+		$user->books = Collection::make(array($book1,$book2));
 		$user->save();
 	
 		$user = User::id($id);

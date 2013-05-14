@@ -6,7 +6,6 @@ namespace Purekid\Mongodm;
  * Mongodm - A PHP Mongodb ORM
  *
  * @package  Mongodm
- * @version  1.0.0
  * @author   Michael Gan <gc1108960@gmail.com>
  * @link     http://github.com/purekid
  */
@@ -100,9 +99,9 @@ abstract class Model
 	 * @param  $keys
 	 * @return void
 	 */
-	public function set_index($keys)
+	public static function set_index($keys)
 	{
-		return $this->_connection->ensure_index($this->collectionName(), $keys);
+		return $this->connection()->ensure_index($this->collectionName(), $keys);
 	}
 	
 	public function save($options = array())
@@ -207,7 +206,7 @@ abstract class Model
 	 * @param  array $fields
 	 * @param  int $limit
 	 * @param  int $skip
-	 * @return ModelSet Object
+	 * @return Collection Object
 	 */
 	static function find($params = array(), $sort = array(), $fields = array() , $limit = null , $skip = null)
 	{
@@ -240,7 +239,7 @@ abstract class Model
 	 *
 	 * @param  array $sort
 	 * @param  array $fields
-	 * @return ModelSet Object
+	 * @return Collection Object
 	 */
 	static function all( $sort = array() , $fields = array())
 	{
@@ -428,8 +427,8 @@ abstract class Model
 					$arr[] = $item->makeRef();
 				}
 				$return = $arr;
-				$value = ModelSet::make($value);
-			}else if($value instanceof ModelSet){
+				$value = Collection::make($value);
+			}else if($value instanceof Collection){
 				$return = $value->makeRef();
 			}else{
 				throw new \Exception ("{$key} is not instance of '$model'");
@@ -474,7 +473,7 @@ abstract class Model
 							}
 						}
 					}
-					$set =  ModelSet::make($res);
+					$set =  Collection::make($res);
 					$cache[$key] = $set;
 					return $set;
 				}
