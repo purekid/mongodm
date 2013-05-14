@@ -131,10 +131,12 @@ CRUD
 	$user = User::id( $id );
 	
 ### Retrieve records
-       // retrieve records that name is 'Michael' and acount  of owned  books equals 2
-       $params = array( 'name'=>'Michael','books'=>array('$size'=>2) );
-       $users = User::find($params);     // $users is instance of Collection
-       echo $users->count();
+
+Retrieve records that name is 'Michael' and acount  of owned  books equals 2
+
+	$params = array( 'name'=>'Michael','books'=>array('$size'=>2) );
+	$users = User::find($params);     // $users is instance of Collection
+	echo $users->count();
        
 ### Retrieve all records
 	$users = User::all();
@@ -143,7 +145,6 @@ CRUD
 	$user = User::one();
 	$user->delete();	
 	
-
 
 Relationship
 ---------- 
