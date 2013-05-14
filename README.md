@@ -247,9 +247,8 @@ Export data to a array
 	
 Inheritance
 ----------
-### Wonderful multilevel inheritance.
 	
-Define models:
+### Define multilevel inheritable models:
 
 	use Purekid\Mongodm\Model;
 	namespace Demo;
@@ -278,7 +277,7 @@ Define models:
 		
 	}
 	
-To use:
+### Use:
 
 	$bob = new Student( array('name'=>'Bob','age'=> 17 ,'gender'=>'male' ) );
 	$bob->save();
@@ -300,26 +299,29 @@ To use:
 	$bob->classmates = array( $john, $lily );
 	$bob->save();
 	
-	
-Now you can:
+### Retrieve and check value:
 
 	$bob = Student::one( array("name"=>"Bob") );
+	
 	echo $bob->dad->name;    // David
 	
 	$classmates = $bob->classmates;
 	
 	echo $classmates->count(); // 2
+    
 	var_dump($classmates->get(0)); // john	
 	
+
+### Retrieve subclass
+
+Retrieve all Human records , queries without '_type' because of it's a toplevel class.
 	
-	//Get all human , toplevel class, queries without _type
     $humans = Human::all();
     
-	//Get all student , queries { "_type":"Student" }
-	$students = Student::all();
-	
-	
+Retrieve all Student records , queries with  { "_type":"Student" } because of it's a subclass.
 
+    $students = Student::all();
+	
 
 ### Hooks
 
