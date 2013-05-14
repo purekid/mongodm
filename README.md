@@ -112,19 +112,25 @@ CRUD
 	$user->name = "Michael";
 	$user->save();
     
-    //Create with initial value
+Create with initial value
+
 	$user = new User( array('name'=>"John") );
 	$user->save();
 
 ### Update
 	$user->name = 20;
-	//Update attrs by array
+
+Update attrs by array
+
 	$user->update( array('age'=>18,'hobbies'=>array('music','game') ) ); 
 	$user->save();
 
 ### Retrieve single record
+
 	$user = User::one( array('name'=>"michael" ) );
-	//[load one record by MongoId]
+	
+Load one record by MongoId
+
 	$id = "517c850641da6da0ab000004";
 
 	$id = new \MongoId('517c850641da6da0ab000004'); //another way
