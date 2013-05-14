@@ -316,19 +316,13 @@ Now you can:
 Hooks
 ---------- 
 	
-	__init() // initialization method
+	__init();
 
-	__beforeDelete(){
-		
-	}
+	__beforeDelete();
 	
-	__beforeSave(){
-		
-	}
+	__beforeSave();
     
-    __afterSave(){
-        
-    }
+    __afterSave();
 
 
 Special thanks to
