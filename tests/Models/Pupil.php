@@ -3,7 +3,7 @@
 namespace Purekid\Mongodm\Test\Model;
 
 
-class Pupil extends User
+class Pupil extends Student
 {
 
  	protected static $attrs = array(
@@ -11,5 +11,5 @@ class Pupil extends User
  		'class' => array('default'=>"A",'type'=>'string'),
  			
 	);
-	
+ 	
 }

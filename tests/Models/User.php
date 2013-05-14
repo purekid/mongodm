@@ -19,4 +19,12 @@ class User extends \Purekid\Mongodm\Model
 			
 	);
 
+	protected function __init(){
+		if(! $this->init_data) $this->init_data = "init";
+	}
+	
+	protected function __preSave(){
+		if(! $this->pre_save_data) $this->pre_save_data = "ohohoh";
+	}
+	
 }
