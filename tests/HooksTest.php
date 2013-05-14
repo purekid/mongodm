@@ -22,7 +22,6 @@ class TestHooks extends PHPUnit_Framework_TestCase {
 		$user = new Pupil();
 		$user->name = "michael";
 		$user->save();
-		
 		$this->assertEquals("ohohoh", $user->pre_save_data);
 		
 	}

@@ -24,7 +24,7 @@ class TestInheritance extends PHPUnit_Framework_TestCase {
 	{
 	
 		$student = new Pupil();
-		$student->name = "michael";
+		$student->name = "michael_pupil";
 		$student->save();
 		$this->assertEquals("A", $student->class);
 	

@@ -353,7 +353,6 @@ Executed before deleting a record
 
 Executed after deleting a record
 
-
 Special thanks to
 -----------------
 

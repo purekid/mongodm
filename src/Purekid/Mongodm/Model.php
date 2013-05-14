@@ -36,9 +36,25 @@ abstract class Model
 		
  		$this->update($data,true);
  		$this->initAttrs();
+ 		$this->_initTypes();
  		$this->__init();
  		
 	}
+	
+	private function _initTypes(){
+
+		$class = $this->get_class_name();
+		$types = $this->getModelTypes();
+		$type = $this->_type;
+		if(!$type || !is_array($type)){
+			$this->_type = $types;
+		}else if(!in_array($class,$type)){
+			$type[] = $class;
+			$this->_type = $type;
+		}
+		
+	}
+	
 	
 	/**
 	 * Update data by a array
@@ -152,6 +168,8 @@ abstract class Model
 	static function count($params = array())
 	{
 	
+		$class = get_called_class();
+		$params['_type'] = $class::get_class_name();
 		$count = self::connection()->count(self::collectionName(),$params);
 		return $count;
 	
@@ -220,6 +238,8 @@ abstract class Model
 	 */
 	static function one($params = array(),$fields = array())
 	{
+		$class = get_called_class();
+		$params['_type'] = $class::get_class_name();
 		$result =  self::connection()->find_one(static::$collection, $params , $fields);
 		if($result){
 			return  Hydrator::hydrate(get_called_class(), $result ,"one");
@@ -241,6 +261,9 @@ abstract class Model
 	static function find($params = array(), $sort = array(), $fields = array() , $limit = null , $skip = null)
 	{
 	
+		$class = get_called_class();
+		$params['_type'] = $class::get_class_name();
+		
 		$results =  self::connection()->find(static::$collection, $params, $fields);
 	
 		$count = $results->count();
@@ -273,8 +296,11 @@ abstract class Model
 	 */
 	static function all( $sort = array() , $fields = array())
 	{
-	
-		return self::find(array(),$fields,$sort);
+		$class = get_called_class();
+		$params = array();
+		$params['_type'] = $class::get_class_name();
+		
+		return self::find($params,$fields,$sort);
 	
 	}
 	
@@ -305,6 +331,16 @@ abstract class Model
 		return null;
 	}
 	
+	/**
+	 * Returns the name of a class using get_class with the namespaces stripped.
+	 * @return  string  Name of class with namespaces stripped
+	 */
+	public static function get_class_name()
+	{
+		$class_name = get_called_class();
+		$class = explode('\\',  $class_name);
+		return $class[count($class) - 1];
+	}
 	
 	protected function initAttrs(){
 		$attrs = self::getAttrs();
@@ -324,7 +360,6 @@ abstract class Model
 	 */
 	protected static function getAttrs(){
 	
-		$baseClass =  __CLASS__;
 		$class = get_called_class();
 		$parent = get_parent_class($class);
 		if($parent){
@@ -334,6 +369,26 @@ abstract class Model
 			$attrs = $class::$attrs;
 		}
 		return $attrs;
+			
+	}
+	
+	/**
+	 * Get defined attributes in $attrs
+	 * @param mixed $ref
+	 * @return array
+	 */
+	protected static function getModelTypes(){
+	
+		$class = get_called_class();
+		$class_name = $class::get_class_name();
+		$parent = get_parent_class($class);
+		if($parent){
+			$names_parent = $parent::getModelTypes();
+			$names = array_merge($names_parent,array($class_name));
+		}else{
+			$names = array();
+		}
+		return $names;
 			
 	}
 	
