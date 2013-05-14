@@ -41,7 +41,7 @@ abstract class Model
 	/**
 	 * Update data by a array
 	 * @param array $cleanData
-	 * @return MongoId Object
+	 * @return boolean
 	 */
 	public function update($cleanData,$isInit = false)
 	{
@@ -93,21 +93,9 @@ abstract class Model
 		return true;
 	}
 
-	/**
-	 * Set an index for collection
-	 *
-	 * @param  $keys
-	 * @return void
-	 */
-	public static function set_index($keys)
-	{
-		return $this->connection()->ensure_index($this->collectionName(), $keys);
-	}
-	
 	public function save($options = array())
 	{
 	
-		$this->__beforeSave();
 		
 		if ($this->exists and empty($this->dirtyData)) return true;
 	
@@ -117,10 +105,12 @@ abstract class Model
 		}
 		if ($this->exists)
 		{
+			$this->__beforeUpdate();
 			$success = $this->_connection->update($this->collectionName(), array('_id' => $this->getId()), array('$set' => $this->dirtyData), $options);
 		}
 		else
 		{
+			$this->__beforeInsert();
 			$insert = $this->_connection->insert($this->collectionName(), $this->cleanData, $options);
 			$success = !is_null($this->cleanData['$id'] = $insert['_id']);
 		}
@@ -132,6 +122,23 @@ abstract class Model
 		
 	}
 	
+	/**
+	 * Set an index for collection
+	 *
+	 * @param  $keys
+	 * @return void
+	 */
+	public static function set_index($keys)
+	{
+		return $this->connection()->ensure_index($this->collectionName(), $keys);
+	}
+	
+	/**
+	 * Get the count of records
+	 *
+	 * @param  $params
+	 * @return integer
+	 */
 	static function count($params = array())
 	{
 	
@@ -147,16 +154,29 @@ abstract class Model
 	 */
 	public function toArray()
 	{
-		
 		return $this->cleanData;
-		
 	}
 	
 	/**
-	 * determine exist in the database
+	 * Determine exist in the database
+	 *
+	 * @return integer
 	 */
 	public function exist(){
 		return $this->exists;
+	}
+	
+	/**
+	 * Create a Mongodb reference
+	 * @return MongoRef Object
+	 */
+	public function makeRef()
+	{
+	
+		$model = get_called_class();
+		$ref = \MongoDBRef::create($this->collectionName(), $this->getId(),$this->dbName());
+		return $ref;
+	
 	}
 	
 	/**
@@ -206,7 +226,7 @@ abstract class Model
 	 * @param  array $fields
 	 * @param  int $limit
 	 * @param  int $skip
-	 * @return Collection Object
+	 * @return Collection
 	 */
 	static function find($params = array(), $sort = array(), $fields = array() , $limit = null , $skip = null)
 	{
@@ -239,7 +259,7 @@ abstract class Model
 	 *
 	 * @param  array $sort
 	 * @param  array $fields
-	 * @return Collection Object
+	 * @return Collection
 	 */
 	static function all( $sort = array() , $fields = array())
 	{
@@ -248,7 +268,11 @@ abstract class Model
 	
 	}
 	
-	
+	/**
+	 * Get collection name
+	 *
+	 * @return string
+	 */
 	public static function collectionName()
 	{
 		$class = get_called_class();
@@ -257,11 +281,10 @@ abstract class Model
 	}
 	
 	
-	
 	/**
-	 * retrieve a record by MongoRef
+	 * Retrieve a record by MongoRef
 	 * @param mixed $ref
-	 * @return Purekid\Mongodm\Model 
+	 * @return Model 
 	 */
 	public static function ref( $ref ){
 		if(isset($ref['$id'])){
@@ -272,20 +295,6 @@ abstract class Model
 		return null;
 	}
 	
-	/**
-	 * Create a Mongodb reference 
-	 * @return MongoRef Object
-	 */
-	public function makeRef()
-	{
-	
-		$model = get_called_class();
-		$ref = \MongoDBRef::create($this->collectionName(), $this->getId(),$this->dbName());
-		return $ref;
-	
-	}
-	
-
 	
 	protected function initAttrs(){
 		$attrs = self::getAttrs();
@@ -298,6 +307,11 @@ abstract class Model
 	
 	}
 	
+	/**
+	 * Get defined attributes in $attrs
+	 * @param mixed $ref
+	 * @return array
+	 */
 	protected static function getAttrs(){
 	
 		$baseClass =  __CLASS__;
@@ -351,6 +365,12 @@ abstract class Model
 		return $dbName;
 	}
 	
+	/**
+	 * Parse value with specific define in $attrs
+	 * @param string $key
+	 * @param mixed $value
+	 * @return mixed
+	 */
 	private function parseValue($key,$value){
 		$attrs = $this->getAttrs();
 	
@@ -484,12 +504,17 @@ abstract class Model
 	/* Hooks */
 	protected function __beforeDelete()
 	{
-	
+		return true;
 	}
 	
-	protected function __beforeSave()
+	protected function __beforeUpdate()
 	{
+		return true;
+	}
 	
+	protected function __beforeInsert()
+	{
+		return true;
 	}
 	
 	/* Magic methods*/
