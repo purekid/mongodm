@@ -39,25 +39,46 @@ How to Use
 ----------
 
 ### Setup database in   config/database.php
+If you want select config section with environment variable APPLICATION_ENV , you should set $config='default' or don't declare $config in your own model class.
 
 	return array(
-		'default' => array(
-			'connection' => array(
-				'hostnames' => 'localhost',
-				'database'  => 'dbname',	
-	// 			'username'  => '',
-	// 			'password'  => '',	
-			)
-		),
-		'test' => array(
-			'connection' => array(
-				'hostnames' => 'localhost',
-				'database'  => 'test',
-	// 			'username'  => '',
-	// 			'password'  => '',
-			)
-		)
-	);
+    
+       /* Configuration section name*/
+        'default' => array(
+    		'connection' => array(
+    			'hostnames' => 'localhost',
+    			'hostnames' => 'localhost',
+    			'database'  => 'default',
+    // 			'username'  => '',
+    // 			'password'  => '',
+    		)
+    	),
+    	'development' => array(
+    		'connection' => array(
+    			'hostnames' => 'localhost',
+    			'database'  => 'development',
+    // 			'username'  => '',
+    // 			'password'  => '',
+    		)
+    	),
+    	'testing' => array(
+    		'connection' => array(
+    			'hostnames' => 'localhost',
+    			'database'  => 'test',
+    // 			'username'  => '',
+    // 			'password'  => '',
+    		)
+    	),
+    	'production' => array(
+    			'connection' => array(
+    				'hostnames' => 'localhost,192.168.1.2',
+    				'database'  => 'production',
+    // 				'username'  => '',
+    // 				'password'  => '',
+    			)
+    	)
+        
+    );
 
 ### Define a model and enjoy it
 
