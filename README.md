@@ -204,7 +204,13 @@ Count
 Iteration	
 
 	foreach($users as $user) { }  
+
+Determine a record exists in the collection by object instance	
 	
+	$john = User::one(array("name"=>"John"));
+	
+	$users->has($john) 
+
 Determine a record exists in the collection by numeric index	
 
 	$users->has(0) 
