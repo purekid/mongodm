@@ -43,7 +43,7 @@ abstract class Model
 	
 	private function _initTypes(){
 
-		$class = $this->get_class_name();
+		$class = $this->get_class_name(false);
 		$types = $this->getModelTypes();
 		$type = $this->_type;
 		if(!$type || !is_array($type)){
@@ -169,7 +169,7 @@ abstract class Model
 	{
 	
 		$class = get_called_class();
-		$params['_type'] = $class::get_class_name();
+		$params['_type'] = $class::get_class_name(false);
 		$count = self::connection()->count(self::collectionName(),$params);
 		return $count;
 	
@@ -241,7 +241,7 @@ abstract class Model
 		$class = get_called_class();
 		$types = $class::getModelTypes();
 		if(count($types) > 1){
-			$params['_type'] = $class::get_class_name();
+			$params['_type'] = $class::get_class_name(false);
 		}
 		
 		$result =  self::connection()->find_one(static::$collection, $params , $fields);
@@ -268,7 +268,7 @@ abstract class Model
 		$class = get_called_class();
 		$types = $class::getModelTypes();
 		if(count($types) > 1){
-			$params['_type'] = $class::get_class_name();
+			$params['_type'] = $class::get_class_name(false);
 		}
 		
 		$results =  self::connection()->find(static::$collection, $params, $fields);
@@ -307,7 +307,7 @@ abstract class Model
 		$types = $class::getModelTypes();
 		$params = array();
 		if(count($types) > 1){
-			$params['_type'] = $class::get_class_name();
+			$params['_type'] = $class::get_class_name(false);
 		}
 		
 		return self::find($params,$fields,$sort);
@@ -343,11 +343,13 @@ abstract class Model
 	
 	/**
 	 * Returns the name of a class using get_class with the namespaces stripped.
+	 * @param boolean $with_namespaces
 	 * @return  string  Name of class with namespaces stripped
 	 */
-	public static function get_class_name()
+	public static function get_class_name($with_namespaces = true)
 	{
 		$class_name = get_called_class();
+		if($with_namespaces) return $class_name;
 		$class = explode('\\',  $class_name);
 		return $class[count($class) - 1];
 	}
@@ -390,7 +392,7 @@ abstract class Model
 	protected static function getModelTypes(){
 	
 		$class = get_called_class();
-		$class_name = $class::get_class_name();
+		$class_name = $class::get_class_name(false);
 		$parent = get_parent_class($class);
 		if($parent){
 			$names_parent = $parent::getModelTypes();
