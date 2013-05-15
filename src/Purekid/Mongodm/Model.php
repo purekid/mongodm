@@ -165,7 +165,7 @@ abstract class Model
 	 * @param  $params
 	 * @return integer
 	 */
-	static function count($params = array())
+	public static function count($params = array())
 	{
 	
 		$class = get_called_class();
@@ -217,7 +217,7 @@ abstract class Model
 	 * @param mixed $id 
 	 * @return Model
 	 */
-	static function id($id)
+	public static function id($id)
 	{
 		
 		if($id){
@@ -236,7 +236,7 @@ abstract class Model
 	 * @param  array $fields
 	 * @return Model
 	 */
-	static function one($params = array(),$fields = array())
+	public static function one($params = array(),$fields = array())
 	{
 		$class = get_called_class();
 		$types = $class::getModelTypes();
@@ -262,7 +262,7 @@ abstract class Model
 	 * @param  int $skip
 	 * @return Collection
 	 */
-	static function find($params = array(), $sort = array(), $fields = array() , $limit = null , $skip = null)
+	public static function find($params = array(), $sort = array(), $fields = array() , $limit = null , $skip = null)
 	{
 	
 		$class = get_called_class();
@@ -301,7 +301,7 @@ abstract class Model
 	 * @param  array $fields
 	 * @return Collection
 	 */
-	static function all( $sort = array() , $fields = array())
+	public static function all( $sort = array() , $fields = array())
 	{
 		$class = get_called_class();
 		$types = $class::getModelTypes();
@@ -432,7 +432,7 @@ abstract class Model
 	private function dbName()
 	{
 	
-		$dbName = "unknown";
+		$dbName = "default";
 		$config = $this::$config;
 		$configs = MongoDB::config($config);
 		if($configs){
