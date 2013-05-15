@@ -16,7 +16,6 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
 	
 	private $_items = array();
 	private $_items_id = array();
-	private $_count = 0;
 	
 	/**
 	 * Make a set from a arrry of Model
@@ -35,7 +34,6 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
 		}
 		
 		$this->_items = $items;		
-		$this->_count = count($items);
 		
 	}
 	
@@ -49,7 +47,7 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
 	{
 		
 		if(is_int($index)){ 
-			if($index + 1 > $this->_count){
+			if($index + 1 > $this->count()){
 				return null;
 			}else{
 				return	current(array_slice ($this->_items , $index , 1)) ;
@@ -89,28 +87,42 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
 	
 	}
 	
-	public function remove($index)
+	/**
+	 * Remove a record from the collection
+	 *
+	 * @param int|MongoID|Model
+	 * @return boolean
+	 */
+	public function remove($param)
 	{
+		if($param instanceof Model ){
+			$param = $param->getId();
+		}
 		
-		$item = $this->get($index);
+		$item = $this->get($param);
 		if($item){
 			$id = (string) $item->getId();
 			if($this->_items[$id]){
 				unset($this->_items[$id]);
-				$this->_count --;
 			}
 		}
 		return true;
 		
 	}
 	
-	public function has( $model = null)
+	/**
+	 * Determine if a record exists in the collection
+	 * 
+	 * @param int|MongoID|object 
+	 * @return boolean
+	 */
+	public function has( $param )
 	{
 		
-		if(is_object($model)){
-			$id = (string) $model->getId() ;
-		}else if(is_string($model)){
-			$id = $model;
+		if(is_object($param)){
+			$id = (string) $param->getId() ;
+		}else if(is_string($param)){
+			$id = $param;
 		}
 		if( isset($id) && isset($this->_items[$id]) ){
 			return true;
@@ -168,8 +180,7 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
 	
 	public function count()
 	{
-		$this->_count = count($this->_items);
-		return $this->_count;
+		return count($this->_items);
 	}
 	
 	public function getIterator() 
