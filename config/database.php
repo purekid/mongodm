@@ -19,7 +19,7 @@ return array(
 	'development' => array(
 		'connection' => array(
 			'hostnames' => 'localhost',
-			'database'  => 'development',
+			'database'  => 'youlin',
 // 			'username'  => '',
 // 			'password'  => '',
 		)
@@ -34,8 +34,8 @@ return array(
 	),
 	'production' => array(
 			'connection' => array(
-				'hostnames' => 'localhost,192.168.1.2',
-				'database'  => 'production',
+				'hostnames' => 'localhost',
+				'database'  => 'youlin',
 // 				'username'  => '',
 // 				'password'  => '',
 			)
