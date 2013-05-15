@@ -2,11 +2,10 @@
 
 namespace Purekid\Mongodm\Test\Model;
 
-class User extends \Purekid\Mongodm\Model 
+class User extends Base
 {
 
 	static $collection = "user";
- 	public static $config = 'test';
 	
 	protected static $attrs = array(
 			

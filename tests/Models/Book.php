@@ -2,10 +2,9 @@
 
 namespace Purekid\Mongodm\Test\Model;
 
-class Book extends \Purekid\Mongodm\Model
+class Book extends Base
 {
 
 	static $collection = "book";
- 	public static $config = 'test';
 	
 }
