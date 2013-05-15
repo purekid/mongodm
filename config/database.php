@@ -10,7 +10,6 @@ return array(
 	'default' => array(
 		'connection' => array(
 			'hostnames' => 'localhost',
-			'hostnames' => 'localhost',
 			'database'  => 'default',
 // 			'username'  => '',
 // 			'password'  => '',
@@ -26,7 +25,7 @@ return array(
 	),
 	'testing' => array(
 		'connection' => array(
-			'hostnames' => 'localhost',
+			'hostnames' => 'localhost,192.168.1.2',
 			'database'  => 'test',
 // 			'username'  => '',
 // 			'password'  => '',
