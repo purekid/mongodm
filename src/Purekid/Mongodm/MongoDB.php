@@ -477,12 +477,22 @@ class MongoDB
 	}
 	
 	static function config($config_block){
+		
 		$config_file = "database.php";
 		$path = __DIR__ . "/../../../config/" .$config_file;
+		
+		$env =  (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : '');
+		
+		if($config_block == "default" && $env){
+			$config_block = $env;
+		}
+		
 		if(file_exists($path)){
 			$config = (require $path); 
 			if(isset($config[$config_block])){
 				return $config[$config_block];
+			}else{
+				throw new \Exception("database config section '{$config_block}' not exist!");
 			}
 			
 			return $config['default'];
