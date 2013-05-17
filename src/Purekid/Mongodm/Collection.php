@@ -119,7 +119,9 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
 	public function has( $param )
 	{
 		
-		if(is_object($param)){
+		if($param instanceof \MongoId){
+			$id = (string) $param;
+		}else if($param instanceof Model){
 			$id = (string) $param->getId() ;
 		}else if(is_string($param)){
 			$id = $param;
