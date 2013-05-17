@@ -1,18 +1,17 @@
 <?php
 
 /**  Determine if use your local config file in place of this file   **/
-$use_local_config = false;
+$use_local_config = true;
 
-/** The path of your config file , change to fit for your project.**/
+/** The path of your config file , change to fit for your project.
+ * 	If your local config file does not exist,this config file will be used.
+ * **/
 $local_config_file = __DIR__."/../../../../application/config/local/mongodm.php";
 
 if($use_local_config && file_exists($local_config_file)){
 		$array = require $local_config_file;
 		return $array;
-}else{
-	throw new Exception("File {$local_config_file} not exists!");
 }
-
 
 /**
  *  --------------------------------------------------------------
