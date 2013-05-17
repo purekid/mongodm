@@ -1,7 +1,7 @@
 <?php
 
 /**  Determine if use your local config file in place of this file   **/
-$use_local_config = true;
+$use_local_config = false;
 
 /** The path of your config file , change to fit for your project.**/
 $local_config_file = __DIR__."/../../../../application/config/local/mongodm.php";
