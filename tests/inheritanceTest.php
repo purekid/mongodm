@@ -60,4 +60,15 @@ class TestInheritance extends PHPUnit_Framework_TestCase {
 	
 	}
 	
+
+	public function testDrop(){
+	
+		$pupil = Pupil::one();
+		$this->assertNotEmpty($pupil);
+		Pupil::drop();
+		$pupil = Pupil::one();
+		$this->assertEmpty($pupil);
+	
+	}
+	
 }
