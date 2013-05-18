@@ -12,15 +12,26 @@ namespace Purekid\Mongodm;
 abstract class Model
 {
 	public $cleanData = array();
+
+	/**
+	 *  exists in the database
+	 */
 	public $exists = false;
 	
+	/**
+	 * section choosen in the config 
+	 */
 	protected static $config = 'default';
-	protected static $use_timestamps = false;
+	
 	protected static $attrs = array();
+	
+	/**
+	 * Data modified 
+	 */
 	protected $dirtyData = array();
 	protected $ignoreData = array();
-	private $_connection = null;
 	private $_cache = array();
+	private $_connection = null;
 	
 	public function __construct($data = array())
 	{
@@ -36,12 +47,15 @@ abstract class Model
 		
  		$this->update($data,true);
  		$this->initAttrs();
- 		$this->_initTypes();
+ 		$this->initTypes();
  		$this->__init();
  		
 	}
 	
-	private function _initTypes(){
+	/**
+	 * Initialize the "_type" attribute for the model
+	 */
+	private function initTypes(){
 
 		$class = $this->get_class_name(false);
 		$types = $this->getModelTypes();
@@ -112,6 +126,11 @@ abstract class Model
 		return true;
 	}
 
+	/**
+	 * Save to database
+	 * @params array $options
+	 * @return array
+	 */
 	public function save($options = array())
 	{
 	
@@ -120,10 +139,6 @@ abstract class Model
 	
 		$this->__preSave();
 		
-		if($this->use_timestamps)
-		{
-			$this->timestamp();
-		}
 		if ($this->exists)
 		{
 			$this->__preUpdate();
@@ -146,33 +161,6 @@ abstract class Model
 		
 		return $success;
 		
-	}
-	
-	/**
-	 * Set an index for collection
-	 *
-	 * @param  $keys
-	 * @return void
-	 */
-	public static function set_index($keys)
-	{
-		return $this->connection()->ensure_index($this->collectionName(), $keys);
-	}
-	
-	/**
-	 * Get the count of records
-	 *
-	 * @param  $params
-	 * @return integer
-	 */
-	public static function count($params = array())
-	{
-	
-		$class = get_called_class();
-		$params['_type'] = $class::get_class_name(false);
-		$count = self::connection()->count(self::collectionName(),$params);
-		return $count;
-	
 	}
 	
 	/**
@@ -208,12 +196,7 @@ abstract class Model
 	}
 	
 	/**
-	 * 
-	 *
-	 * @return array
-	 */
-	/**
-	 * Find a record by MongoId
+	 * Retrieve a record by MongoId
 	 * @param mixed $id 
 	 * @return Model
 	 */
@@ -230,7 +213,7 @@ abstract class Model
 	}
 	
 	/**
-	 * Find a record
+	 * Retrieve a record
 	 *
 	 * @param  array $params
 	 * @param  array $fields
@@ -253,7 +236,7 @@ abstract class Model
 	}
 	
 	/**
-	 * Find records
+	 * Retrieve records
 	 *
 	 * @param  array $params
 	 * @param  array $sort
@@ -295,7 +278,7 @@ abstract class Model
 	}
 	
 	/**
-	 * Find records
+	 * Retrieve all records
 	 *
 	 * @param  array $sort
 	 * @param  array $fields
@@ -311,6 +294,24 @@ abstract class Model
 		}
 		
 		return self::find($params,$fields,$sort);
+	
+	}
+	
+	/**
+	 * Count of records
+	 *
+	 * @param  $params
+	 * @return integer
+	 */
+	public static function count($params = array())
+	{
+		$class = get_called_class();
+		$types = $class::getModelTypes();
+		if(count($types) > 1){
+			$params['_type'] = $class::get_class_name(false);
+		}
+		$count = self::connection()->count(self::collectionName(),$params);
+		return $count;
 	
 	}
 	
@@ -354,6 +355,9 @@ abstract class Model
 		return $class[count($class) - 1];
 	}
 	
+	/**
+	 * Initialize attributes with default value
+	 */
 	protected function initAttrs(){
 		$attrs = self::getAttrs();
 		foreach($attrs as $key => $attr){
@@ -362,12 +366,10 @@ abstract class Model
 				$this->$key = $attr['default'];
 			}
 		}
-	
 	}
 	
 	/**
 	 * Get defined attributes in $attrs
-	 * @param mixed $ref
 	 * @return array
 	 */
 	protected static function getAttrs(){
@@ -380,13 +382,13 @@ abstract class Model
 		}else{
 			$attrs = $class::$attrs;
 		}
+		if(empty($attrs)) $attrs = array();
 		return $attrs;
 			
 	}
 	
 	/**
-	 * Get defined attributes in $attrs
-	 * @param mixed $ref
+	 * Get types of model,type is the class_name without namespace of Model
 	 * @return array
 	 */
 	protected static function getModelTypes(){
@@ -405,19 +407,9 @@ abstract class Model
 	}
 	
 	/**
-	 * Set the creation and update timestamps on the model.
-	 *
-	 * Uses the time() method
-	 *
-	 * @return void
+	 * Get Mongodb connection instance
+	 * @return Mongodb
 	 */
-	private function timestamp()
-	{
-		$this->_cache['update_time'] = time();
-	
-		if ( ! $this->exists ) $this->_cache['create_time'] = $this->_cache['update_time'];
-	}
-	
 	private static function connection()
 	{
 		$class = get_called_class();
@@ -497,6 +489,10 @@ abstract class Model
 	
 	}
 	
+	/**
+	 *  If the attribute of $key is a reference ,
+	 *  save the attribute into database as MongoDBRef
+	 */
 	private function setRef($key,$value)
 	{
 		$attrs = $this->getAttrs();
@@ -536,6 +532,10 @@ abstract class Model
 		return $return;
 	}
 	
+	/**
+	 *  If the attribute of $key is a reference ,
+	 *  load its original record from db 
+	 */
 	private function loadRef($key)
 	{
 		$attrs = $this->getAttrs();
