@@ -128,7 +128,7 @@ abstract class Model
 
 	/**
 	 * Save to database
-	 * @params array $options
+	 * @params array $options     
 	 * @return array
 	 */
 	public function save($options = array())
@@ -327,6 +327,17 @@ abstract class Model
 		return $collection;
 	}
 	
+	/**
+	 * Drop the collection
+	 *
+	 * @return boolean
+	 */
+	public static function drop(){
+	
+		$class = get_called_class();
+		return self::connection()->drop_collection($class::collectionName());
+	
+	}
 	
 	/**
 	 * Retrieve a record by MongoRef
