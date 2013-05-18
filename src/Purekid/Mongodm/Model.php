@@ -674,9 +674,13 @@ abstract class Model
 		} 
 		
 		$this->parseValue($key,$value);
+		if(isset($this->cleanData[$key]) && $this->cleanData[$key] === $value){
+			
+		}else{
 		
-		$this->cleanData[$key] = $value;
-		$this->dirtyData[$key] = $value;
+			$this->cleanData[$key] = $value;
+			$this->dirtyData[$key] = $value;
+		}
 		
 	}
 
