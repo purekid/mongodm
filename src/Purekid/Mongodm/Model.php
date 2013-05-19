@@ -519,6 +519,8 @@ abstract class Model
 			if($value instanceof $model){
 				$ref = $value->makeRef();
 				$return = $ref;
+			}else if($value == null){
+				$return = null;
 			}else{
 				throw new \Exception ("{$key} is not instance of '$model'");
 			}
@@ -534,6 +536,8 @@ abstract class Model
 				$value = Collection::make($value);
 			}else if($value instanceof Collection){
 				$return = $value->makeRef();
+			}else if($value == null){
+				$return = null;
 			}else{
 				throw new \Exception ("{$key} is not instance of '$model'");
 			}
