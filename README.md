@@ -355,7 +355,13 @@ Retrieve all Human records , queries without '_type' because of it's a toplevel 
 Retrieve all Student records , queries with  { "_type":"Student" } because of it's a subclass.
 
     $students = Student::all();
-	
+
+
+### Other static methods 
+
+Drop the collection in database
+
+##### drop()
 
 ### Hooks
 
