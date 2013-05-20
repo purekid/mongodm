@@ -452,9 +452,16 @@ abstract class Model
 	 * @return mixed
 	 */
 	private function parseValue($key,$value){
+		
 		$attrs = $this->getAttrs();
-	
-		if( isset($attrs[$key]) && isset($attrs[$key]['type'])){
+		if( !isset($attrs[$key]) && is_object($value)){
+			if(method_exists($value, 'toArray')){
+				$value = (array) $value->toArray();
+			}else if(method_exists($value, 'to_array')){
+				$value = (array) $value->to_array();
+			}
+		}
+		else if( isset($attrs[$key]) && isset($attrs[$key]['type'])){
 			$type = $attrs[$key]['type'];
 			$type_defined = array('reference','references','integer','string','double','timestamp','boolean','array','object');
 			if(in_array($type, $type_defined)){
@@ -677,11 +684,10 @@ abstract class Model
 			$value = $this->setRef($key,$value);
 		} 
 		
-		$this->parseValue($key,$value);
+		$value = $this->parseValue($key,$value);
 		if(isset($this->cleanData[$key]) && $this->cleanData[$key] === $value){
 			
 		}else{
-		
 			$this->cleanData[$key] = $value;
 			$this->dirtyData[$key] = $value;
 		}
