@@ -143,7 +143,14 @@ class MongoDB
 
 		/* Create connection object, attempt to connect */
 		$options['connect'] = false;
-		$this->_connection = new \MongoClient($config['hostnames'], $options);
+		
+		$class = '\MongoClient';
+		if(!class_exists($class)){
+			$class = '\MongoDB';
+		}
+		
+		$this->_connection = new $class($config['hostnames'], $options);
+		
 		/* Try connect */
 		try
 		{
