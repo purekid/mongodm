@@ -463,7 +463,7 @@ abstract class Model
 		}
 		else if( isset($attrs[$key]) && isset($attrs[$key]['type'])){
 			$type = $attrs[$key]['type'];
-			$type_defined = array('reference','references','integer','string','double','timestamp','boolean','array','object');
+			$type_defined = array('mixed','reference','references','integer','string','double','timestamp','boolean','array','object');
 			if(in_array($type, $type_defined)){
 				switch($type){
 					case "integer":

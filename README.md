@@ -114,7 +114,8 @@ Types Supported for model attr
 ----------   
 
 	$types = [
-	  	'string',     // default type 
+	    'mixed',  // mixed type 
+	  	'string',     
 	    'reference',  // a reference to another model
 	    'references', // references to another model
 	    'integer',  
