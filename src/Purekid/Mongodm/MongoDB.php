@@ -150,7 +150,6 @@ class MongoDB
 		}
 		
 		$this->_connection = new $class($config['hostnames'], $options);
-		
 		/* Try connect */
 		try
 		{
@@ -166,8 +165,8 @@ class MongoDB
 			throw new \Exception('No database specified in MangoDB Config');
 		}
 		$this->_db = $this->_connection->selectDB($config['database']);
+		$this->_connected = true;
 		
-		$this->_connected = $this->_connection->connected;
 		return true;
 	}
 
