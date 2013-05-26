@@ -152,7 +152,7 @@ Update attrs by array
 
 	$user = User::one( array('name'=>"michael" ) );
 	
-Load one record by MongoId
+retrieve one record by MongoId
 
 	$id = "517c850641da6da0ab000004";
 
