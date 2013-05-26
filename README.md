@@ -115,10 +115,11 @@ Types Supported for model attr
 
 	$types = [
 	    'mixed',  // mixed type 
-	  	'string',     
+	    'string',     
 	    'reference',  // a reference to another model
 	    'references', // references to another model
 	    'integer',  
+	    'int',  // alias of 'integer'
 	    'double',     // float 
 	    'timestamp',  // store as MongoTimestamp in Mongodb
 	    'boolean',    // true or false
