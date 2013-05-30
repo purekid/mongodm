@@ -367,6 +367,18 @@ abstract class Model
 	}
 	
 	/**
+	 * Ensure index 
+	 * @param mixed $keys
+	 * @param array $options
+	 * @return  boolean 
+	 */
+	public static function ensure_index (  $keys, $options = array())
+	{
+		$result =  self::connection()->ensure_index(self::collectionName(),$keys,$options);
+		return $result; 
+	}
+	
+	/**
 	 * Initialize attributes with default value
 	 */
 	protected function initAttrs(){

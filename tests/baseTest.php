@@ -19,7 +19,7 @@ class TestBase extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testDefaultAttr(){
-		
+
 		$user = new User();
 		$user->name = "michael";
 		$this->assertEquals((int)16, $user->age);
