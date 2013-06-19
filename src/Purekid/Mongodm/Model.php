@@ -200,14 +200,14 @@ abstract class Model
 	 * @param mixed $id 
 	 * @return Model
 	 */
-	public static function id($id)
-	{
-		
-		if($id){
-			$id = new \MongoId($id);
-		}else{
-			return null;
-		}
+	public static function id($id){
+
+        if($id && strlen($id) == 24)  {
+            $id = new \MongoId($id);
+        }else{
+            return null;
+        }
+        
 		return self::one( array( "_id" => $id ));
 	
 	}
