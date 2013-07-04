@@ -90,7 +90,7 @@ If you want select config section with environment variable APPLICATION_ENV , yo
         static $collection = "user";
         
         /** use specific config section **/
-        public static $config = 'test';
+        public static $config = 'testing';
         
         /** specific definition for attributes, not necessary! **/
         protected static $attrs = array(
