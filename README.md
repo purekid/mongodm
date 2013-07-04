@@ -25,7 +25,7 @@ Installation
  
 	{
 		"require": {
-		    "purekid/mongodm": "dev-master",
+		    "purekid/mongodm": "dev-master"
 		}
 	}
 
