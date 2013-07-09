@@ -47,7 +47,6 @@ If you want select config section with environment variable APPLICATION_ENV , yo
         'default' => array(
     		'connection' => array(
     			'hostnames' => 'localhost',
-    			'hostnames' => 'localhost',
     			'database'  => 'default',
     // 			'username'  => '',
     // 			'password'  => '',
