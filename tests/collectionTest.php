@@ -2,7 +2,7 @@
 
 
 use Purekid\Mongodm\Test\Model\Book;
-
+use Purekid\Mongodm\Test\Model\User;
 
 class TestCollection extends PHPUnit_Framework_TestCase {
 
@@ -40,5 +40,48 @@ class TestCollection extends PHPUnit_Framework_TestCase {
 	
 	}
 	
-	
+	public function testReferencesChangedDirectly(){
+
+        $user = new User(array('name'=>'michael'));
+        $user->save();
+
+        $book = new Book(array('name'=>'book1'));
+        $book->save();
+
+        $books = array($book);
+
+        $user->books = $books;
+        $user->save();
+
+        $book_2 = new Book(array('name'=>'book2'));
+
+        $book_2->save();
+        $user->books->add($book_2);
+        $user->save();
+
+        $book2_id = $book_2->getId();
+
+        $this->assertEquals($user->books->count(),2);
+
+        $id = $user->getId();
+
+        $user = User::id($id);
+
+        $book_3 = new Book(array('name'=>'book3'));
+        $book_3->save();
+        $user->books->add($book_3);
+
+        $this->assertEquals($user->books->count(),3);
+
+        $user->books->remove($book2_id);
+
+        $user->save();
+
+        $user = User::id($id);
+
+        $this->assertEquals($user->books->count(),2);
+
+
+
+    }
 }
