@@ -68,8 +68,8 @@ abstract class Model
 		}
 		
 	}
-	
-	
+
+
 	/**
 	 * Update data by a array
 	 * @param array $cleanData
@@ -133,7 +133,9 @@ abstract class Model
 	 */
 	public function save($options = array())
 	{
-	
+
+        $this->_processReferencesChanged();
+
 		/* if no changes then do nothing */
 		if ($this->exists and empty($this->dirtyData)) return true;
 	
@@ -200,14 +202,14 @@ abstract class Model
 	 * @param mixed $id 
 	 * @return Model
 	 */
-	public static function id($id){
-
-        if($id && strlen($id) == 24)  {
-            $id = new \MongoId($id);
-        }else{
-            return null;
-        }
-        
+	public static function id($id)
+	{
+		
+		if($id){
+			$id = new \MongoId($id);
+		}else{
+			return null;
+		}
 		return self::one( array( "_id" => $id ));
 	
 	}
@@ -296,7 +298,21 @@ abstract class Model
 		return self::find($params,$fields,$sort);
 	
 	}
-	
+
+    public static function group(array $keys, array $query, $initial = null,$reduce = null)
+	{
+        if(!$reduce) $reduce = new \MongoCode( 'function(doc, out){ out.object = doc }');
+        if(!$initial) $initial = array('object'=>0);
+        return self::connection()->group(self::collectionName(),$keys,$initial,$reduce,array('condition'=>$query));
+
+    }
+
+    public static function aggregate($query){
+        $rows =  self::connection()->aggregate(self::collectionName(),$query);
+        return $rows;
+//        return Hydrator::hydrate(get_called_class(), $results);
+    }
+
 	/**
 	 * Count of records
 	 *
@@ -519,7 +535,24 @@ abstract class Model
 		return $value;
 	
 	}
-	
+
+    private function _processReferencesChanged(){
+        $cache = $this->_cache;
+        $attrs = $this->getAttrs();
+        foreach($cache as $key => $item){
+            if(!isset($attrs[$key])) continue;
+            $attr = $attrs[$key];
+            if($attr['type'] == 'references'){
+                if( $item instanceof Collection && $this->cleanData[$key] !== $item->makeRef()){
+//                    $this->cleanData[$key] = $item->makeRef();
+//                    $this->dirtyData[$key] = $item->makeRef();
+                    $this->__set($key,$item);
+                }
+            }
+        }
+
+    }
+
 	/**
 	 *  If the attribute of $key is a reference ,
 	 *  save the attribute into database as MongoDBRef
@@ -585,7 +618,8 @@ abstract class Model
 		$model = $reference['model'];
 		$type = $reference['type'];
 		if( isset($cache[$key]) ){
-			return $cache[$key];
+            $obj = &$cache[$key];
+			return $obj;
 		}else{
 			if(class_exists($model)){
 				if($type == "reference"){
@@ -607,7 +641,8 @@ abstract class Model
 					}
 					$set =  Collection::make($res);
 					$cache[$key] = $set;
-					return $set;
+                    $obj = &$cache[$key];
+                    return $obj;
 				}
 			}
 		}
