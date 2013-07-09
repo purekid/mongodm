@@ -168,6 +168,9 @@ Retrieve records that name is 'Michael' and acount  of owned  books equals 2
        
 ### Retrieve all records
 	$users = User::all();
+	
+### Count records
+	$count = User::count(array('age'=>16));
 
 ### Delete record
 	$user = User::one();
