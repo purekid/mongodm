@@ -205,7 +205,7 @@ abstract class Model
 	public static function id($id)
 	{
 		
-		if($id){
+		if($id  && strlen($id) == 24 ){
 			$id = new \MongoId($id);
 		}else{
 			return null;
