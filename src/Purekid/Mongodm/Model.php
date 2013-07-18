@@ -145,8 +145,6 @@ abstract class Model
 		{
 			$this->__preUpdate();
 			$success = $this->_connection->update($this->collectionName(), array('_id' => $this->getId()), array('$set' => $this->dirtyData), $options);
-			$this->exists = true ;
-			$this->dirtyData = array();
 			$this->__postUpdate();
 		}
 		else
@@ -154,11 +152,14 @@ abstract class Model
 			$this->__preInsert();
 			$insert = $this->_connection->insert($this->collectionName(), $this->cleanData, $options);
 			$success = !is_null($this->cleanData['$id'] = $insert['_id']);
-			$this->exists = true ;
-			$this->dirtyData = array();
-			$this->__postInsert();
+			if($success){
+				$this->exists = true ;
+				$this->__postInsert();
+			}
+			
 		}
 	
+		$this->dirtyData = array();
 		$this->__postSave();
 		
 		return $success;
