@@ -162,7 +162,7 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
      * @param  Closure  $callback
      * @return Purekid\Mongodm\Collection
      */
-    public function each($callback)
+    public function each(\Closure $callback)
     {
         array_map($callback, $this->_items);
 

@@ -114,9 +114,14 @@ class TestCollection extends PHPUnit_Framework_TestCase {
         $user = User::id($user_id);
 
 
+        $names = array();
         $user->books->each(function($item){
-            $this->assertEquals( $item->name, 1);
+            $names[] = $item->name;
         });
+
+        foreach($names as $name){
+            $this->assertEquals($name,1);
+        }
 
     }
 
