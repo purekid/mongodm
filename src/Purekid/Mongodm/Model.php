@@ -134,7 +134,7 @@ abstract class Model
 	public function save($options = array())
 	{
 
-        $this->_processReferencesChanged();
+        	$this->_processReferencesChanged();
 
 		/* if no changes then do nothing */
 		if ($this->exists and empty($this->dirtyData)) return true;
