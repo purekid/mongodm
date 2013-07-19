@@ -229,6 +229,12 @@ Count
 Iteration	
 
 	foreach($users as $user) { }  
+	
+	OR
+	
+	$users->each(function($user){
+	
+	})
 
 Determine a record exists in the collection by object instance	
 	
