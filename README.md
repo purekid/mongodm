@@ -229,6 +229,12 @@ Count
 Iteration	
 
 	foreach($users as $user) { }  
+	
+	OR use Closure (PHP >= 5.4)
+	
+	$users->each(function($user){
+	
+	})
 
 Determine a record exists in the collection by object instance	
 	
