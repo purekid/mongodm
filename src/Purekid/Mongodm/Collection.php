@@ -41,7 +41,7 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
 	 * Get item by numeric index or MongoId 
 	 *
 	 * @param  array $models
-	 * @return Purekid\Mongodm\Model
+	 * @return \Purekid\Mongodm\Model
 	 */
 	public function get($index = 0 )
 	{
@@ -134,10 +134,10 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
 	}
 	
 	/**
-	 * Make a set from a arrry of Model
+	 * Make a collection from a arrry of Model
 	 *
 	 * @param  array $models
-	 * @return Purekid\Mongodm\ModelSet
+	 * @return \Purekid\Mongodm\Collection
 	 */
 	static function make($models)
 	{
@@ -155,6 +155,30 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
 	{
 		return array_pop($this->_items);
 	}
+
+    /**
+     * Execute a callback over each item.
+     *
+     * @param  Closure  $callback
+     * @return Purekid\Mongodm\Collection
+     */
+    public function each(\Closure $callback)
+    {
+        array_map($callback, $this->_items);
+
+        return $this;
+    }
+
+    /**
+     * Run a filter over each of the items.
+     *
+     * @param  Closure  $callback
+     * @return \Purekid\Support\Collection
+     */
+    public function filter(Closure $callback)
+    {
+        return new static(array_filter($this->items, $callback));
+    }
 	
 	/**
 	 * Add a model item or model array or ModelSet to this set

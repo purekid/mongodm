@@ -84,4 +84,40 @@ class TestCollection extends PHPUnit_Framework_TestCase {
 
 
     }
+
+    function testEach(){
+
+        $user = new User(array('name'=>'michael'));
+        $user->save();
+
+        $user_id = $user->getId();
+
+        $book = new Book(array('name'=>'book1'));
+        $book->save();
+
+        $book2 = new Book(array('name'=>'book2'));
+        $book2->save();
+
+        $books = array($book,$book2);
+
+        $user->books = $books;
+        $user->save();
+
+        $user->books->each(function($item){
+             $item->name = '1';
+             $item->save();
+        });
+
+        $user->save();
+
+
+        $user = User::id($user_id);
+
+
+        $user->books->each(function($item){
+            $this->assertEquals( $item->name, 1);
+        });
+
+    }
+
 }
