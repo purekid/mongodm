@@ -230,7 +230,7 @@ Iteration
 
 	foreach($users as $user) { }  
 	
-	OR
+	OR use Closure (PHP >= 5.4)
 	
 	$users->each(function($user){
 	
