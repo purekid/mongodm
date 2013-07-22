@@ -193,7 +193,7 @@ abstract class Model
 	{
 	
 		$model = get_called_class();
-		$ref = \MongoDBRef::create($this->collectionName(), $this->getId(),$this->dbName());
+		$ref = \MongoDBRef::create($this->collectionName(), $this->getId());
 		return $ref;
 	
 	}
