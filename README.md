@@ -237,6 +237,7 @@ Iteration
 	})
 	
 Sort
+
 	//sort by age desc
 	$users->sortBy(function($user){
 	    return $user->age;
