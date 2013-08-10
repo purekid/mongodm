@@ -235,6 +235,20 @@ Iteration
 	$users->each(function($user){
 	
 	})
+	
+Sort
+	//sort by age desc
+	$users->sortBy(function($user){
+	    return $user->age;
+	});
+	
+	//sort by name asc
+	$users->sortBy(function($user){
+	    return $user->name;
+	} , true);
+	
+	//reverse collection items
+	$users->reverse();
 
 Determine a record exists in the collection by object instance	
 	
