@@ -35,7 +35,7 @@ Installation
 	php composer.phar install
 
 
-How to Use
+Usage
 ----------
 
 ### Setup database in   config/database.php
