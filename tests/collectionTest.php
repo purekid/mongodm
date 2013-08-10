@@ -1,6 +1,7 @@
 <?php
 
 
+use Purekid\Mongodm\Collection;
 use Purekid\Mongodm\Test\Model\Book;
 use Purekid\Mongodm\Test\Model\User;
 
@@ -122,6 +123,39 @@ class TestCollection extends PHPUnit_Framework_TestCase {
         foreach($names as $name){
             $this->assertEquals($name,1);
         }
+
+    }
+
+    function testSort(){
+
+        $book = new Book( array('name'=>'b','price'=>3));
+        $book->save();
+
+        $book1 = new Book( array('name'=>'c','price'=>1));
+        $book1 -> save();
+
+        $book2 = new Book( array('name'=>'a','price'=>2));
+        $book2->save();
+
+        $books = Collection::make(array($book,$book1,$book2));
+
+        $this->assertEquals($books->get(0)->name , 'b');
+
+        $books->sortBy(function($book){ return $book->name; });
+
+        $this->assertEquals($books->get(0)->name , 'c');
+
+        $books->sortBy(function($book){ return $book->name; } , true);
+
+        $this->assertEquals($books->get(0)->name , 'a');
+
+        $books->reverse();
+
+        $this->assertEquals($books->get(0)->name , 'c');
+
+        $books->sortBy(function($book){ return $book->price; } , true);
+
+        $this->assertEquals($books->get(0)->price , 1);
 
     }
 

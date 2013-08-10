@@ -132,8 +132,54 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
 		return false;
 				
 	}
-	
-	/**
+
+
+    /**
+     * Sort the collection using the given Closure
+     * @param callable $callback
+     * @param boolean $asc
+     * @return \Purekid\Mongodm\Collection
+     */
+    public function sortBy(\Closure $callback , $asc = false)
+    {
+        $results = array();
+
+        foreach ($this->_items as $key => $value)
+        {
+            $results[$key] = $callback($value);
+        }
+
+        if($asc){
+            asort($results);
+        }else{
+            arsort($results);
+        }
+
+        foreach (array_keys($results) as $key)
+        {
+            $results[$key] = $this->_items[$key];
+        }
+
+        $this->_items = $results;
+
+        return $this;
+    }
+
+    /**
+     * Reverse items order.
+     *
+     * @return \Purekid\Mongodm\Collection
+     */
+    public function reverse()
+    {
+
+        $this->_items =  array_reverse($this->_items);
+        return $this;
+
+    }
+
+
+    /**
 	 * Make a collection from a arrry of Model
 	 *
 	 * @param  array $models
