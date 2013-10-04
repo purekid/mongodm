@@ -337,7 +337,7 @@ class MongoDB
 
 	/* File management */
 
-	public function gridFS( $arg1 = NULL, $arg2 = NULL)
+	public function gridFS($arg1 = NULL)
 	{
 		try{
 			$this->_connected OR $this->connect();
@@ -352,12 +352,7 @@ class MongoDB
 			: 'fs';
 		}
 
-		if ( ! isset($arg2) && isset($this->_config['gridFS']['arg2']))
-		{
-			$arg2 = $this->_config['gridFS']['arg2'];
-		}
-
-		return $this->_db->getGridFS($arg1,$arg2);
+		return $this->_db->getGridFS($arg1);
 	}
 
 	public function get_file(array $criteria = array())
