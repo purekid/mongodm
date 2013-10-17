@@ -45,7 +45,7 @@ class MongoDB
 				$config = self::config($name);
 			}
 
-			new MongoDB($name,$config);
+			self::$instances[$name] = new MongoDB($name, $config);
 		}
 
 		return self::$instances[$name];
