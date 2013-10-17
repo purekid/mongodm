@@ -10,6 +10,9 @@
             "homepage": "http://github/purekid"
         }
     ],
+    "require-dev": {
+        "chriskite/phactory": "dev-master"
+    },
     "autoload": {
         "psr-0": {
             "Purekid\\Mongodm\\": "src"
