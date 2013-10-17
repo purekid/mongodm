@@ -1,13 +1,16 @@
 <?php
 
+namespace Purekid\Mongodm\Test;
 
+use Purekid\Mongodm\Test\TestCase\PhactoryTestCase;
 use Purekid\Mongodm\Collection;
 use Purekid\Mongodm\Test\Model\Book;
 use Purekid\Mongodm\Test\Model\User;
 
-class TestCollection extends PHPUnit_Framework_TestCase {
+class CollectionTest extends PhactoryTestCase {
 
-	public function testCollectionFunction(){
+	public function testCollectionFunction()
+    {
 	
 		$book1 = new Book();
 		$book1->name = "book1";
@@ -41,7 +44,8 @@ class TestCollection extends PHPUnit_Framework_TestCase {
 	
 	}
 	
-	public function testReferencesChangedDirectly(){
+	public function testReferencesChangedDirectly()
+    {
 
         $user = new User(array('name'=>'michael'));
         $user->save();
@@ -86,7 +90,8 @@ class TestCollection extends PHPUnit_Framework_TestCase {
 
     }
 
-    function testEach(){
+    function testEach()
+    {
 
         $user = new User(array('name'=>'michael'));
         $user->save();
@@ -126,7 +131,8 @@ class TestCollection extends PHPUnit_Framework_TestCase {
 
     }
 
-    function testSort(){
+    function testSort()
+    {
 
         $book = new Book( array('name'=>'b','price'=>3));
         $book->save();
@@ -159,7 +165,8 @@ class TestCollection extends PHPUnit_Framework_TestCase {
 
     }
 
-    function testFilter(){
+    function testFilter()
+    {
 
         $book = new Book( array('name'=>'b','price'=>3));
         $book->save();
@@ -190,7 +197,8 @@ class TestCollection extends PHPUnit_Framework_TestCase {
 
     }
 
-    function testMap(){
+    function testMap()
+    {
 
         $book = new Book( array('name'=>'b','price'=>3));
         $book->save();

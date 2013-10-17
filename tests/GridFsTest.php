@@ -1,8 +1,11 @@
 <?php
 
+namespace Purekid\Mongodm\Test;
+
+use Purekid\Mongodm\Test\TestCase\PhactoryTestCase;
 use Purekid\Mongodm\MongoDB;
 
-class GridFsTest extends PHPUnit_Framework_TestCase
+class GridFsTest extends PhactoryTestCase
 {
     public function getGridFSPrefixes()
     {
@@ -17,7 +20,7 @@ class GridFsTest extends PHPUnit_Framework_TestCase
     */
     public function testGetGridFs($prefix)
     {
-        $mongo_db = MongoDB::instance();
+        $mongo_db = self::$db;
         $grid_fs = $mongo_db->gridFs($prefix);
         $this->assertInstanceOf('MongoGridFS', $grid_fs);
     }
