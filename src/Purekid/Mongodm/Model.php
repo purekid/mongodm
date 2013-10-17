@@ -11,6 +11,7 @@ namespace Purekid\Mongodm;
  */
 abstract class Model
 {
+
 	public $cleanData = array();
 
 	/**
@@ -22,18 +23,24 @@ abstract class Model
 	 * section choosen in the config 
 	 */
 	protected static $config = 'default';
-	
-	protected static $attrs = array();
+
+    protected static $attrs = array();
 	
 	/**
 	 * Data modified 
 	 */
 	protected $dirtyData = array();
+
 	protected $ignoreData = array();
-	private $_cache = array();
+
+    /**
+     * Cache for references data
+     */
+    private $_cache = array();
+
 	private $_connection = null;
 	
-	public function __construct($data = array())
+	public function __construct( $data = array() )
 	{
 		if (is_null($this->_connection))
 		{
@@ -52,22 +59,6 @@ abstract class Model
  		
 	}
 	
-	/**
-	 * Initialize the "_type" attribute for the model
-	 */
-	private function initTypes(){
-
-		$class = $this->get_class_name(false);
-		$types = $this->getModelTypes();
-		$type = $this->_type;
-		if(!$type || !is_array($type)){
-			$this->_type = $types;
-		}else if(!in_array($class,$type)){
-			$type[] = $class;
-			$this->_type = $type;
-		}
-		
-	}
 
 
 	/**
@@ -128,13 +119,14 @@ abstract class Model
 
 	/**
 	 * Save to database
-	 * @params array $options     
+     *
+	 * @param array $options
 	 * @return array
 	 */
 	public function save($options = array())
 	{
 
-        	$this->_processReferencesChanged();
+        $this->_processReferencesChanged();
 
 		/* if no changes then do nothing */
 		if ($this->exists and empty($this->dirtyData)) return true;
@@ -302,6 +294,7 @@ abstract class Model
 
     public static function group(array $keys, array $query, $initial = null,$reduce = null)
 	{
+
         if(!$reduce) $reduce = new \MongoCode( 'function(doc, out){ out.object = doc }');
         if(!$initial) $initial = array('object'=>0);
         return self::connection()->group(self::collectionName(),$keys,$initial,$reduce,array('condition'=>$query));
@@ -309,9 +302,10 @@ abstract class Model
     }
 
     public static function aggregate($query){
+
         $rows =  self::connection()->aggregate(self::collectionName(),$query);
         return $rows;
-//        return Hydrator::hydrate(get_called_class(), $results);
+
     }
 
 	/**
@@ -358,6 +352,7 @@ abstract class Model
 	
 	/**
 	 * Retrieve a record by MongoRef
+     *
 	 * @param mixed $ref
 	 * @return Model 
 	 */
@@ -372,6 +367,7 @@ abstract class Model
 	
 	/**
 	 * Returns the name of a class using get_class with the namespaces stripped.
+     *
 	 * @param boolean $with_namespaces
 	 * @return  string  Name of class with namespaces stripped
 	 */
@@ -395,57 +391,25 @@ abstract class Model
 		return $result; 
 	}
 	
-	/**
-	 * Initialize attributes with default value
-	 */
-	protected function initAttrs(){
-		$attrs = self::getAttrs();
-		foreach($attrs as $key => $attr){
-			if(! isset($attr['default'])) continue;
-			if( !isset($this->cleanData[$key])){
-				$this->$key = $attr['default'];
-			}
-		}
-	}
-	
-	/**
-	 * Get defined attributes in $attrs
-	 * @return array
-	 */
-	protected static function getAttrs(){
-	
-		$class = get_called_class();
-		$parent = get_parent_class($class);
-		if($parent){
-			$attrs_parent = $parent::getAttrs();
-			$attrs = array_merge($attrs_parent,$class::$attrs);
-		}else{
-			$attrs = $class::$attrs;
-		}
-		if(empty($attrs)) $attrs = array();
-		return $attrs;
-			
-	}
-	
-	/**
-	 * Get types of model,type is the class_name without namespace of Model
-	 * @return array
-	 */
-	protected static function getModelTypes(){
-	
-		$class = get_called_class();
-		$class_name = $class::get_class_name(false);
-		$parent = get_parent_class($class);
-		if($parent){
-			$names_parent = $parent::getModelTypes();
-			$names = array_merge($names_parent,array($class_name));
-		}else{
-			$names = array();
-		}
-		return $names;
-			
-	}
-	
+
+
+    /**
+     * Initialize the "_type" attribute for the model
+     */
+    private function initTypes(){
+
+        $class = $this->get_class_name(false);
+        $types = $this->getModelTypes();
+        $type = $this->_type;
+        if(!$type || !is_array($type)){
+            $this->_type = $types;
+        }else if(!in_array($class,$type)){
+            $type[] = $class;
+            $this->_type = $type;
+        }
+
+    }
+
 	/**
 	 * Get Mongodb connection instance
 	 * @return Mongodb
@@ -458,7 +422,7 @@ abstract class Model
 	}
 	
 	/**
-	 * get current database name
+	 * Get current database name
 	 * @return string
 	 */
 	private function dbName()
@@ -474,8 +438,9 @@ abstract class Model
 		return $dbName;
 	}
 	
-	/**
-	 * Parse value with specific define in $attrs
+    /**
+	 * Parse value with specific definition in $attrs
+     *
 	 * @param string $key
 	 * @param mixed $value
 	 * @return mixed
@@ -537,7 +502,11 @@ abstract class Model
 	
 	}
 
+    /**
+     *  Update the 'references' attr when that 'references' instance has changed.
+     */
     private function _processReferencesChanged(){
+
         $cache = $this->_cache;
         $attrs = $this->getAttrs();
         foreach($cache as $key => $item){
@@ -603,7 +572,7 @@ abstract class Model
 	
 	/**
 	 *  If the attribute of $key is a reference ,
-	 *  load its original record from db 
+	 *  load its original record from db and save to $_cache temporarily.
 	 */
 	private function loadRef($key)
 	{
@@ -648,8 +617,61 @@ abstract class Model
 			}
 		}
 	}
-	
-	/* Hooks */
+
+
+    /**
+     * Initialize attributes with default value
+     */
+    protected function initAttrs(){
+        $attrs = self::getAttrs();
+        foreach($attrs as $key => $attr){
+            if(! isset($attr['default'])) continue;
+            if( !isset($this->cleanData[$key])){
+                $this->$key = $attr['default'];
+            }
+        }
+    }
+
+    /**
+     * Get all defined attributes in $attrs ( extended by parent class )
+     * @return array
+     */
+    protected static function getAttrs(){
+
+        $class = get_called_class();
+        $parent = get_parent_class($class);
+        if($parent){
+            $attrs_parent = $parent::getAttrs();
+            $attrs = array_merge($attrs_parent,$class::$attrs);
+        }else{
+            $attrs = $class::$attrs;
+        }
+        if(empty($attrs)) $attrs = array();
+        return $attrs;
+
+    }
+
+    /**
+     * Get types of model,type is the class_name without namespace of Model
+     * @return array
+     */
+    protected static function getModelTypes(){
+
+        $class = get_called_class();
+        $class_name = $class::get_class_name(false);
+        $parent = get_parent_class($class);
+        if($parent){
+            $names_parent = $parent::getModelTypes();
+            $names = array_merge($names_parent,array($class_name));
+        }else{
+            $names = array();
+        }
+        return $names;
+
+    }
+
+
+	/*********** Hooks ***********/
 	
 	protected function __init()
 	{
@@ -696,8 +718,9 @@ abstract class Model
 		return true;
 	}
 	
-	/* Magic methods*/
-	
+	/*********** Magic methods ************/
+
+
 	/**
 	 * @param  $key
 	 * @return mixed

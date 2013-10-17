@@ -6,11 +6,11 @@ $use_local_config = true;
 /** The path of your config file , change to fit for your project.
  * 	If your local config file does not exist,this config file will be used.
  * **/
-$local_config_file = __DIR__."/../../../../application/config/local/mongodm.php";
+$local_config_file = __DIR__."/../../../../application/config/mongodm.php";
 
 if($use_local_config && file_exists($local_config_file)){
-		$array = require $local_config_file;
-		return $array;
+    $array = require $local_config_file;
+    return $array;
 }
 
 /**
@@ -27,32 +27,26 @@ return array(
 		'connection' => array(
 			'hostnames' => 'localhost',
 			'database'  => 'default',
-// 			'username'  => '',
-// 			'password'  => '',
+// 			'username'  => ''
+// 			'password'  => ''
 		)
 	),
 	'development' => array(
 		'connection' => array(
 			'hostnames' => 'localhost',
-			'database'  => 'development_db',
-// 			'username'  => '',
-// 			'password'  => '',
+			'database'  => 'development_db'
 		)
 	),
 	'testing' => array(
 		'connection' => array(
-			'hostnames' => 'localhost,192.168.1.2',
-			'database'  => 'test_db',
-// 			'username'  => '',
-// 			'password'  => '',
+			'hostnames' => 'localhost',
+			'database'  => 'test_db'
 		)
 	),
 	'production' => array(
 			'connection' => array(
 				'hostnames' => 'localhost',
-				'database'  => 'production_db',
-// 				'username'  => '',
-// 				'password'  => '',
+				'database'  => 'production_db'
 			)
 	)
 );
