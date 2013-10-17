@@ -24,7 +24,7 @@ abstract class Model
 	 */
 	protected static $config = 'default';
 
-    protected static $attrs = array();
+	protected static $attrs = array();
 	
 	/**
 	 * Data modified 
@@ -33,10 +33,10 @@ abstract class Model
 
 	protected $ignoreData = array();
 
-    /**
-     * Cache for references data
-     */
-    private $_cache = array();
+	/**
+	* Cache for references data
+	*/
+	private $_cache = array();
 
 	private $_connection = null;
 	
@@ -60,7 +60,6 @@ abstract class Model
 	}
 	
 
-
 	/**
 	 * Update data by a array
 	 * @param array $cleanData
@@ -68,19 +67,21 @@ abstract class Model
 	 */
 	public function update($cleanData,$isInit = false)
 	{
-		foreach($cleanData as $key => $value){
-			if($isInit){
-				$attrs = $this->getAttrs();
+		if($isInit){
+			$attrs = $this->getAttrs();
+			foreach($cleanData as $key => $value){
 				if(($value instanceof Model) && isset($attrs[$key]) && isset($attrs[$key]['type']) 
 			    	&& ( $attrs[$key]['type'] == 'reference' or $attrs[$key]['type'] == 'references' )){
 					$value = $this->setRef($key,$value);
 				} 
-					$this->cleanData[$key] = $value;
-				
-			}else{
+				$this->cleanData[$key] = $value;
+			}
+		}else{
+			foreach($cleanData as $key => $value){
 				$this->$key = $value;
 			}
 		}
+	
 		return true;
 	}
 
