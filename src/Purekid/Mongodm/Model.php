@@ -65,7 +65,7 @@ abstract class Model
 	 * @param array $cleanData
 	 * @return boolean
 	 */
-	public function update($cleanData,$isInit = false)
+	public function update(array $cleanData,$isInit = false)
 	{
 		if($isInit){
 			$attrs = $this->getAttrs();
