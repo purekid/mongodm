@@ -18,7 +18,8 @@ class TestBase extends PHPUnit_Framework_TestCase {
 		
 	}
 	
-	public function testDefaultAttr(){
+	public function testDefaultAttr()
+	{
 
 		$user = new User();
 		$user->name = "michael";
@@ -34,7 +35,8 @@ class TestBase extends PHPUnit_Framework_TestCase {
 		
 	}
 	
-	public function testAttrType(){
+	public function testAttrType()
+	{
 		
 		$user = new User();
 		$user->name = "michael";
@@ -49,7 +51,7 @@ class TestBase extends PHPUnit_Framework_TestCase {
 	
 	public function testCreateWithData()
 	{
-		
+
 		$book = new Book(array("name"=>"Love"));
 		$book->save();
 		
@@ -65,8 +67,9 @@ class TestBase extends PHPUnit_Framework_TestCase {
 	
 	}
 	
-	public function testSetGet(){
-	
+	public function testSetGet()
+	{
+
 		$user = User::one();
 		$id = $user->getId();
 		$this->assertInstanceOf("\MongoId", $user->getId());
@@ -91,15 +94,17 @@ class TestBase extends PHPUnit_Framework_TestCase {
 	
 	}
 	
-	public function testAll(){
-	
+	public function testAll()
+	{
+
 		$user = User::all();
 		$this->assertGreaterThan(0, $user->count());
 
 	}
 	
-	public function testFind(){
-	
+	public function testFind()
+	{
+
 		$user = User::find(array("name"=>"michael"));
 		$this->assertGreaterThan(0, $user->count());
 		$user = User::find(array("name"=>"michael_no_exists"));
@@ -107,15 +112,17 @@ class TestBase extends PHPUnit_Framework_TestCase {
 	
 	}
 	
-	public function testFindOne(){
-		
+	public function testFindOne()
+	{
+
 		$user = User::one(array('name'=>'michael'));
 		$this->assertEquals("michael", $user->name);
 		
 	}
 	
-	public function testUpdate(){
-		
+	public function testUpdate()
+	{
+
 		$user = User::one();
 		$id = $user->getId();
 		$name = $user->name;
@@ -132,8 +139,9 @@ class TestBase extends PHPUnit_Framework_TestCase {
 		
 	}
 	
-	public function testDelete(){
-	
+	public function testDelete()
+	{
+
 		$user = User::one();
 		$id = $user->getId();
 		$this->assertInstanceOf("\MongoId", $user->getId());
@@ -143,8 +151,9 @@ class TestBase extends PHPUnit_Framework_TestCase {
 	
 	}
 	
-	public function testRelation1TO1(){
-	
+	public function testRelation1TO1()
+	{
+
 		$user = User::one();
 		$id = $user->getId();
 		$this->assertInstanceOf("\MongoId", $user->getId());
@@ -165,8 +174,9 @@ class TestBase extends PHPUnit_Framework_TestCase {
 	
 	}
 	
-	public function testRelation1TOMany(){
-	
+	public function testRelation1TOMany()
+	{
+
 		$user = User::one();
 		$id = $user->getId();
 		$this->assertInstanceOf("\MongoId", $user->getId());
