@@ -135,8 +135,29 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
 
 
     /**
+     * Run a map over the collection using the given Closure and return a new collection
+     * @param Closure $callback
+     * @return \Purekid\Mongodm\Collection
+     */
+    public function map(\Closure $callback)
+    {
+        return new static(array_map($callback, $this->_items));
+    }
+
+    /**
+     * Filter the collection using the given Closure and return a new collection
+     * @param Closure $callback
+     * @return \Purekid\Mongodm\Collection
+     */
+    public function filter(\Closure $callback)
+    {
+        return new static(array_filter($this->_items, $callback));
+    }
+
+
+    /**
      * Sort the collection using the given Closure
-     * @param callable $callback
+     * @param Closure $callback
      * @param boolean $asc
      * @return \Purekid\Mongodm\Collection
      */
