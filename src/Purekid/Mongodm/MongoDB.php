@@ -198,6 +198,16 @@ class MongoDB
 		$this->_db = $this->_connection = NULL;
 	}
 
+	/**
+	 * Get db
+	 *
+	 * @return MongoDB || null
+	 */
+	public function &getDB()
+	{
+		return $this->_db;
+	}
+
 	/* Database Management */
 
 	public function last_error()
