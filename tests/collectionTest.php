@@ -208,6 +208,8 @@ class TestCollection extends PHPUnit_Framework_TestCase {
 
         $books_map_1 = $books->map(function($book){   if($book->price > 10) { $book->price = 99; }  return $book;   });
 
+        $this->assertEquals( $books->get(2)->price , 99);
+
         $this->assertEquals( $books_map_1->count() , 4);
 
         $this->assertEquals( $books_map_1->get(2)->price , 99 );
