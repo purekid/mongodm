@@ -132,15 +132,17 @@ CRUD
 ### Create 
 	$user = new User();
 	$user->name = "Michael";
+	$user->age = 18;
 	$user->save();
     
 Create with initial value
 
 	$user = new User( array('name'=>"John") );
+	$user->age = 20;
 	$user->save();
 
 ### Update
-	$user->name = 20;
+	$user->age = 19;
 
 Update attrs by array
 
@@ -250,6 +252,29 @@ Sort
 	
 	//reverse collection items
 	$users->reverse();
+	
+Map
+	
+	$func = function($user){
+		  		if( $user->age >= 18 ){
+		    		$user->is_adult = true;
+		    		return $user;
+	        	}
+			};
+	
+	$adults = $users->map($func);   
+	
+	// Notice:  1. $adults is a new collection   2. In original $users , data has changed at the same time. 
+	
+Filter 
+
+	$func = function($user){
+	        	if( $user->age >= 18 ){
+	    			return true;
+	    		}
+			}
+
+	$adults = $users->filter($func); // $adults is a new collection
 
 Determine a record exists in the collection by object instance	
 	
