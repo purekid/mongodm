@@ -8,6 +8,10 @@ class MutatorTest extends PHPUnit_Framework_TestCase {
   
   public function testMutate(){
     
+    $john = new User();
+    $john->age = 18;
+    $john->save();
+    
     $user = User::one();
     $id = $user->getId();
     $age = $user->age;
