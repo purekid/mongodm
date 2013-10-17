@@ -83,6 +83,31 @@ abstract class Model
 		}
 		return true;
 	}
+
+	/**
+	 * Mutate data by direct query
+	 * @param array $updateQuery
+	 * @return boolean
+	 */
+	public function mutate($updateQuery, $options = array())
+	{
+		if(!is_array($updateQuery)) throw new Exception('$updateQuery should be an array');
+		if(!is_array($options)) throw new Exception('$options should be an array');
+
+		$default = array(
+			'w' => 1
+		);
+		$options = array_merge($default, $options);
+
+		try {
+			$this->_connection->update($this->collectionName(), array('_id' => $this->cleanData['_id']), $updateQuery, $options);
+		}
+		catch(\MongoCursorException $e) {
+			return false;
+		}
+
+		return true;
+	}
 	
 	/**
 	 * get MongoId of this record
