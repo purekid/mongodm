@@ -39,8 +39,8 @@ return array(
 	),
 	'testing' => array(
 		'connection' => array(
-			'hostnames' => 'localhost',
-			'database'  => 'test_db'
+			'hostnames' => '192.168.1.105',
+			'database'  => 'test_d22b'
 		)
 	),
 	'production' => array(
