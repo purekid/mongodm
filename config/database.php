@@ -17,7 +17,7 @@ if($use_local_config && file_exists($local_config_file)){
  *  --------------------------------------------------------------
  *  | You can create a local config file with the content below. |
  *  --------------------------------------------------------------
- *  If environment variable 'APPLICATION_ENV' is defined 
+ *  If environment variable 'APPLICATION_ENV' is defined
  *  and your model $config is 'default',we use APPLICATION_ENV as the section name.
  */
 return array(
@@ -45,10 +45,10 @@ return array(
 		)
 	),
 	'production' => array(
-			'connection' => array(
-				'hostnames' => 'localhost',
-				'database'  => 'production_db'
-			)
+        'connection' => array(
+            'hostnames' => 'localhost',
+            'database'  => 'production_db'
+        )
 	)
 );
 
