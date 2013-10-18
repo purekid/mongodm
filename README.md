@@ -63,10 +63,10 @@ If you want select config section with environment variable APPLICATION_ENV , yo
     		)
     	),
     	'production' => array(
-    			'connection' => array(
-    				'hostnames' => 'localhost',
-    				'database'  => 'production'
-    			)
+    		'connection' => array(
+    			'hostnames' => 'localhost',
+    			'database'  => 'production'
+    		)
     	)
     );
 
