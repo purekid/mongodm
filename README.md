@@ -68,7 +68,6 @@ If you want select config section with environment variable APPLICATION_ENV , yo
     				'database'  => 'production'
     			)
     	)
-        
     );
 
 ### Define a model and enjoy it
