@@ -42,8 +42,6 @@ Usage
 If you want select config section with environment variable APPLICATION_ENV , you should set $config='default' or don't declare $config in your own model class.
 
 	return array(
-    
-       /* Configuration section name*/
         'default' => array(
     		'connection' => array(
     			'hostnames' => 'localhost',
@@ -55,25 +53,19 @@ If you want select config section with environment variable APPLICATION_ENV , yo
     	'development' => array(
     		'connection' => array(
     			'hostnames' => 'localhost',
-    			'database'  => 'development',
-    // 			'username'  => '',
-    // 			'password'  => '',
+    			'database'  => 'development'
     		)
     	),
     	'testing' => array(
     		'connection' => array(
     			'hostnames' => 'localhost',
-    			'database'  => 'test',
-    // 			'username'  => '',
-    // 			'password'  => '',
+    			'database'  => 'test'
     		)
     	),
     	'production' => array(
     			'connection' => array(
-    				'hostnames' => 'localhost,192.168.1.2',
-    				'database'  => 'production',
-    // 				'username'  => '',
-    // 				'password'  => '',
+    				'hostnames' => 'localhost',
+    				'database'  => 'production'
     			)
     	)
         
