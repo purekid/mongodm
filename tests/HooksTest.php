@@ -1,8 +1,11 @@
 <?php
 
+namespace Purekid\Mongodm\Test;
+
+use Purekid\Mongodm\Test\TestCase\PhactoryTestCase;
 use Purekid\Mongodm\Test\Model\Pupil;
 
-class TestHooks extends PHPUnit_Framework_TestCase {
+class HooksTest extends PhactoryTestCase {
 
 	
 	public function testInit()

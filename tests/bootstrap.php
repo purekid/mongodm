@@ -16,3 +16,5 @@ $map = array(
 		'Purekid\Mongodm\Test\Model\Pupil'=> __DIR__."/Model/Pupil.php"
 		);
 $loader->addClassMap($map);
+
+$loader->add('Purekid\Mongodm\Test', __DIR__);

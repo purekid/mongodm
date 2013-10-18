@@ -21,6 +21,13 @@ class MongoDB
 	public static $instances = array();
 
 	/**
+	 * Database config
+	 * 
+	 * @var array
+	 */
+	public static $config = array();
+
+	/**
 	 * Load instance
 	 *
 	 * @static
@@ -38,7 +45,7 @@ class MongoDB
 				$config = self::config($name);
 			}
 
-			new MongoDB($name,$config);
+			self::$instances[$name] = new MongoDB($name, $config);
 		}
 
 		return self::$instances[$name];
@@ -189,6 +196,16 @@ class MongoDB
 		}
 
 		$this->_db = $this->_connection = NULL;
+	}
+
+	/**
+	 * Get db
+	 *
+	 * @return MongoDB || null
+	 */
+	public function &getDB()
+	{
+		return $this->_db;
 	}
 
 	/* Database Management */
@@ -476,8 +493,20 @@ class MongoDB
 
 		return $r;
 	}
+
+	public static function setConfig($config) {
+		self::$config = $config;
+	}
+
+	public static function setConfigBlock($block = 'default', $config = array()) {
+		self::$config[$block] = $config;
+	}
 	
 	static function config($config_block){
+
+		if(!empty(self::$config)) {
+			return self::$config[$config_block];
+		}
 		
 		$config_file = "database.php";
 		$path = __DIR__ . "/../../../config/" .$config_file;

@@ -1,13 +1,13 @@
 <?php
 
+namespace Purekid\Mongodm\Test;
+
+use Purekid\Mongodm\Test\TestCase\PhactoryTestCase;
 use Purekid\Mongodm\Test\Model\Pupil;
-
 use Purekid\Mongodm\Test\Model\Book;
-
 use Purekid\Mongodm\Test\Model\Student;
 
-
-class TestInheritance extends PHPUnit_Framework_TestCase {
+class InheritanceTest extends PhactoryTestCase {
 
 	
 	public function testCreate()
