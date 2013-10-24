@@ -38,6 +38,30 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
     }
 
     /**
+     * Add a model item or model array or ModelSet to this set
+     *
+     * @param  mixed $items
+     * @return $this
+     */
+    public function add($items)
+    {
+        if($items && $items instanceof \Purekid\Mongodm\Model){
+            $id = (string) $items->getId();
+            $this->_items[$id] = $items;
+        }else if(is_array($items)){
+            foreach($items as $obj){
+                if($obj instanceof \Purekid\Mongodm\Model){
+                    $this->add($obj);
+                }
+            }
+        }else if($items instanceof self){
+            $this->add($items->toArray());
+        }
+        return $this;
+
+    }
+
+    /**
      * Get item by numeric index or MongoId
      *
      * @param  array $models
@@ -67,27 +91,6 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
     }
 
     /**
-     * Export all items to a Array
-     * @param boolean $is_numeric_index
-     * @return array
-     */
-    public function toArray( $is_numeric_index = true)
-    {
-
-        $array = array();
-        foreach($this->_items as $item){
-            if(!$is_numeric_index){
-                $id = (string) $item->getId();
-                $array[$id] = $item;
-            }else{
-                $array[] = $item;
-            }
-        }
-        return $array;
-
-    }
-
-    /**
      * Remove a record from the collection
      *
      * @param int|MongoID|Model
@@ -109,7 +112,6 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
         return true;
 
     }
-
 
     /**
      * Slice the underlying collection array.
@@ -169,7 +171,6 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
         return false;
 
     }
-
 
     /**
      * Run a map over the collection using the given Closure and return a new collection
@@ -273,33 +274,30 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
         return $this;
     }
 
-    /**
-     * Add a model item or model array or ModelSet to this set
-     *
-     * @param  mixed $items
-     * @return $this
-     */
-    public function add($items)
-    {
-        if($items && $items instanceof \Purekid\Mongodm\Model){
-            $id = (string) $items->getId();
-            $this->_items[$id] = $items;
-        }else if(is_array($items)){
-            foreach($items as $obj){
-                if($obj instanceof \Purekid\Mongodm\Model){
-                    $this->add($obj);
-                }
-            }
-        }else if($items instanceof self){
-            $this->add($items->toArray());
-        }
-        return $this;
-
-    }
-
     public function count()
     {
         return count($this->_items);
+    }
+
+    /**
+     * Export all items to a Array
+     * @param boolean $is_numeric_index
+     * @return array
+     */
+    public function toArray( $is_numeric_index = true)
+    {
+
+        $array = array();
+        foreach($this->_items as $item){
+            if(!$is_numeric_index){
+                $id = (string) $item->getId();
+                $array[$id] = $item;
+            }else{
+                $array[] = $item;
+            }
+        }
+        return $array;
+
     }
 
     public function getIterator()
