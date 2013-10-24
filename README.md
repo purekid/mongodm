@@ -218,6 +218,7 @@ $users is instance of Collection
 Count 
 
 	$users->count();  
+	$users->isEmpty();
 	
 Iteration	
 
@@ -243,6 +244,11 @@ Sort
 	
 	//reverse collection items
 	$users->reverse();
+
+Slice and Take
+	
+	$users->slice(0,1);
+	$users->take(2);
 	
 Map
 	
