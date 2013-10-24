@@ -232,4 +232,59 @@ class CollectionTest extends PhactoryTestCase {
 
     }
 
+    function testSlice(){
+
+        $book = new Book( array('name'=>'a'));
+        $book->save();
+
+        $book1 = new Book( array('name'=>'b'));
+        $book1 -> save();
+
+        $book2 = new Book( array('name'=>'c'));
+        $book2->save();
+
+        $book3 = new Book( array('name'=>'d'));
+        $book3->save();
+
+        $books = Collection::make(array($book,$book1,$book2,$book3));
+
+        $slice1 = $books->slice(0,1);
+        $this->assertEquals( $slice1->count(),1);
+        $this->assertEquals( $slice1->first()->name,'a');
+
+        $slice = $books->slice(1,3);
+        $this->assertEquals( $slice->count(),3);
+        $this->assertEquals( $slice->first()->name,'b');
+        $this->assertEquals( $slice->get(2)->name,'d');
+
+        $slice = $books->slice(2,4);
+        $this->assertEquals( $slice->count(),2);
+        $this->assertEquals( $slice->first()->name,'c');
+        $this->assertEquals( $slice->last()->name,'d');
+
+    }
+
+    function testTake(){
+
+        $book = new Book( array('name'=>'a'));
+        $book->save();
+
+        $book1 = new Book( array('name'=>'b'));
+        $book1 -> save();
+
+        $book2 = new Book( array('name'=>'c'));
+        $book2->save();
+
+        $book3 = new Book( array('name'=>'d'));
+        $book3->save();
+
+        $books = Collection::make(array($book,$book1,$book2,$book3));
+
+        $take = $books->take(3);
+        $this->assertEquals( $take->count(),3);
+        $this->assertEquals( $take->first()->name,'a');
+        $this->assertEquals( $take->last()->name,'c');
+
+    }
+
 }
