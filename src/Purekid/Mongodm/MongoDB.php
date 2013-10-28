@@ -143,20 +143,20 @@ class MongoDB
 			$config['hostnames'] = 'mongodb://' . $config['hostnames'];
 		}
 
-		if (!isset($options))
-		{
-			$options = array();
+		if (!isset($config['options']) || !is_array($config['options'])) {
+			$config['options'] = array();  
 		}
-
+		
 		/* Create connection object, attempt to connect */
-		$options['connect'] = false;
+		$config['options']['connect'] = false;
 		
 		$class = '\MongoClient';
 		if(!class_exists($class)){
 			$class = '\MongoDB';
 		}
 		
-		$this->_connection = new $class($config['hostnames'], $options);
+		$this->_connection = new $class($config['hostnames'], $config['options']);
+		
 		/* Try connect */
 		try
 		{
