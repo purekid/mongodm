@@ -152,7 +152,7 @@ class MongoDB
 		
 		$class = '\MongoClient';
 		if(!class_exists($class)){
-			$class = '\MongoDB';
+			$class = '\Mongo';
 		}
 		
 		$this->_connection = new $class($config['hostnames'], $config['options']);
