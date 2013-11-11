@@ -4,6 +4,7 @@ namespace Purekid\Mongodm;
 
 /**
  * Mongodm - A PHP Mongodb ORM
+ *
  * This file is base on  mikelbring(https://github.com/mikelbring/Mongor)'s work and is inspired by https://github.com/Wouterrr/MangoDB
  *
  * @package  Mongodm
@@ -45,7 +46,7 @@ class MongoDB
 				$config = self::config($name);
 			}
 
-			self::$instances[$name] = new MongoDB($name, $config);
+			self::$instances[$name] = new self($name, $config);
 		}
 
 		return self::$instances[$name];
@@ -96,7 +97,7 @@ class MongoDB
 
 		$this->_config = $config;
 		/* Store the database instance */
-		MongoDB::$instances[$name] = $this;
+		self::$instances[$name] = $this;
 	}
 
 	final public function __destruct()
@@ -203,7 +204,7 @@ class MongoDB
 	 *
 	 * @return MongoDB || null
 	 */
-	public function &getDB()
+	public function getDB()
 	{
 		return $this->_db;
 	}
