@@ -284,15 +284,21 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
      * @param boolean $is_numeric_index
      * @return array
      */
-    public function toArray( $is_numeric_index = true)
+    public function toArray( $is_numeric_index = true ,$itemToArray = false)
     {
 
         $array = array();
         foreach($this->_items as $item){
             if(!$is_numeric_index){
                 $id = (string) $item->getId();
+                if($itemToArray){
+                    $item = $item->toArray();
+                }
                 $array[$id] = $item;
             }else{
+                if($itemToArray){
+                    $item = $item->toArray();
+                }
                 $array[] = $item;
             }
         }

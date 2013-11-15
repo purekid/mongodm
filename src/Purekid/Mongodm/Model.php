@@ -18,7 +18,7 @@ abstract class Model
 	 *  exists in the database
 	 */
 	public $exists = false;
-	
+
 	/**
 	 * section choosen in the config 
 	 */
@@ -30,6 +30,11 @@ abstract class Model
 	 * Data modified 
 	 */
 	protected $dirtyData = array();
+
+    /**
+     * Data to unset
+     */
+    protected $unsetData = array();
 
 	protected $ignoreData = array();
 
@@ -155,14 +160,23 @@ abstract class Model
         $this->_processReferencesChanged();
 
 		/* if no changes then do nothing */
-		if ($this->exists and empty($this->dirtyData)) return true;
-	
+
+		if ($this->exists and empty($this->dirtyData) and empty($this->unsetData)) return true;
+
 		$this->__preSave();
 		
 		if ($this->exists)
 		{
 			$this->__preUpdate();
-			$success = $this->_connection->update($this->collectionName(), array('_id' => $this->getId()), array('$set' => $this->dirtyData), $options);
+            $updateQuery = array();
+            if(!empty($this->dirtyData)){
+                $updateQuery['$set'] = $this->dirtyData;
+            };
+
+            if(!empty($this->unsetData)){
+                $updateQuery['$unset'] = $this->unsetData;
+            }
+			$success = $this->_connection->update($this->collectionName(), array('_id' => $this->getId()), $updateQuery , $options);
 			$this->__postUpdate();
 		}
 		else
@@ -178,6 +192,7 @@ abstract class Model
 		}
 	
 		$this->dirtyData = array();
+        $this->unsetData = array();
 		$this->__postSave();
 		
 		return $success;
@@ -202,18 +217,25 @@ abstract class Model
 	public function exist(){
 		return $this->exists;
 	}
-	
+
+
+
+    public function __call($func,$args){
+        if($func == 'unset'){
+            call_user_func_array( array($this,"_unset") , $args);
+
+        }
+    }
+
 	/**
 	 * Create a Mongodb reference
 	 * @return MongoRef Object
 	 */
 	public function makeRef()
 	{
-	
 		$model = get_called_class();
 		$ref = \MongoDBRef::create($this->collectionName(), $this->getId());
 		return $ref;
-	
 	}
 	
 	/**
@@ -416,8 +438,6 @@ abstract class Model
 		$result =  self::connection()->ensure_index(self::collectionName(),$keys,$options);
 		return $result; 
 	}
-	
-
 
     /**
      * Initialize the "_type" attribute for the model
@@ -529,7 +549,7 @@ abstract class Model
 	}
 
     /**
-     *  Update the 'references' attr when that 'references' instance has changed.
+     *  Update the 'references' attribute for model's instance when that 'references' data  has changed.
      */
     private function _processReferencesChanged(){
 
@@ -540,8 +560,6 @@ abstract class Model
             $attr = $attrs[$key];
             if($attr['type'] == 'references'){
                 if( $item instanceof Collection && $this->cleanData[$key] !== $item->makeRef()){
-//                    $this->cleanData[$key] = $item->makeRef();
-//                    $this->dirtyData[$key] = $item->makeRef();
                     $this->__set($key,$item);
                 }
             }
@@ -560,8 +578,7 @@ abstract class Model
 		$reference = $attrs[$key];
 		$model = $reference['model'];
 		$type = $reference['type'];
-		// 		$return = null;
-	
+
 		if($type == "reference"){
 			$model = $reference['model'];
 			$type = $reference['type'];
@@ -595,7 +612,7 @@ abstract class Model
 		$cache[$key] = $value;
 		return $return;
 	}
-	
+
 	/**
 	 *  If the attribute of $key is a reference ,
 	 *  load its original record from db and save to $_cache temporarily.
@@ -644,6 +661,26 @@ abstract class Model
 		}
 	}
 
+    /**
+     * unset a attribute
+     * @param $key
+     */
+    private function _unset( $key ){
+        if(strpos($key,".") !== false){
+            throw new \Exception('The key to unset can\'t contains "." ');
+        }
+
+        if(isset($this->cleanData[$key] )){
+            unset($this->cleanData[$key]);
+        }
+
+        if(isset($this->dirtyData[$key] )){
+            unset($this->dirtyData[$key]);
+        }
+
+        $this->unsetData[$key] = 1;
+
+    }
 
     /**
      * Initialize attributes with default value

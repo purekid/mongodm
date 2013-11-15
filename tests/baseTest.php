@@ -206,5 +206,26 @@ class BaseTest extends PhactoryTestCase {
 				
 		
 	}
+
+    public function testUnset(){
+
+        $user = User::one();
+        $id = $user->getId();
+
+        $user->name = 'michael';
+        $user->save();
+
+        $user = User::id($id);
+
+        $this->assertEquals($user->name , 'michael');
+
+        $user->unset('name');
+        $user->save();
+
+        $user = User::id($id);
+
+        $this->assertNull($user->name);
+
+    }
 	
 }
