@@ -2,7 +2,7 @@ Mongodm
 ======= 
 [![Build Status](https://secure.travis-ci.org/purekid/mongodm.png?branch=master)](http://travis-ci.org/purekid/mongodm)
 
-a PHP MongoDB ORM ,  simple and flexible
+MongoDB ORM that includes support for references,embed and multilevel inheritance.
 
 Requirements
 ------------
@@ -15,6 +15,7 @@ Features
 
 - ORM
 - Simple and flexible
+- Support for embed 
 - Support for references (lazy loaded)
 - Support for multilevel inheritance
 
