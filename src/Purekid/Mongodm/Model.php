@@ -699,7 +699,7 @@ abstract class Model
             $type = $embed['type'];
             if($value instanceof $model){
                 $value->setIsEmbed(true);
-                $return  = $value->toArray(['_type','_id']);
+                $return  = $value->toArray(array('_type','_id'));
             }else if($value == null){
                 $return = null;
             }else{
