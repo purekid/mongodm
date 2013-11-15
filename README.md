@@ -135,10 +135,15 @@ Create with initial value
 ### Update
 	$user->age = 19;
 
-Update attrs by array
+Update attributes by array
 
 	$user->update( array('age'=>18,'hobbies'=>array('music','game') ) ); 
 	$user->save();
+
+Unset attributes
+	
+	$user->unset('age');
+	$user->unset( array('age','hobbies') )
 
 ### Retrieve single record
 
