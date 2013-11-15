@@ -24,7 +24,11 @@ class MutatorTest extends PHPUnit_Framework_TestCase {
   }
   
   public function testMutateFail(){
-    
+
+    $user = new User();
+    $user->name = 'michael';
+    $user->save();
+
     $user = User::one();
     $id = $user->getId();
     $age = $user->age;

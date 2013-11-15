@@ -72,7 +72,8 @@ class BaseTest extends PhactoryTestCase {
 	
 	public function testSetGet()
 	{
-
+        $user = new User(array("age"=>40,"name"=>"John"));
+        $user->save();
 		$user = User::one();
 		$id = $user->getId();
 		$this->assertInstanceOf("\MongoId", $user->getId());
@@ -209,11 +210,10 @@ class BaseTest extends PhactoryTestCase {
 
     public function testUnset(){
 
-        $user = User::one();
-        $id = $user->getId();
-
+        $user = new User;
         $user->name = 'michael';
         $user->save();
+        $id = $user->getId();
 
         $user = User::id($id);
 
@@ -225,6 +225,23 @@ class BaseTest extends PhactoryTestCase {
         $user = User::id($id);
 
         $this->assertNull($user->name);
+
+        $user->age = 11;
+        $user->hobbies = array('watching tv','music');
+        $user->save();
+
+        $user = User::id($id);
+
+        $this->assertEquals($user->age , 11);
+
+        $user->unset(array('age','hobbies'));
+
+        $user->save();
+
+        $user = User::id($id);
+        $this->assertNull($user->age);
+
+        $this->assertNull($user->hobbies);
 
     }
 	

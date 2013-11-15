@@ -45,7 +45,7 @@ abstract class Model
 
 	private $_connection = null;
 	
-	public function __construct( $data = array() )
+	public function __construct( $data = array())
 	{
 		if (is_null($this->_connection))
 		{
@@ -56,9 +56,13 @@ abstract class Model
 			}
 			$this->_connection = MongoDB::instance($config);
 		}
-		
+
  		$this->update($data,true);
- 		$this->initAttrs();
+        if(isset($data['_id']) && $data['_id'] instanceof \MongoId){
+            $this->exists = true;
+        }else{
+            $this->initAttrs();
+        }
  		$this->initTypes();
  		$this->__init();
  		
@@ -269,7 +273,6 @@ abstract class Model
 		if(count($types) > 1){
 			$params['_type'] = $class::get_class_name(false);
 		}
-		
 		$result =  self::connection()->find_one(static::$collection, $params , $fields);
 		if($result){
 			return  Hydrator::hydrate(get_called_class(), $result ,"one");
@@ -666,19 +669,25 @@ abstract class Model
      * @param $key
      */
     private function _unset( $key ){
-        if(strpos($key,".") !== false){
-            throw new \Exception('The key to unset can\'t contains "." ');
-        }
+        if(is_array($key)){
+            foreach($key as $item){
+                $this->_unset($item);
+            }
+        }else{
+            if(strpos($key,".") !== false){
+                throw new \Exception('The key to unset can\'t contains "." ');
+            }
 
-        if(isset($this->cleanData[$key] )){
-            unset($this->cleanData[$key]);
-        }
+            if(isset($this->cleanData[$key] )){
+                unset($this->cleanData[$key]);
+            }
 
-        if(isset($this->dirtyData[$key] )){
-            unset($this->dirtyData[$key]);
-        }
+            if(isset($this->dirtyData[$key] )){
+                unset($this->dirtyData[$key]);
+            }
 
-        $this->unsetData[$key] = 1;
+            $this->unsetData[$key] = 1;
+        }
 
     }
 
