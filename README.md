@@ -94,7 +94,9 @@ If you want select config section with environment variable APPLICATION_ENV , yo
             'money' => array('default'=>20.0,'type'=>'double'),
             'hobbies' => array('default'=>array('love'),'type'=>'array'),
             'born_time' => array('type'=>'timestamp'),
-            'family'=>array('type'=>'object')
+            'family'=>array('type'=>'object'),
+            'pet_fav' => array('model'=>'Purekid\Mongodm\Test\Model\Pet','type'=>'embed'),
+            'pets' => array('model'=>'Purekid\Mongodm\Test\Model\Pet','type'=>'embeds'),
                 
         );
     
@@ -108,6 +110,8 @@ Types Supported for model attr
 	    'string',     
 	    'reference',  // a reference to another model
 	    'references', // references to another model
+	    'embed',  // model embedded
+	    'embeds', // models embedded
 	    'integer',  
 	    'int',  // alias of 'integer'
 	    'double',     // float 
@@ -175,7 +179,7 @@ Retrieve records that name is 'Michael' and acount  of owned  books equals 2
 	$user->delete();	
 	
 
-Relationship
+Relationship - Reference
 ---------- 
 ### Lazyload a 1:1 relationship record
 
@@ -195,6 +199,7 @@ Relationship
 ### Lazyload 1:many relationship records
 
 	$user = User::one();
+	$id = $user->getId();
 
 	$book1 = new Book();
 	$book1->name = "book1";
@@ -212,6 +217,42 @@ Relationship
 	//somewhere , load these books
 	$user = User::id($id);
 	$books = $user->books;      // $books is a instance of Collection
+
+Relationship - Embed
+---------- 
+
+### Single Embed 
+
+	$pet = new Pet();
+	$pet->name = "putty";
+
+	$user->pet_fav = $pet;
+	$user->save();
+
+	// now you can do this
+	$user = User::one( array('name'=>"michael" ) );
+	echo $user->pet_fav->name;
+
+### Embeds
+
+	$user = User::one();
+	$id = $user->getId();
+	
+	$pet_dog = new Pet();
+	$pet_dog->name = "puppy";
+	$pet_dog->save();
+	
+	$pet_cat = new Pet();
+	$pet_cat->name = "kitty";
+	$pet_cat->save();
+
+	$user->pets = array($pet_cat,$pet_dog);
+	//also you can
+	$user->pets = Collection::make(array($pet_cat,$pet_dog));
+	$user->save();
+
+	$user = User::id($id);
+	$pets = $user->pets;     
 
 ###  Collection 
 
