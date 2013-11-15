@@ -296,7 +296,7 @@ class BaseTest extends PhactoryTestCase {
         $pet2->name = 'pet2';
         $pet2->weight = 15;
 
-        $user->pets_fav = [$pet,$pet2];
+        $user->pets_fav = array($pet,$pet2);
         $user->save();
 
         $user = User::id($id);

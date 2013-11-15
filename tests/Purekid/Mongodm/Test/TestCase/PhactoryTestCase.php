@@ -30,7 +30,7 @@ abstract class PhactoryTestCase extends \PHPUnit_Framework_TestCase
 
     if(!self::$phactory) {
       self::$phactory = new Phactory(self::$db->getDB());
-//      self::$phactory->reset();
+      self::$phactory->reset();
     }
 
     //set up Phactory db connection
@@ -40,7 +40,7 @@ abstract class PhactoryTestCase extends \PHPUnit_Framework_TestCase
   public static function tearDownAfterClass()
   {
     foreach(self::$db->getDB()->getCollectionNames() as $collection) {
-//      self::$db->getDB()->$collection->drop();
+      self::$db->getDB()->$collection->drop();
     }
   }
  
@@ -50,6 +50,6 @@ abstract class PhactoryTestCase extends \PHPUnit_Framework_TestCase
  
   protected function tearDown()
   {
-//    self::$phactory->recall();
+    self::$phactory->recall();
   }
 }

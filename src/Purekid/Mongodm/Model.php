@@ -227,7 +227,7 @@ abstract class Model
 	public function toArray($ignore = array('_type'))
 	{
         if(!empty($ignore)){
-            $ignores = [];
+            $ignores = array();
             foreach($ignore as $val){
                 $ignores[$val] = 1;
             }
