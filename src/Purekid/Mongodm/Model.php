@@ -44,6 +44,16 @@ abstract class Model
 	private $_cache = array();
 
 	private $_connection = null;
+
+    /**
+     * If $_isEmbed = true , this model can't save to database alone.
+     */
+    private $_isEmbed = false;
+
+    /**
+     * Id for offline model (such as embed model)
+     */
+    private $_tempId = null;
 	
 	public function __construct( $data = array())
 	{
@@ -67,7 +77,6 @@ abstract class Model
  		$this->__init();
  		
 	}
-	
 
 	/**
 	 * Update data by a array
@@ -128,7 +137,9 @@ abstract class Model
 	{
 		if(isset($this->cleanData['_id'])){
 			return new \MongoId($this->cleanData['_id']);
-		}
+		}else if(isset($this->_tempId)){
+            return $this->_tempId;
+        }
 		return null;
 	}
 
@@ -161,7 +172,12 @@ abstract class Model
 	public function save($options = array())
 	{
 
+        if($this->_isEmbed){
+            return false;
+        }
+
         $this->_processReferencesChanged();
+        $this->_processEmbedsChanged();
 
 		/* if no changes then do nothing */
 
@@ -208,9 +224,17 @@ abstract class Model
 	 *
 	 * @return array
 	 */
-	public function toArray()
+	public function toArray($ignore = array('_type'))
 	{
-		return $this->cleanData;
+        if(!empty($ignore)){
+            $ignores = [];
+            foreach($ignore as $val){
+                $ignores[$val] = 1;
+            }
+            $ignore = $ignores;
+        }
+
+		return array_diff_key($this->cleanData,$ignore);
 	}
 	
 	/**
@@ -221,8 +245,6 @@ abstract class Model
 	public function exist(){
 		return $this->exists;
 	}
-
-
 
     public function __call($func,$args){
         if($func == 'unset'){
@@ -429,7 +451,28 @@ abstract class Model
 		$class = explode('\\',  $class_name);
 		return $class[count($class) - 1];
 	}
-	
+
+
+    public function setIsEmbed($is_embed){
+
+        $this->_isEmbed = $is_embed;
+        if($is_embed){
+            unset($this->_connection);
+            unset($this->exists);
+        }
+
+    }
+
+    public function getIsEmbed(){
+
+        return $this->_isEmbed ;
+
+    }
+
+    public function setTempId( $tempId ){
+        $this->_tempId = $tempId;
+    }
+
 	/**
 	 * Ensure index 
 	 * @param mixed $keys
@@ -506,7 +549,7 @@ abstract class Model
 		}
 		else if( isset($attrs[$key]) && isset($attrs[$key]['type'])){
 			$type = $attrs[$key]['type'];
-			$type_defined = array('mixed','reference','references','integer','int','string','double','timestamp','boolean','array','object');
+			$type_defined = array('mixed','reference','references','embed','embeds','integer','int','string','double','timestamp','boolean','array','object');
 			if($type == "int") $type = 'integer';
 			if(in_array($type, $type_defined)){
 				switch($type){
@@ -570,6 +613,29 @@ abstract class Model
 
     }
 
+    /**
+     *  Update the 'embeds' attribute for model's instance when that 'embeds' data  has changed.
+     */
+    private function _processEmbedsChanged(){
+
+        $cache = $this->_cache;
+        $attrs = $this->getAttrs();
+        foreach($cache as $key => $item){
+            if(!isset($attrs[$key])) continue;
+            $attr = $attrs[$key];
+            if($attr['type'] == 'embed'){
+                if( $item instanceof Model && $this->cleanData[$key] !== $item->toArray()){
+                    $this->__set($key,$item);
+                }
+            }else if($attr['type'] == 'embeds'){
+                if( $item instanceof Collection && $this->cleanData[$key] !== $item->toEmbedsArray()){
+                    $this->__set($key,$item);
+                }
+            }
+        }
+
+    }
+
 	/**
 	 *  If the attribute of $key is a reference ,
 	 *  save the attribute into database as MongoDBRef
@@ -615,6 +681,104 @@ abstract class Model
 		$cache[$key] = $value;
 		return $return;
 	}
+
+    /**
+     *  Tthe attribute of $key is a Embed
+     *
+     */
+    private function setEmbed($key,$value)
+    {
+        $attrs = $this->getAttrs();
+        $cache = &$this->_cache;
+        $embed = $attrs[$key];
+        $model = $embed['model'];
+        $type = $embed['type'];
+
+        if($type == "embed"){
+            $model = $embed['model'];
+            $type = $embed['type'];
+            if($value instanceof $model){
+                $value->setIsEmbed(true);
+                $return  = $value->toArray(['_type','_id']);
+            }else if($value == null){
+                $return = null;
+            }else{
+                throw new \Exception ("{$key} is not instance of '$model'");
+            }
+
+        }else if($type == "embeds"){
+            $arr = array();
+            if(is_array($value)){
+                foreach($value as $item){
+                    if(! ( $item instanceof Model ) ) continue;
+                    $item->setIsEmbed(true);
+                    $arr[] = $item;
+                }
+                $value = Collection::make($arr);
+            }
+
+            if($value instanceof Collection){
+                $return = $value->toEmbedsArray();
+            }else if($value == null){
+                $return = null;
+            }else{
+                throw new \Exception ("{$key} is not instance of '$model'");
+            }
+        }
+
+        $cache[$key] = $value;
+
+        return $return;
+    }
+
+    private function loadEmbed($key)
+    {
+        $attrs = $this->getAttrs();
+        $embed = $attrs[$key];
+        $cache = &$this->_cache;
+
+        if(isset($this->cleanData[$key])){
+            $value = $this->cleanData[$key];
+        }else{
+            $value = null;
+        }
+
+        $model = $embed['model'];
+        $type = $embed['type'];
+        if( isset($cache[$key]) ){
+            $obj = &$cache[$key];
+            return $obj;
+        }else{
+            if(class_exists($model)){
+                if($type == "embed"){
+                    if($value){
+                        $data = $value;
+                        $object = new $model($data);
+                        $object->setIsEmbed(true);
+                        $cache[$key] = $object;
+                        return $object;
+                    }
+                    return null;
+                }else if($type == "embeds"){
+                    $res = array();
+                    if(!empty($value)){
+                        foreach($value as $item){
+                            $data = $item;
+                            $record = new $model($data);
+                            $record->setIsEmbed(true);
+                            if($record){
+                                $res[] = $record;
+                            }
+                        }
+                    }
+                    $set =  Collection::make($res);
+                    $cache[$key] = $set;
+                    $obj = &$cache[$key];
+                    return $obj;
+                }
+            }
+        }
+    }
 
 	/**
 	 *  If the attribute of $key is a reference ,
@@ -800,12 +964,19 @@ abstract class Model
 	public function __get($key)
 	{
 		$attrs = $this->getAttrs();
-	    if( isset($attrs[$key]) && isset($attrs[$key]['type']) 
-	    	&& ( $attrs[$key]['type'] == 'reference' or $attrs[$key]['type'] == 'references' )){
-			$value = $this->loadRef($key);
-			return $value;
+        $value = NULL;
+	    if( isset($attrs[$key]) && isset($attrs[$key]['type']) ){
+            if($attrs[$key]['type'] == 'reference' or $attrs[$key]['type'] == 'references' ){
+                $value = $this->loadRef($key);
+                return $value;
+            }else if($attrs[$key]['type'] == 'embed' or $attrs[$key]['type'] == 'embeds' ){
+                $value = $this->loadEmbed($key);
+                return $value;
+            }
+
 		}
-		else if (array_key_exists($key, $this->cleanData))
+
+		if (array_key_exists($key, $this->cleanData))
 		{
 			$value = $this->parseValue($key,$this->cleanData[$key]);
 			return $value;
@@ -823,15 +994,20 @@ abstract class Model
 	public function __set($key, $value)
 	{
 		$attrs = $this->getAttrs();
-		if(isset($attrs[$key]) && isset($attrs[$key]['type']) 
-	    	&& ( $attrs[$key]['type'] == 'reference' or $attrs[$key]['type'] == 'references' )){
-			$value = $this->setRef($key,$value);
-		} 
+
+		if(isset($attrs[$key]) && isset($attrs[$key]['type']) ){
+            if($attrs[$key]['type'] == 'reference' or $attrs[$key]['type'] == 'references' ){
+                $value = $this->setRef($key,$value);
+            }else if($attrs[$key]['type'] == 'embed' or $attrs[$key]['type'] == 'embeds' ){
+                $value = $this->setEmbed($key,$value);
+            }
+		}
 		
 		$value = $this->parseValue($key,$value);
+
 		if(isset($this->cleanData[$key]) && $this->cleanData[$key] === $value){
 			
-		}else{
+		}else if($value){
 			$this->cleanData[$key] = $value;
 			$this->dirtyData[$key] = $value;
 		}

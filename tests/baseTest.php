@@ -2,6 +2,7 @@
 
 namespace Purekid\Mongodm\Test;
 
+use Purekid\Mongodm\Test\Model\Pet;
 use Purekid\Mongodm\Test\TestCase\PhactoryTestCase;
 use Purekid\Mongodm\Test\Model\Book;
 use Purekid\Mongodm\Test\Model\User;
@@ -242,6 +243,78 @@ class BaseTest extends PhactoryTestCase {
         $this->assertNull($user->age);
 
         $this->assertNull($user->hobbies);
+
+    }
+
+    public function testEmbed(){
+
+        $user = new User;
+        $user->name = 'michael';
+        $user->save();
+
+        $id = $user->getId();
+
+        $pet = new Pet();
+
+        $user->pet = $pet;
+        $user->save();
+
+        $user->pet->age = 17;
+        $user->save();
+
+        $this->assertEquals(17, $user->pet->age );
+
+        $user = User::id($id);
+
+        $this->assertEquals(17, $user->pet->age );
+
+        $user->pet->weight = 20;
+
+        $this->assertEquals(20, $user->pet->weight );
+
+        $user->save();
+
+        $user = User::id($id);
+
+        $this->assertEquals(20, $user->pet->weight );
+
+    }
+
+    public function testEmbeds(){
+
+        $user = new User;
+        $user->name = 'michael';
+        $user->save();
+
+        $id = $user->getId();
+
+        $pet = new Pet();
+        $pet->name = 'pet1';
+        $pet->weight = 10;
+
+        $pet2 = new Pet();
+        $pet2->name = 'pet2';
+        $pet2->weight = 15;
+
+        $user->pets_fav = [$pet,$pet2];
+        $user->save();
+
+        $user = User::id($id);
+
+        $this->assertEquals(2, $user->pets_fav->count() );
+
+        $this->assertEquals('pet1', $user->pets_fav->get(0)->name );
+
+        $user->pets_fav->remove(0);
+
+        $user->save();
+
+        $user = User::id($id);
+
+        $this->assertEquals(1, $user->pets_fav->count() );
+        $this->assertEquals('pet2', $user->pets_fav->get(0)->name );
+
+        $user->save();
 
     }
 	

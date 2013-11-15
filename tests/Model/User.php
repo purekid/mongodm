@@ -14,8 +14,10 @@ class User extends Base
 		'age' => array('default'=>16,'type'=>'integer'),
 		'money' => array('default'=>20.0,'type'=>'double'),
 		'hobbies' => array('default'=>array('love'),'type'=>'array'),
-		'family'=>array('type'=>'object')
-			
+		'family'=>array('type'=>'object'),
+        'pet' => array( 'model'=>'Purekid\Mongodm\Test\Model\Pet' , 'type'=>'embed'),
+        'pets_fav' => array( 'model'=>'Purekid\Mongodm\Test\Model\Pet' , 'type'=>'embeds')
+
 	);
 
 	protected function __init(){

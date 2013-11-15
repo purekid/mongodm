@@ -27,9 +27,16 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
 
         $items = array();
 
+        $i = 0;
         foreach($models as $model){
             if(! ($model instanceof Model)) continue;
-            $id = (string) $model->getId();
+            if($model->exists){
+                $id = (string) $model->getId();
+            }else if($model->getIsEmbed()){
+                $id = $i++;
+                $model->setTempId($id);
+            }
+
             $items[$id] = $model;
         }
 
@@ -305,6 +312,23 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
         return $array;
 
     }
+
+    /**
+     * Export all items to a Array with embed style ( without _type,_id)
+     * @return array
+     */
+    public function toEmbedsArray()
+    {
+
+        $array = array();
+        foreach($this->_items as $item){
+            $item = $item->toArray(['_type','_id']);
+            $array[] = $item;
+        }
+        return $array;
+
+    }
+
 
     public function getIterator()
     {
