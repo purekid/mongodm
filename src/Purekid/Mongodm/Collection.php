@@ -322,7 +322,7 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
 
         $array = array();
         foreach($this->_items as $item){
-            $item = $item->toArray(['_type','_id']);
+            $item = $item->toArray(array('_type','_id'));
             $array[] = $item;
         }
         return $array;
