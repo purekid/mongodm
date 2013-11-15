@@ -169,7 +169,7 @@ abstract class Model
 		{
 			$this->__preInsert();
 			$insert = $this->_connection->insert($this->collectionName(), $this->cleanData, $options);
-			$success = !is_null($this->cleanData['$id'] = $insert['_id']);
+			$success = !is_null($this->cleanData['_id'] = $insert['_id']);
 			if($success){
 				$this->exists = true ;
 				$this->__postInsert();

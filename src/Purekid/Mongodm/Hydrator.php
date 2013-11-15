@@ -38,10 +38,9 @@ class Hydrator
 		
 		$model = new $class((array) $result);
 		$model->exists = true;
-		if (isset($model->cleanData['$id']))
+		if (isset($model->cleanData['_id']))
 		{
-			$id = (string) $model->cleanData['$id'];
-		
+			$id = (string) $model->cleanData['_id'];
 		}
 		return $model;
 		
