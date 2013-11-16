@@ -1,14 +1,26 @@
-Mongodm  
+Mongodm    
 ======= 
 [![Build Status](https://secure.travis-ci.org/purekid/mongodm.png?branch=master)](http://travis-ci.org/purekid/mongodm)
 
-MongoDB ORM that includes support for references,embed and multilevel inheritance.
 
-Requirements
+- [Introduction](#introduction)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Setup Database](#setup-database)
+- [Basic Usage - CRUD](#model-crud)
+- [Relationship - Reference](#relationship---reference)
+- [Relationship - Embed](#relationship---embed)
+- [Collection](#collection)
+- [Inheritance](#inheritance)
+- [Other methods](#other-static-methods-in-model)
+- [Model Hooks](#model-hooks)
+- [Special Thanks](#special-thanks-to)
+
+
+Introduction
 ------------
-- PHP 5.3 or greater
-- Mongodb 1.3 or greater
-- PHP Mongo extension 
+Mongodm is a MongoDB ORM that includes support for references,embed and even multilevel inheritance.
 
 Features
 --------
@@ -18,6 +30,13 @@ Features
 - Support for embed 
 - Support for references (lazy loaded)
 - Support for multilevel inheritance
+- Support for local collection operations
+
+Requirements
+------------
+- PHP 5.3 or greater
+- Mongodb 1.3 or greater
+- PHP Mongo extension 
 
 Installation
 ----------
@@ -36,7 +55,7 @@ Installation
 	php composer.phar install
 
 
-Usage
+Setup Database
 ----------
 
 ### Setup database in   config/database.php
@@ -103,9 +122,8 @@ If you want select config section with environment variable APPLICATION_ENV , yo
     
     }
     
-Types Supported for model attr
-----------   
-
+### Types supported for model attributes
+  
 	$types = [
 	    'mixed',  // mixed type 
 	    'string',     
@@ -122,7 +140,7 @@ Types Supported for model attr
 	    'object'
 	]
 
-CRUD
+Model CRUD
 ---------- 
 
 ### Create 
@@ -451,14 +469,12 @@ Retrieve all Student records , queries with  { "_type":"Student" } because of it
     $students = Student::all();
 
 
-### Other static methods 
+Other static methods in Model
+----------
+drop() , ensureIndex() 
 
-Drop the collection in database
-
-##### drop()
-
-### Hooks
-
+Model Hooks
+----------
 The following hooks are available:
 
 ##### __init()
