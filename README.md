@@ -70,18 +70,6 @@ If you want select config section with environment variable APPLICATION_ENV , yo
     // 			'password'  => '',
     		)
     	),
-    	'development' => array(
-    		'connection' => array(
-    			'hostnames' => 'localhost',
-    			'database'  => 'development'
-    		)
-    	),
-    	'testing' => array(
-    		'connection' => array(
-    			'hostnames' => 'localhost',
-    			'database'  => 'test'
-    		)
-    	),
     	'production' => array(
     		'connection' => array(
     			'hostnames' => 'localhost',
@@ -90,11 +78,10 @@ If you want select config section with environment variable APPLICATION_ENV , yo
     	)
     );
 
-### Define a model and enjoy it
+### Create a model and enjoy it
 
-    use Purekid\Mongodm\Model;
         
-    class User extends Model 
+    class User extends \Purekid\Mongodm\Model 
     {
     
         static $collection = "user";
@@ -127,10 +114,10 @@ If you want select config section with environment variable APPLICATION_ENV , yo
 	$types = [
 	    'mixed',  // mixed type 
 	    'string',     
-	    'reference',  // a reference to another model
-	    'references', // references to another model
-	    'embed',  // model embedded
-	    'embeds', // models embedded
+	    'reference',  // 1 ： 1 reference
+	    'references', // 1 ： many references
+	    'embed', 
+	    'embeds', 
 	    'integer',  
 	    'int',  // alias of 'integer'
 	    'double',     // float 
