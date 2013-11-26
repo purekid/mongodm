@@ -1,14 +1,26 @@
-Mongodm  
+Mongodm    
 ======= 
 [![Build Status](https://secure.travis-ci.org/purekid/mongodm.png?branch=master)](http://travis-ci.org/purekid/mongodm)
 
-MongoDB ORM that includes support for references,embed and multilevel inheritance.
 
-Requirements
+- [Introduction](#introduction)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Setup Database](#setup-database)
+- [Basic Usage - CRUD](#model-crud)
+- [Relationship - Reference](#relationship---reference)
+- [Relationship - Embed](#relationship---embed)
+- [Collection](#collection)
+- [Inheritance](#inheritance)
+- [Other methods](#other-static-methods-in-model)
+- [Model Hooks](#model-hooks)
+- [Special Thanks](#special-thanks-to)
+
+
+Introduction
 ------------
-- PHP 5.3 or greater
-- Mongodb 1.3 or greater
-- PHP Mongo extension 
+Mongodm is a MongoDB ORM that includes support for references,embed and even multilevel inheritance.
 
 Features
 --------
@@ -18,30 +30,37 @@ Features
 - Support for embed 
 - Support for references (lazy loaded)
 - Support for multilevel inheritance
+- Support for local collection operations
+
+Requirements
+------------
+- PHP 5.3 or greater
+- Mongodb 1.3 or greater
+- PHP Mongo extension 
 
 Installation
 ----------
 
 ### 1. Setup in composer.json: 
- 
+```yml
 	{
 		"require": {
 		    "purekid/mongodm": "dev-master"
 		}
 	}
-
+```
 
 ### 2. Install by composer:
 
-	php composer.phar install
+	$ php composer.phar update
+		
 
-
-Usage
+Setup Database
 ----------
 
 ### Setup database in   config/database.php
 If you want select config section with environment variable APPLICATION_ENV , you should set $config='default' or don't declare $config in your own model class.
-
+```php
 	return array(
         'default' => array(
     		'connection' => array(
@@ -51,18 +70,6 @@ If you want select config section with environment variable APPLICATION_ENV , yo
     // 			'password'  => '',
     		)
     	),
-    	'development' => array(
-    		'connection' => array(
-    			'hostnames' => 'localhost',
-    			'database'  => 'development'
-    		)
-    	),
-    	'testing' => array(
-    		'connection' => array(
-    			'hostnames' => 'localhost',
-    			'database'  => 'test'
-    		)
-    	),
     	'production' => array(
     		'connection' => array(
     			'hostnames' => 'localhost',
@@ -70,12 +77,11 @@ If you want select config section with environment variable APPLICATION_ENV , yo
     		)
     	)
     );
+```
+### Create a model and enjoy it
 
-### Define a model and enjoy it
-
-    use Purekid\Mongodm\Model;
-        
-    class User extends Model 
+```php       
+    class User extends \Purekid\Mongodm\Model 
     {
     
         static $collection = "user";
@@ -102,17 +108,18 @@ If you want select config section with environment variable APPLICATION_ENV , yo
         );
     
     }
-    
-Types Supported for model attr
-----------   
+```    
 
+### Types supported for model attributes
+
+```php  
 	$types = [
 	    'mixed',  // mixed type 
 	    'string',     
-	    'reference',  // a reference to another model
-	    'references', // references to another model
-	    'embed',  // model embedded
-	    'embeds', // models embedded
+	    'reference',  // 1 ： 1 reference
+	    'references', // 1 ： many references
+	    'embed', 
+	    'embeds', 
 	    'integer',  
 	    'int',  // alias of 'integer'
 	    'double',     // float 
@@ -121,69 +128,72 @@ Types Supported for model attr
 	    'array',    
 	    'object'
 	]
-
-CRUD
+```
+Model CRUD
 ---------- 
 
 ### Create 
+```php  
 	$user = new User();
 	$user->name = "Michael";
 	$user->age = 18;
 	$user->save();
-    
+``` 
 Create with initial value
-
+```php  
 	$user = new User( array('name'=>"John") );
 	$user->age = 20;
 	$user->save();
-
+```
 ### Update
+```php  
 	$user->age = 19;
-
+```
 Update attributes by array
-
+```php  
 	$user->update( array('age'=>18,'hobbies'=>array('music','game') ) ); 
 	$user->save();
-
+```
 Unset attributes
-	
+```php  	
 	$user->unset('age');
 	$user->unset( array('age','hobbies') )
-
+```
 ### Retrieve single record
-
+```php  
 	$user = User::one( array('name'=>"michael" ) );
-	
+```	
 retrieve one record by MongoId
-
+```php  
 	$id = "517c850641da6da0ab000004";
-
 	$id = new \MongoId('517c850641da6da0ab000004'); //another way
 	$user = User::id( $id );
-	
+```	
 ### Retrieve records
 
 Retrieve records that name is 'Michael' and acount  of owned  books equals 2
-
+```php  
 	$params = array( 'name'=>'Michael','books'=>array('$size'=>2) );
 	$users = User::find($params);     // $users is instance of Collection
 	echo $users->count();
-       
+```      
 ### Retrieve all records
+```php  
 	$users = User::all();
-	
+```	
 ### Count records
+```php  
 	$count = User::count(array('age'=>16));
-
+```
 ### Delete record
+```php  
 	$user = User::one();
 	$user->delete();	
-	
-
+```	
 Relationship - Reference
 ---------- 
 ### Lazyload a 1:1 relationship record
-
+```php  
 	$book = new Book();
 	$book->name = "My Love";
 	$book->price = 15;
@@ -196,9 +206,9 @@ Relationship - Reference
 	// now you can do this
 	$user = User::one( array('name'=>"michael" ) );
 	echo $user->book_fav->name;
-
+```
 ### Lazyload 1:many relationship records
-
+```php  
 	$user = User::one();
 	$id = $user->getId();
 
@@ -218,12 +228,12 @@ Relationship - Reference
 	//somewhere , load these books
 	$user = User::id($id);
 	$books = $user->books;      // $books is a instance of Collection
-
+```
 Relationship - Embed
 ---------- 
 
 ### Single Embed 
-
+```php  
 	$pet = new Pet();
 	$pet->name = "putty";
 
@@ -233,9 +243,9 @@ Relationship - Embed
 	// now you can do this
 	$user = User::one( array('name'=>"michael" ) );
 	echo $user->pet_fav->name;
-
+```
 ### Embeds
-
+```php  
 	$user = User::one();
 	$id = $user->getId();
 	
@@ -254,21 +264,21 @@ Relationship - Embed
 
 	$user = User::id($id);
 	$pets = $user->pets;     
-
+```
 ###  Collection 
 
 $users is instance of Collection
-
+```php  
 	$users = User::find(  array( 'name'=>'Michael','books'=>array('$size'=>2) ) );    
 	$users_other = User::find(  array( 'name'=>'John','books'=>array('$size'=>2) ) );   
-	
+```	
 Count 
-
+```php  
 	$users->count();  
 	$users->isEmpty();
-	
+```	
 Iteration	
-
+```php  
 	foreach($users as $user) { }  
 	
 	// OR use Closure 
@@ -276,9 +286,9 @@ Iteration
 	$users->each(function($user){
 	
 	})
-	
+```	
 Sort
-
+```php  
 	//sort by age desc
 	$users->sortBy(function($user){
 	    return $user->age;
@@ -291,14 +301,14 @@ Sort
 	
 	//reverse collection items
 	$users->reverse();
-
+```
 Slice and Take
-	
+```php  	
 	$users->slice(0,1);
 	$users->take(2);
-	
+```	
 Map
-	
+```php  	
 	$func = function($user){
 		  		if( $user->age >= 18 ){
 		    		$user->is_adult = true;
@@ -309,9 +319,9 @@ Map
 	$adults = $users->map($func);   
 	
 	// Notice:  1. $adults is a new collection   2. In original $users , data has changed at the same time. 
-	
+```	
 Filter 
-
+```php  
 	$func = function($user){
 	        	if( $user->age >= 18 ){
 	    			return true;
@@ -319,65 +329,65 @@ Filter
 			}
 
 	$adults = $users->filter($func); // $adults is a new collection
-
+```
 Determine a record exists in the collection by object instance	
-	
+```php  	
 	$john = User::one(array("name"=>"John"));
 	
 	$users->has($john) 
-
+```
 Determine a record exists in the collection by numeric index	
-
+```php  
 	$users->has(0) 
-	
+```	
 Determine a record exists in the collection by MongoID	
-
+```php  
 	$users->has('518c6a242d12d3db0c000007') 
-
+```
 Get a record by numeric index
-
+```php  
 	$users->get(0) 
-
+```
 Get a record by MongoID 
-
+```php  
 	$users->get('518c6a242d12d3db0c000007') 
-
+```
 Remove a record by numeric index
-
+```php  
 	$users->remove(0)  
-
+```
 Remove a record  by MongoID
-
+```php  
 	$users->remove('518c6a242d12d3db0c000007') 
-	
+```	
 Add a single record to collection
-
+```php  
 	$bob = new User( array("name"=>"Bob"));
 	$bob->save();
 	$users->add($bob);
-	
+```	
 Add records to collection
-	
+```php  	
 	$bob = new User( array("name"=>"Bob"));
 	$bob->save();
 	$lisa = new User( array("name"=>"Lisa"));
 	$lisa->save();
 	
 	$users->add( array($bob,$lisa) ); 
-	
+```	
 Merge two collection 
-	
+```php  	
 	$users->add($users_other);  // the collection $users_other appends to end of $users 
-	
+```
 Export data to a array
-
+```php  
 	$users->toArray();
-	
+```	
 Inheritance
 ----------
 	
 ### Define multilevel inheritable models:
-
+```php  
 	use Purekid\Mongodm\Model;
 	namespace Demo;
 	
@@ -404,9 +414,9 @@ Inheritance
 		)
 		
 	}
-	
+```	
 ### Use:
-
+```php  
 	$bob = new Student( array('name'=>'Bob','age'=> 17 ,'gender'=>'male' ) );
 	$bob->save();
 	
@@ -426,9 +436,9 @@ Inheritance
 	$bob->mum = $lisa;
 	$bob->classmates = array( $john, $lily );
 	$bob->save();
-	
+```	
 ### Retrieve and check value:
-
+```php  
 	$bob = Student::one( array("name"=>"Bob") );
 	
 	echo $bob->dad->name;    // David
@@ -438,27 +448,27 @@ Inheritance
 	echo $classmates->count(); // 2
     
 	var_dump($classmates->get(0)); // john	
-	
+```	
 
 ### Retrieve subclass
 
 Retrieve all Human records , queries without '_type' because of it's a toplevel class.
-	
+```php  	
     $humans = Human::all();
-    
+``` 
 Retrieve all Student records , queries with  { "_type":"Student" } because of it's a subclass.
-
+```php  
     $students = Student::all();
+```
 
-
-### Other static methods 
-
-Drop the collection in database
-
-##### drop()
-
-### Hooks
-
+Other static methods in Model
+----------
+```php
+	User::drop() // Drop collection 
+	User::ensureIndex()  // Add index for collection
+```
+Model Hooks
+----------
 The following hooks are available:
 
 ##### __init()
