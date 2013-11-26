@@ -993,6 +993,7 @@ abstract class Model
 	 */
 	public function __set($key, $value)
 	{
+
 		$attrs = $this->getAttrs();
 
 		if(isset($attrs[$key]) && isset($attrs[$key]['type']) ){
@@ -1007,7 +1008,7 @@ abstract class Model
 
 		if(isset($this->cleanData[$key]) && $this->cleanData[$key] === $value){
 			
-		}else if($value){
+		}else{
 			$this->cleanData[$key] = $value;
 			$this->dirtyData[$key] = $value;
 		}
