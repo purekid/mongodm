@@ -263,12 +263,12 @@ abstract class Model
 		return $this->exists;
 	}
 
-    public function __call($func,$args){
-        if($func == 'unset'){
-            call_user_func_array( array($this,"_unset") , $args);
+  public function __call($func,$args){
+      if($func == 'unset'){
+          call_user_func_array( array($this,"_unset") , $args);
 
-        }
-    }
+      }
+  }
 
 	/**
 	 * Create a Mongodb reference
@@ -951,7 +951,6 @@ abstract class Model
         return $names;
 
     }
-
 
 	/*********** Hooks ***********/
 	
