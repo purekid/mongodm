@@ -2,6 +2,8 @@
 
 namespace Purekid\Mongodm;
 
+use \Purekid\Mongodm\Exception\InvalidDataTypeException;
+
 /**
  * Mongodm - A PHP Mongodb ORM
  *
@@ -11,6 +13,21 @@ namespace Purekid\Mongodm;
  */
 abstract class Model
 {
+
+  const DATA_TYPE_ARRAY      = 'array';
+  const DATA_TYPE_BOOLEAN    = 'boolean';
+  const DATA_TYPE_DATE       = 'date';
+  const DATA_TYPE_DOUBLE     = 'double';
+  const DATA_TYPE_EMBED      = 'embed';
+  const DATA_TYPE_EMBEDS     = 'embeds';
+  const DATA_TYPE_INT        = 'int';
+  const DATA_TYPE_INTEGER    = 'integer';
+  const DATA_TYPE_MIXED      = 'mixed';
+  const DATA_TYPE_REFERENCE  = 'reference';
+  const DATA_TYPE_REFERENCES = 'references';
+  const DATA_TYPE_STRING     = 'string';
+  const DATA_TYPE_TIMESTAMP  = 'timestamp';
+  const DATA_TYPE_OBJECT     = 'object';
 
 	public $cleanData = array();
 
@@ -537,61 +554,90 @@ abstract class Model
 	 * @param mixed $value
 	 * @return mixed
 	 */
-	private function parseValue($key,$value){
+	public function parseValue($key,$value){
 		
 		$attrs = $this->getAttrs();
-		if( !isset($attrs[$key]) && is_object($value)){
+		if(!isset($attrs[$key]) && is_object($value)){
 			if(method_exists($value, 'toArray')){
 				$value = (array) $value->toArray();
-			}else if(method_exists($value, 'to_array')){
+			}
+      else if(method_exists($value, 'to_array')){
 				$value = (array) $value->to_array();
 			}
 		}
-		else if( isset($attrs[$key]) && isset($attrs[$key]['type'])){
-			$type = $attrs[$key]['type'];
-			$type_defined = array('mixed','reference','references','embed','embeds','integer','int','string','double','timestamp','boolean','array','object');
-			if($type == "int") $type = 'integer';
-			if(in_array($type, $type_defined)){
-				switch($type){
-					case "integer":
-						$value = intval($value);
+		else if(isset($attrs[$key]) && isset($attrs[$key]['type'])) {
+			switch($attrs[$key]['type']) {
+        case "int":
+				case "integer":
+					$value = (integer) $value;
+				break;
+        case "str":
+				case "string":
+					$value = (string) $value;
 					break;
-					case "string":
-						$value = (string) $value;
-						break;
-					case "double":
-						$value = floatval($value);
-						break;
-					case "timestamp":
-						if(! ($value instanceof \MongoTimestamp)){
-							$value = new \MongoTimestamp($value);
-						}
-						break;
-					case "boolean":
-						$value = (boolean) $value;
-						break;
-					case "object":
-						if(!empty($value) && !is_object($value)){
-							throw new \Exception("[$key] is not a object");
-						}
-						$value = (object) $value;
-						break;
-					case "array":
-						if(!empty($value) && !is_array($value)){
-							throw new \Exception("[$key] is not a array");
-						}
-						$value = (array) $value;
-						break;
-					default:
-						
-						break;
-				}
-			}else{
-				throw new \Exception("type {$type} is invalid！");
+        case "flt":
+        case "float":
+        case "dbl";
+				case "double":
+					$value = (float) $value;
+					break;
+				case "timestamp":
+					if(! ($value instanceof \MongoTimestamp)){
+            try {
+						  $value = new \MongoTimestamp($value);
+            }
+            catch(\Exception $e) {
+              throw new InvalidDataTypeException('$key cannot be parsed by \MongoTimestamp', $e->getCode(), $e);
+            }
+					}
+					break;
+        case "date":
+          if(! ($value instanceof \MongoDate)) {
+            try {
+              if(!$value instanceof \MongoDate) {
+                if(is_numeric($value)) {
+                  $value = '@'.$value;
+                }
+                if(!$value instanceof \DateTime) {
+                  $value = new \DateTime($value);
+                }
+                $value = new \MongoDate($value->getTimestamp());
+              }
+            }
+            catch(\Exception $e) {
+              throw new InvalidDataTypeException('$key cannot be parsed by \DateTime', $e->getCode(), $e);
+            }
+          }
+          break;
+        case "bool":
+				case "boolean":
+					$value = (boolean) $value;
+					break;
+        case "obj":
+				case "object":
+					if(!empty($value) && !is_array($value) && !is_object($value)){
+						throw new InvalidDataTypeException("[$key] is not an object");
+					}
+					$value = (object) $value;
+					break;
+				case "array":
+					if(!empty($value) && !is_array($value)){
+						throw new InvalidDataTypeException("[$key] is not an array");
+					}
+					$value = (array) $value;
+					break;
+        case "embed":
+        case "embeds";
+        case "mixed":
+        case "reference":
+        case "references":
+          break;
+				default:
+          throw new InvalidDataTypeException("{$attrs[$key]['type']} is not a valid type");
+					break;
 			}
 		}
 		return $value;
-	
 	}
 
     /**
