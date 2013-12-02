@@ -73,11 +73,37 @@ If you want select config section with environment variable APPLICATION_ENV , yo
     	'production' => array(
     		'connection' => array(
     			'hostnames' => 'localhost',
-    			'database'  => 'production'
+    			'database'  => 'production',
+    			'options' => array('replicaSet' => 'rs0')
     		)
     	)
     );
 ```
+
+### Setup database in application
+You can also set up configuration using the `MongoDB::setConfigBlock` method.
+
+```php
+
+\Purekid\Mongodm\MongoDB::setConfigBlock('default', array(
+    'connection' => array(
+        'hostnames' => 'localhost',
+        'database'  => 'default',
+        'options'  => array()
+    )
+));
+
+// 
+\Purekid\Mongodm\MongoDB::setConfigBlock('auth', array(
+    'connection' => array(
+        'hostnames' => 'localhost',
+        'database'  => 'authDB',
+        'options'  => array()
+    )
+));
+
+```
+
 ### Create a model and enjoy it
 
 ```php       
