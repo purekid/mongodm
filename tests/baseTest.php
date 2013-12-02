@@ -98,6 +98,34 @@ class BaseTest extends PhactoryTestCase {
 	
 	
 	}
+
+  public function testMagicCall()
+  {
+    $user = new User(array('age' => 40, 'name' => 'testMagicCall'));
+    $user->save();
+    $user = User::one(array('name' => 'testMagicCall'));
+
+    $user->setTestNameMagic('testMagicCall');
+    $testName = $user->getTestNameMagic();
+
+    $this->assertEquals('testMagicCall', $testName, 'Magic getting and setting failed');
+  }
+
+  public function testGetSetMethod()
+  {
+    $user = new User(array('age' => 40, 'name' => 'testGetSetMethod'));
+    $user->save();
+    $user = User::one(array('name' => 'testGetSetMethod'));
+
+    $user->setTestSetMethod('testSetMethod');
+    $testSetMethod = $user->testSetMethod;
+
+    $user->testGetMethod = 'testGetMethod';
+    $testGetMethod = $user->getTestGetMethod();
+
+    $this->assertEquals('testsetmethod', $testSetMethod, 'Custom set method failed');
+    $this->assertEquals('TESTGETMETHOD', $testGetMethod, 'Custom get method failed');
+  }
 	
 	public function testAll()
 	{

@@ -27,5 +27,15 @@ class User extends Base
 	protected function __preSave(){
 		if(! $this->pre_save_data) $this->pre_save_data = "ohohoh";
 	}
+
+	public function setTestSetMethod($value) {
+		$value = strtolower($value);
+		$this->__setter('testSetMethod', $value);
+	}
+
+	public function getTestGetMethod() {
+		$value = $this->__getter('testGetMethod');
+		return strtoupper($value);
+	}
 	
 }

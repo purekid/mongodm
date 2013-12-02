@@ -106,13 +106,23 @@ If you want select config section with environment variable APPLICATION_ENV , yo
             'pets' => array('model'=>'Purekid\Mongodm\Test\Model\Pet','type'=>'embeds'),
                 
         );
+
+        public function setFirstName($name) {
+        	$name = ucfirst(strtolower($name));
+        	$this->__setter('firstName', $name);
+        }
+
+        public function getLastName($name) {
+        	$name = $this->__getter('name');
+        	return strtoupper($name);
+        }
     
     }
 ```    
 
 ### Types supported for model attributes
 
-```php  
+```php
 	$types = [
 	    'mixed',  // mixed type 
 	    'string',     
@@ -145,6 +155,38 @@ Create with initial value
 	$user->age = 20;
 	$user->save();
 ```
+
+Create using set method
+```php
+	$user->setLastName('Jones'); // Alias of $user->lastName = 'Jones';
+	$user->setFirstName('John'); // Implements setFirstName() method
+```
+
+#### Set and get values
+You can set/get values via variable `$user->name = "John"` or by method `$user->getName()`.
+
+Set using variable or method
+```php
+ 	// no "set" method exists
+	$user->lastName = 'Jones';
+	$user->setLastName('Jones');
+
+	// "set" method exists implements setFirstName()
+	$user->firstName = 'jOhn'; // "John"
+	$user->setFirstName('jOhn'); // "John"
+```
+
+Get using variable or method
+```php
+ 	// "get" method exists implements getLastName()
+	print $user->lastName; // "JONES"
+	print $user->getLastName(); // "JONES"
+
+	// no "get" method
+	print $user->firstName; // "John"
+	print $user->setFirstName('John'); // "John"
+```
+
 ### Update
 ```php  
 	$user->age = 19;
