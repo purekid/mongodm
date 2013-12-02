@@ -73,8 +73,8 @@ class BaseTest extends PhactoryTestCase {
 	
 	public function testSetGet()
 	{
-        $user = new User(array("age"=>40,"name"=>"John"));
-        $user->save();
+    $user = new User(array("age"=>40,"name"=>"John"));
+    $user->save();
 		$user = User::one();
 		$id = $user->getId();
 		$this->assertInstanceOf("\MongoId", $user->getId());
@@ -127,7 +127,8 @@ class BaseTest extends PhactoryTestCase {
 	
 	public function testUpdate()
 	{
-
+    $user = new User(array("age"=>40,"name"=>"John"));
+    $user->save();
 		$user = User::one();
 		$id = $user->getId();
 		$name = $user->name;
@@ -146,7 +147,8 @@ class BaseTest extends PhactoryTestCase {
 	
 	public function testDelete()
 	{
-
+    $user = new User(array("age"=>40,"name"=>"John"));
+    $user->save();
 		$user = User::one();
 		$id = $user->getId();
 		$this->assertInstanceOf("\MongoId", $user->getId());
@@ -159,6 +161,8 @@ class BaseTest extends PhactoryTestCase {
 	public function testRelation1TO1()
 	{
 
+    $user = new User(array("age"=>40,"name"=>"John"));
+    $user->save();
 		$user = User::one();
 		$id = $user->getId();
 		$this->assertInstanceOf("\MongoId", $user->getId());
@@ -182,6 +186,8 @@ class BaseTest extends PhactoryTestCase {
 	public function testRelation1TOMany()
 	{
 
+    $user = new User(array("age"=>40,"name"=>"John"));
+    $user->save();
 		$user = User::one();
 		$id = $user->getId();
 		$this->assertInstanceOf("\MongoId", $user->getId());
