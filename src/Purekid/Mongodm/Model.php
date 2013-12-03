@@ -263,12 +263,6 @@ abstract class Model
 		return $this->exists;
 	}
 
-  public function __call($func,$args){
-    if($func == 'unset'){
-      call_user_func_array( array($this,"_unset") , $args);
-    }
-  }
-
 	/**
 	 * Create a Mongodb reference
 	 * @return MongoRef Object
@@ -1000,63 +994,129 @@ abstract class Model
 	
 	/*********** Magic methods ************/
 
+  /**
+   * Interface for __get magic method
+   * 
+   * @param string $key
+   * @return mixed
+   */
+  public function __getter($key)
+  {
+    $attrs = $this->getAttrs();
+    $value = NULL;
+    if(isset($attrs[$key], $attrs[$key]['type'])) {
+      if(in_array($attrs[$key]['type'], array(self::DATA_TYPE_REFERENCE, self::DATA_TYPE_REFERENCES))) {
+        return $this->loadRef($key);
+      }
+      else if (in_array($attrs[$key]['type'], array(self::DATA_TYPE_EMBED, self::DATA_TYPE_EMBEDS))) {
+        return $this->loadEmbed($key);
+      }
+    }
+
+    if(isset($this->cleanData[$key])) {
+      $value = $this->parseValue($key,$this->cleanData[$key]);
+      return $value;
+    }
+    else if(isset($key, $this->ignoreData[$key])) {
+      return $this->ignoreData[$key];
+    }
+  
+  }
 
 	/**
-	 * @param  $key
+	 * @param string $key
 	 * @return mixed
 	 */
 	public function __get($key)
 	{
-		$attrs = $this->getAttrs();
-        $value = NULL;
-	    if( isset($attrs[$key]) && isset($attrs[$key]['type']) ){
-            if($attrs[$key]['type'] == 'reference' or $attrs[$key]['type'] == 'references' ){
-                $value = $this->loadRef($key);
-                return $value;
-            }else if($attrs[$key]['type'] == 'embed' or $attrs[$key]['type'] == 'embeds' ){
-                $value = $this->loadEmbed($key);
-                return $value;
-            }
+    $value = $this->__getter($key);
 
-		}
+    if(method_exists($this, 'get'.ucfirst($key))) {
+      return call_user_func(array($this, 'get'.ucfirst($key)), $value);
+    }
 
-		if (array_key_exists($key, $this->cleanData))
-		{
-			$value = $this->parseValue($key,$this->cleanData[$key]);
-			return $value;
-		}
-		elseif (array_key_exists($key, $this->ignoreData))
-		{
-			return $this->ignoreData[$key];
-		}
-	
+    return $value;
 	}
 	
 	/**
-	 * Magic Method for setting model data.
+	 * Interface for __set magic method
+   *
+   * @param string $key
+   * @param mixed $value 
 	 */
-	public function __set($key, $value)
+	public function __setter($key, $value)
 	{
-
 		$attrs = $this->getAttrs();
 
 		if(isset($attrs[$key]) && isset($attrs[$key]['type']) ){
-            if($attrs[$key]['type'] == 'reference' or $attrs[$key]['type'] == 'references' ){
-                $value = $this->setRef($key,$value);
-            }else if($attrs[$key]['type'] == 'embed' or $attrs[$key]['type'] == 'embeds' ){
-                $value = $this->setEmbed($key,$value);
-            }
+      if(in_array($attrs[$key]['type'], array(self::DATA_TYPE_REFERENCE, self::DATA_TYPE_REFERENCES))) {
+        $value = $this->setRef($key,$value);
+      }
+      else if (in_array($attrs[$key]['type'], array(self::DATA_TYPE_EMBED, self::DATA_TYPE_EMBEDS))) {
+        $value = $this->setEmbed($key,$value);
+      }
 		}
 		
 		$value = $this->parseValue($key,$value);
 
-		if(isset($this->cleanData[$key]) && $this->cleanData[$key] === $value){
-			
-		}else{
+		if(!isset($this->cleanData[$key]) || $this->cleanData[$key] !== $value) {
 			$this->cleanData[$key] = $value;
 			$this->dirtyData[$key] = $value;
 		}
-		
 	}
+
+  /**
+   * @param string $key
+   * @param mixed $value 
+   */
+  public function __set($key, $value)
+  {
+    if(method_exists($this, 'set'.ucfirst($key))) {
+      return call_user_func(array($this, 'set'.ucfirst($key)), $value);
+    }
+    else {
+      $this->__setter($key, $value);
+    }
+  }
+
+  /**
+   * 
+   * @param string $key
+   */
+  public function __isset($key)
+  {
+    return isset($this->cleanData[$key])
+        || isset($this->dirtyData[$key])
+        || isset($this->ignoreData[$key]);
+  }
+
+
+  /**
+   * @param string $func
+   * @param mixed $args
+   */
+  public function __call($func, $args){
+    if($func == 'unset'){
+      call_user_func_array( array($this,"_unset") , $args);
+    }
+
+    if(strpos($func, 'get') === 0 && strlen($func) > 3) {
+      $key = strtolower(substr($func, 3));
+      if(method_exists($this, $func)) {
+        return call_user_func(array($this, $func));
+      }
+
+      return $this->__get($key);
+    }
+
+    if(strpos($func, 'set') === 0 && strlen($func) > 3) {
+      $key = strtolower(substr($func, 3));
+      if(method_exists($this, $func)) {
+        return call_user_func(array($this, $func), isset($args[0]) ? $args[0] : null);
+      }
+
+      return $this->__set($key, isset($args[0]) ? $args[0] : null);
+    }
+  }
 
 }
