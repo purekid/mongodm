@@ -40,6 +40,8 @@ class InheritanceTest extends PhactoryTestCase {
 
 	public function testRelation1TO1(){
 	
+    $user = new Student(array("name"=>"John"));
+    $user->save();
 		$user = Student::one();
 		$id = $user->getId();
 		$this->assertInstanceOf("\MongoId", $user->getId());
