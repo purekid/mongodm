@@ -15,18 +15,34 @@ abstract class Model
 {
 
   const DATA_TYPE_ARRAY      = 'array';
+
+  const DATA_TYPE_BOOL       = 'bool';
   const DATA_TYPE_BOOLEAN    = 'boolean';
+
   const DATA_TYPE_DATE       = 'date';
+
+  const DATA_TYPE_DBL        = 'dbl';
   const DATA_TYPE_DOUBLE     = 'double';
+  const DATA_TYPE_FLT        = 'flt';
+  const DATA_TYPE_FLOAT      = 'float';
+
   const DATA_TYPE_EMBED      = 'embed';
   const DATA_TYPE_EMBEDS     = 'embeds';
+
   const DATA_TYPE_INT        = 'int';
   const DATA_TYPE_INTEGER    = 'integer';
+
   const DATA_TYPE_MIXED      = 'mixed';
+
   const DATA_TYPE_REFERENCE  = 'reference';
   const DATA_TYPE_REFERENCES = 'references';
+
+  const DATA_TYPE_STR        = 'str';
   const DATA_TYPE_STRING     = 'string';
+
   const DATA_TYPE_TIMESTAMP  = 'timestamp';
+
+  const DATA_TYPE_OBJ        = 'obj';
   const DATA_TYPE_OBJECT     = 'object';
 
 	public $cleanData = array();
@@ -106,7 +122,7 @@ abstract class Model
 			$attrs = $this->getAttrs();
 			foreach($cleanData as $key => $value){
 				if(($value instanceof Model) && isset($attrs[$key]) && isset($attrs[$key]['type']) 
-			    	&& ( $attrs[$key]['type'] == 'reference' or $attrs[$key]['type'] == 'references' )){
+			    	&& ( $attrs[$key]['type'] == self::DATA_TYPE_REFERENCE or $attrs[$key]['type'] == self::DATA_TYPE_REFERENCES )){
 					$value = $this->setRef($key,$value);
 				} 
 				$this->cleanData[$key] = $value;
@@ -560,21 +576,21 @@ abstract class Model
 		}
 		else if(isset($attrs[$key]) && isset($attrs[$key]['type'])) {
 			switch($attrs[$key]['type']) {
-        case "int":
-				case "integer":
+        case self::DATA_TYPE_INT:
+				case self::DATA_TYPE_INTEGER:
 					$value = (integer) $value;
 				break;
-        case "str":
-				case "string":
+        case self::DATA_TYPE_STR:
+				case self::DATA_TYPE_STRING:
 					$value = (string) $value;
 					break;
-        case "flt":
-        case "float":
-        case "dbl";
-				case "double":
+        case self::DATA_TYPE_FLT:
+        case self::DATA_TYPE_FLOAT:
+        case self::DATA_TYPE_DBL;
+				case self::DATA_TYPE_DOUBLE:
 					$value = (float) $value;
 					break;
-				case "timestamp":
+				case self::DATA_TYPE_TIMESTAMP:
 					if(! ($value instanceof \MongoTimestamp)){
             try {
 						  $value = new \MongoTimestamp($value);
@@ -584,7 +600,7 @@ abstract class Model
             }
 					}
 					break;
-        case "date":
+        case self::DATA_TYPE_DATE:
           if(! ($value instanceof \MongoDate)) {
             try {
               if(!$value instanceof \MongoDate) {
@@ -602,28 +618,28 @@ abstract class Model
             }
           }
           break;
-        case "bool":
-				case "boolean":
+        case self::DATA_TYPE_BOOL:
+				case self::DATA_TYPE_BOOLEAN:
 					$value = (boolean) $value;
 					break;
-        case "obj":
-				case "object":
+        case self::DATA_TYPE_OBJ:
+				case self::DATA_TYPE_OBJECT:
 					if(!empty($value) && !is_array($value) && !is_object($value)){
 						throw new InvalidDataTypeException("[$key] is not an object");
 					}
 					$value = (object) $value;
 					break;
-				case "array":
+				case self::DATA_TYPE_ARRAY:
 					if(!empty($value) && !is_array($value)){
 						throw new InvalidDataTypeException("[$key] is not an array");
 					}
 					$value = (array) $value;
 					break;
-        case "embed":
-        case "embeds";
-        case "mixed":
-        case "reference":
-        case "references":
+        case self::DATA_TYPE_EMBED:
+        case self::DATA_TYPE_EMBEDS:
+        case self::DATA_TYPE_MIXED:
+        case self::DATA_TYPE_REFERENCE:
+        case self::DATA_TYPE_REFERENCES:
           break;
 				default:
           throw new InvalidDataTypeException("{$attrs[$key]['type']} is not a valid type");
@@ -643,9 +659,9 @@ abstract class Model
         foreach($cache as $key => $item){
             if(!isset($attrs[$key])) continue;
             $attr = $attrs[$key];
-            if($attr['type'] == 'references'){
+            if($attr['type'] == self::DATA_TYPE_REFERENCES){
                 if( $item instanceof Collection && $this->cleanData[$key] !== $item->makeRef()){
-                    $this->__set($key,$item);
+                    $this->__setter($key,$item);
                 }
             }
         }
@@ -662,13 +678,13 @@ abstract class Model
         foreach($cache as $key => $item){
             if(!isset($attrs[$key])) continue;
             $attr = $attrs[$key];
-            if($attr['type'] == 'embed'){
+            if($attr['type'] == self::DATA_TYPE_EMBED){
                 if( $item instanceof Model && $this->cleanData[$key] !== $item->toArray()){
-                    $this->__set($key,$item);
+                    $this->__setter($key,$item);
                 }
-            }else if($attr['type'] == 'embeds'){
+            }else if($attr['type'] == self::DATA_TYPE_EMBEDS){
                 if( $item instanceof Collection && $this->cleanData[$key] !== $item->toEmbedsArray()){
-                    $this->__set($key,$item);
+                    $this->__setter($key,$item);
                 }
             }
         }
@@ -687,7 +703,7 @@ abstract class Model
 		$model = $reference['model'];
 		$type = $reference['type'];
 
-		if($type == "reference"){
+		if($type == self::DATA_TYPE_REFERENCE){
 			$model = $reference['model'];
 			$type = $reference['type'];
 			if($value instanceof $model){
@@ -699,7 +715,7 @@ abstract class Model
 				throw new \Exception ("{$key} is not instance of '$model'");
 			}
 				
-		}else if($type == "references"){
+		}else if($type == self::DATA_TYPE_REFERENCES){
 			$arr = array();
 			if(is_array($value)){
 				foreach($value as $item){
@@ -733,7 +749,7 @@ abstract class Model
         $model = $embed['model'];
         $type = $embed['type'];
 
-        if($type == "embed"){
+        if($type == self::DATA_TYPE_EMBED){
             $model = $embed['model'];
             $type = $embed['type'];
             if($value instanceof $model){
@@ -745,7 +761,7 @@ abstract class Model
                 throw new \Exception ("{$key} is not instance of '$model'");
             }
 
-        }else if($type == "embeds"){
+        }else if($type == self::DATA_TYPE_EMBEDS){
             $arr = array();
             if(is_array($value)){
                 foreach($value as $item){
@@ -789,7 +805,7 @@ abstract class Model
             return $obj;
         }else{
             if(class_exists($model)){
-                if($type == "embed"){
+                if($type == self::DATA_TYPE_EMBED){
                     if($value){
                         $data = $value;
                         $object = new $model($data);
@@ -798,7 +814,7 @@ abstract class Model
                         return $object;
                     }
                     return null;
-                }else if($type == "embeds"){
+                }else if($type == self::DATA_TYPE_EMBEDS){
                     $res = array();
                     if(!empty($value)){
                         foreach($value as $item){
@@ -841,14 +857,14 @@ abstract class Model
 			return $obj;
 		}else{
 			if(class_exists($model)){
-				if($type == "reference"){
+				if($type == self::DATA_TYPE_REFERENCE){
 					if(\MongoDBRef::isRef($value)){
 						$object = $model::id($value['$id']);
 						$cache[$key] = $object;
 						return $object;
 					}
 					return null;
-				}else if($type == "references"){
+				}else if($type == self::DATA_TYPE_REFERENCES){
 					$res = array();
 					if(!empty($value)){
 						foreach($value as $item){
