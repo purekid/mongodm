@@ -869,29 +869,11 @@ abstract class Model
 
     /**
      * unset a attribute
+     * @deprecated see __unset magic method and __unsetter
      * @param $key
      */
-    private function _unset( $key ){
-        if(is_array($key)){
-            foreach($key as $item){
-                $this->_unset($item);
-            }
-        }else{
-            if(strpos($key,".") !== false){
-                throw new \Exception('The key to unset can\'t contains "." ');
-            }
-
-            if(isset($this->cleanData[$key] )){
-                unset($this->cleanData[$key]);
-            }
-
-            if(isset($this->dirtyData[$key] )){
-                unset($this->dirtyData[$key]);
-            }
-
-            $this->unsetData[$key] = 1;
-        }
-
+    private function _unset( $key ) {
+      $this->__unset($key);
     }
 
     /**
@@ -1078,6 +1060,50 @@ abstract class Model
       $this->__setter($key, $value);
     }
   }
+  
+  /**
+   * Interface for __unset magic method
+   *
+   * @param string $key
+   */
+  public function __unsetter($key)
+  {
+    $attrs = $this->getAttrs();
+    if(strpos($key, ".") !== false) {
+      throw new \Exception('The key to unset can\'t contain a "." ');
+    }
+
+    if(isset($this->cleanData[$key])) {
+      unset($this->cleanData[$key]);
+    }
+
+    if(isset($this->dirtyData[$key])) {
+      unset($this->dirtyData[$key]);
+    }
+
+    $this->unsetData[$key] = 1;
+  }
+
+  /**
+   * @param string $key
+   * @param mixed $value 
+   */
+  public function __unset($key)
+  {
+    if(is_array($key)) {
+      foreach($key as $item) {
+        $this->__unset($item);
+      }
+    }
+    else {
+      if(method_exists($this, 'unset'.ucfirst($key))) {
+        return call_user_func(array($this, 'unset'.ucfirst($key)));
+      }
+      else {
+        $this->__unsetter($key);
+      }
+    }
+  }
 
   /**
    * 
@@ -1096,8 +1122,8 @@ abstract class Model
    * @param mixed $args
    */
   public function __call($func, $args){
-    if($func == 'unset'){
-      call_user_func_array( array($this,"_unset") , $args);
+    if($func == 'unset' && isset($args[0])) {
+      $this->__unset($args[0]);
     }
 
     if(strpos($func, 'get') === 0 && strlen($func) > 3) {
