@@ -35,8 +35,7 @@ class Hydrator
 	
 	private static function pack($class,$result)
 	{
-		
-		$model = new $class((array) $result  );
+		$model = new $class($result, true);
 		if (isset($model->cleanData['_id']))
 		{
 			$id = (string) $model->cleanData['_id'];

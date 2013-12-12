@@ -72,8 +72,12 @@ abstract class Model
      */
     private $_tempId = null;
 	
-	public function __construct( $data = array())
+	public function __construct( $data = array(), $mapFields = false)
 	{
+        if($mapFields === true) {
+          $data = self::mapFields($data, true);
+        }
+
 		if (is_null($this->_connection))
 		{
 			if(isset($this::$config)){
@@ -206,20 +210,23 @@ abstract class Model
 		{
 			$this->__preUpdate();
             $updateQuery = array();
+
             if(!empty($this->dirtyData)){
-                $updateQuery['$set'] = $this->dirtyData;
+                $updateQuery['$set'] = self::mapFields($this->dirtyData);
             };
 
             if(!empty($this->unsetData)){
-                $updateQuery['$unset'] = $this->unsetData;
+                $updateQuery['$unset'] = self::mapFields($this->unsetData);
             }
+
 			$success = $this->_connection->update($this->collectionName(), array('_id' => $this->getId()), $updateQuery , $options);
 			$this->__postUpdate();
 		}
 		else
 		{
 			$this->__preInsert();
-			$insert = $this->_connection->insert($this->collectionName(), $this->cleanData, $options);
+            $data = self::mapFields($this->cleanData);
+			$insert = $this->_connection->insert($this->collectionName(), $data, $options);
 			$success = !is_null($this->cleanData['_id'] = $insert['_id']);
 			if($success){
 				$this->exists = true ;
@@ -273,6 +280,77 @@ abstract class Model
 		$ref = \MongoDBRef::create($this->collectionName(), $this->getId());
 		return $ref;
 	}
+
+  /**
+   * Cache attrs map
+   */
+  protected static function cacheAttrsMap() {
+    $class = get_called_class();
+    $attrs = $class::getAttrs();
+    $private =& $class::getPrivateData();
+
+    if(!isset($private['attrsMapCache'])) {
+        $private['attrsMapCache'] = array();
+    }
+    $cache =& $private['attrsMapCache'];
+
+    if(empty($cache)) {
+      $cache = array(
+        'db' => array(),
+        'model' => array()
+      );
+
+      foreach($class::getAttrs() as $key => $value) {
+        if(isset($value['field'])) {
+          $cache['db'][$key] = $value['field'];
+          $cache['model'][$value['field']] = $key;
+        }
+      }
+    }
+  }
+
+  /**
+   * Map fields
+   * 
+   * @
+   */
+  public static function mapFields($array, $toModel = false) {
+    $class = get_called_class();
+
+    $class::cacheAttrsMap();
+    $attrs = $class::getAttrs();
+    $private =& $class::getPrivateData();
+    $map =& $private['attrsMapCache']['db'];
+
+    if($toModel === true) {
+        $map =& $private['attrsMapCache']['model'];
+    }
+
+    foreach($map as $from => $to) {
+        if(isset($array[$from])) {
+
+            // Map embeds
+            $key = $toModel ? $to : $from;
+            if(isset($attrs[$key], $attrs[$key]['type'])) {
+                if($attrs[$key]['type'] === $class::DATA_TYPE_EMBED) {
+                    $array[$from] = call_user_func(array($attrs[$key]['model'], 'mapFields'), $array[$from], $toModel);
+                }
+                if(is_array($array[$from]) && $attrs[$key]['type'] === $class::DATA_TYPE_EMBEDS) {
+                    $embedArray = array();
+                    foreach($array[$from] as $item) {
+                        $embedArray[] = call_user_func(array($attrs[$key]['model'], 'mapFields'), $item, $toModel);
+                    }
+                    $array[$from] = $embedArray;
+                }
+            }
+
+            $array[$to] = $array[$from];
+            unset($array[$from]);
+        }
+    }
+
+    return $array;
+  }
 	
 	/**
 	 * Retrieve a record by MongoId
@@ -922,8 +1000,20 @@ abstract class Model
             $attrs = $class::$attrs;
         }
         if(empty($attrs)) $attrs = array();
-        return $attrs;
+        return array_diff_key($attrs, array('__private__'));
 
+    }
+
+    /**
+     * Get private data
+     * @return array
+     */
+    protected static function &getPrivateData() {
+        $class = get_called_class();
+        if(!isset($class::$attrs['__private__'])) {
+            $class::$attrs['__private__'] = array();
+        }
+        return $class::$attrs['__private__'];
     }
 
     /**
