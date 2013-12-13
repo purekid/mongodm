@@ -533,4 +533,9 @@ class MongoDB
 		
 	}
 	
+	public function aggregate($collectionName, $query)
+    	{
+        	return $this->_db->selectCollection($collectionName)->Aggregate($query);
+    	}
+	
 }
