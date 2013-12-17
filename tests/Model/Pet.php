@@ -5,7 +5,7 @@ namespace Purekid\Mongodm\Test\Model;
 class Pet extends Base
 {
 
-	static $collection = "pet";
+    public static $collection = "pet";
 
     protected static $attrs = array(
 

@@ -1,17 +1,34 @@
 <?php
 
+/**
+ * This file is part of the Mongodm package.
+ *
+ * (c) Michael Gan <gc1108960@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @category Mongodm
+ * @package  Mongodm
+ * @author   Michael Gan <gc1108960@gmail.com>
+ * @license  https://github.com/purekid/mongodm/blob/master/LICENSE.md MIT Licence
+ * @link     https://github.com/purekid/mongodm
+ */
+
 namespace Purekid\Mongodm;
 
 use Purekid\Mongodm\Model;
 
 /**
- * Mongodm - A PHP Mongodb ORM
+ * Collection
  *
+ * @category Mongodm
  * @package  Mongodm
  * @author   Michael Gan <gc1108960@gmail.com>
- * @link     http://github.com/purekid
+ * @license  https://github.com/purekid/mongodm/blob/master/LICENSE.md MIT Licence
+ * @link     https://github.com/purekid/mongodm
  */
-class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
+class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
 {
 
     private $_items = array();
@@ -20,7 +37,7 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
     /**
      * Make a collection from a arrry of Model
      *
-     * @param  array $models
+     * @param array $models models to add to the collection
      */
     public function __construct($models = array())
     {
@@ -28,11 +45,11 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
         $items = array();
 
         $i = 0;
-        foreach($models as $model){
-            if(! ($model instanceof Model)) continue;
-            if($model->exists){
+        foreach ($models as $model) {
+            if (! ($model instanceof Model)) continue;
+            if ($model->exists) {
                 $id = (string) $model->getId();
-            }else if($model->getIsEmbed()){
+            } elseif ($model->getIsEmbed()) {
                 $id = $i++;
                 $model->setTempId($id);
             }
@@ -47,23 +64,25 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
     /**
      * Add a model item or model array or ModelSet to this set
      *
-     * @param  mixed $items
+     * @param mixed $items model item or arry or ModelSet to add
+     *
      * @return $this
      */
     public function add($items)
     {
-        if($items && $items instanceof \Purekid\Mongodm\Model){
+        if ($items && $items instanceof \Purekid\Mongodm\Model) {
             $id = (string) $items->getId();
             $this->_items[$id] = $items;
-        }else if(is_array($items)){
-            foreach($items as $obj){
-                if($obj instanceof \Purekid\Mongodm\Model){
+        } elseif (is_array($items)) {
+            foreach ($items as $obj) {
+                if ($obj instanceof \Purekid\Mongodm\Model) {
                     $this->add($obj);
                 }
             }
-        }else if($items instanceof self){
+        } elseif ($items instanceof self) {
             $this->add($items->toArray());
         }
+
         return $this;
 
     }
@@ -71,25 +90,26 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
     /**
      * Get item by numeric index or MongoId
      *
-     * @param  array $models
+     * @param int $index model to get
+     *
      * @return \Purekid\Mongodm\Model
      */
-    public function get($index = 0 )
+    public function get($index = 0)
     {
 
-        if(is_int($index)){
-            if($index + 1 > $this->count()){
+        if (is_int($index)) {
+            if ($index + 1 > $this->count()) {
                 return null;
-            }else{
-                return	current(array_slice ($this->_items , $index , 1)) ;
+            } else {
+                return current(array_slice($this->_items, $index, 1));
             }
-        }else{
+        } else {
 
-            if($index instanceof \MongoId){
+            if ($index instanceof \MongoId) {
                 $index = (string) $index;
             }
 
-            if($this->has($index)){
+            if ($this->has($index)) {
                 return $this->_items[$index];
             }
         }
@@ -100,22 +120,24 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
     /**
      * Remove a record from the collection
      *
-     * @param int|MongoID|Model
+     * @param int|MongoID|Model $param model to remove
+     *
      * @return boolean
      */
     public function remove($param)
     {
-        if($param instanceof Model ){
+        if ($param instanceof Model) {
             $param = $param->getId();
         }
 
         $item = $this->get($param);
-        if($item){
+        if ($item) {
             $id = (string) $item->getId();
-            if($this->_items[$id]){
+            if ($this->_items[$id]) {
                 unset($this->_items[$id]);
             }
         }
+
         return true;
 
     }
@@ -123,9 +145,10 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
     /**
      * Slice the underlying collection array.
      *
-     * @param  int   $offset
-     * @param  int   $length
-     * @param  bool  $preserveKeys
+     * @param int  $offset       offset to slice
+     * @param int  $length       length
+     * @param bool $preserveKeys preserve keys
+     *
      * @return \Purekid\Mongodm\Collection
      */
     public function slice($offset, $length = null, $preserveKeys = false)
@@ -136,13 +159,13 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
     /**
      * Take the first or last {$limit} items.
      *
-     * @param  int  $limit
+     * @param int $limit limit
+     *
      * @return \Purekid\Mongodm\Collection
      */
     public function take($limit = null)
     {
         if ($limit < 0) return $this->slice($limit, abs($limit));
-
         return $this->slice(0, $limit);
     }
 
@@ -159,29 +182,33 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
     /**
      * Determine if a record exists in the collection
      *
-     * @param int|MongoID|object
+     * @param int|MongoID|object $param param
+     *
      * @return boolean
      */
-    public function has( $param )
+    public function has($param)
     {
 
-        if($param instanceof \MongoId){
+        if ($param instanceof \MongoId) {
             $id = (string) $param;
-        }else if($param instanceof Model){
-            $id = (string) $param->getId() ;
-        }else if(is_string($param)){
+        } elseif ($param instanceof Model) {
+            $id = (string) $param->getId();
+        } elseif (is_string($param)) {
             $id = $param;
         }
-        if( isset($id) && isset($this->_items[$id]) ){
+        if ( isset($id) && isset($this->_items[$id]) ) {
             return true;
         }
+
         return false;
 
     }
 
     /**
      * Run a map over the collection using the given Closure and return a new collection
-     * @param Closure $callback
+     *
+     * @param Closure $callback callback
+     *
      * @return \Purekid\Mongodm\Collection
      */
     public function map(\Closure $callback)
@@ -191,7 +218,9 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
 
     /**
      * Filter the collection using the given Closure and return a new collection
-     * @param Closure $callback
+     *
+     * @param Closure $callback callback
+     *
      * @return \Purekid\Mongodm\Collection
      */
     public function filter(\Closure $callback)
@@ -199,30 +228,29 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
         return new static(array_filter($this->_items, $callback));
     }
 
-
     /**
      * Sort the collection using the given Closure
-     * @param Closure $callback
-     * @param boolean $asc
+     *
+     * @param Closure $callback callback
+     * @param boolean $asc      asc
+     *
      * @return \Purekid\Mongodm\Collection
      */
     public function sortBy(\Closure $callback , $asc = false)
     {
         $results = array();
 
-        foreach ($this->_items as $key => $value)
-        {
+        foreach ($this->_items as $key => $value) {
             $results[$key] = $callback($value);
         }
 
-        if($asc){
+        if ($asc) {
             asort($results);
-        }else{
+        } else {
             arsort($results);
         }
 
-        foreach (array_keys($results) as $key)
-        {
+        foreach (array_keys($results) as $key) {
             $results[$key] = $this->_items[$key];
         }
 
@@ -240,29 +268,39 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
     {
 
         $this->_items =  array_reverse($this->_items);
+
         return $this;
 
     }
 
-
     /**
      * Make a collection from a arrry of Model
      *
-     * @param  array $models
+     * @param array $models models
+     *
      * @return \Purekid\Mongodm\Collection
      */
-    static function make($models)
+    public static function make($models)
     {
-
         return new self($models);
 
     }
 
+    /**
+     * First
+     *
+     * @return Model
+     */
     public function first()
     {
         return current($this->_items);
     }
 
+    /**
+     * Last
+     *
+     * @return Model
+     */
     public function last()
     {
         return array_pop($this->_items);
@@ -271,7 +309,8 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
     /**
      * Execute a callback over each item.
      *
-     * @param  Closure  $callback
+     * @param Closure $callback callback
+     *
      * @return \Purekid\Mongodm\Collection
      */
     public function each(\Closure $callback)
@@ -281,6 +320,11 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
         return $this;
     }
 
+    /**
+     * Count
+     *
+     * @return int
+     */
     public function count()
     {
         return count($this->_items);
@@ -288,88 +332,128 @@ class Collection  implements \IteratorAggregate,\ArrayAccess, \Countable
 
     /**
      * Export all items to a Array
-     * @param boolean $is_numeric_index
+     *
+     * @param boolean $is_numeric_index is numeric index
+     * @param boolean $itemToArray      item to array
+     *
      * @return array
      */
-    public function toArray( $is_numeric_index = true ,$itemToArray = false)
+    public function toArray($is_numeric_index = true ,$itemToArray = false)
     {
 
         $array = array();
-        foreach($this->_items as $item){
-            if(!$is_numeric_index){
+        foreach ($this->_items as $item) {
+            if (!$is_numeric_index) {
                 $id = (string) $item->getId();
-                if($itemToArray){
+                if ($itemToArray) {
                     $item = $item->toArray();
                 }
                 $array[$id] = $item;
-            }else{
-                if($itemToArray){
+            } else {
+                if ($itemToArray) {
                     $item = $item->toArray();
                 }
                 $array[] = $item;
             }
         }
+
         return $array;
 
     }
 
     /**
      * Export all items to a Array with embed style ( without _type,_id)
+     *
      * @return array
      */
     public function toEmbedsArray()
     {
 
         $array = array();
-        foreach($this->_items as $item){
+        foreach ($this->_items as $item) {
             $item = $item->toArray(array('_type','_id'));
             $array[] = $item;
         }
+
         return $array;
 
     }
 
-
+    /**
+     * get iterator
+     *
+     * @return \ArrayIterator
+     */
     public function getIterator()
     {
         return new \ArrayIterator($this->_items);
     }
 
     /**
-     * make a  MongoRefs array of items
+     * make a MongoRefs array of items
      *
-     * @param  mixed $items
-     * @return $this
+     * @return \MongoRef[]
      */
     public function makeRef()
     {
-
         $data = array();
-        foreach($this->_items as $item){
+        foreach ($this->_items as $item) {
             $data[] = $item->makeRef();
         }
-        return $data;
 
+        return $data;
     }
 
+    /**
+     * Offset exists
+     *
+     * @param int|string $key index
+     *
+     * @return boolean
+     */
     public function offsetExists($key)
     {
-        if(is_integer($key) && $key + 1 <= $this->count()){
+        if (is_integer($key) && $key + 1 <= $this->count()) {
             return true;
         }
+
         return $this->has($key);
     }
 
+    /**
+     * Offset get
+     *
+     * @param int|string $key index
+     *
+     * @return boolean
+     */
     public function offsetGet($key)
     {
         return $this->get($key);
     }
 
+    /**
+     * Offset set
+     *
+     * @param mixed $offset offset
+     * @param mixed $value  value
+     *
+     * @throws \Exception
+     *
+     * @return null
+     */
     public function offsetSet($offset, $value)
     {
         throw new \Exception('cannot change the set by using []');
     }
 
+    /**
+     * Offset unset
+     *
+     * @param int $index index
+     *
+     * @return bool
+     */
     public function offsetUnset($index)
     {
         $this->remove($index);
