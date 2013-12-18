@@ -91,19 +91,19 @@ abstract class Model
     /**
     * Cache for references data
     */
-    private $_cache = array();
+    protected $_cache = array();
 
-    private $_connection = null;
+    protected $_connection = null;
 
     /**
      * If $_isEmbed = true , this model can't save to database alone.
      */
-    private $_isEmbed = false;
+    protected $_isEmbed = false;
 
     /**
      * Id for offline model (such as embed model)
      */
-    private $_tempId = null;
+    protected $_tempId = null;
 
     /**
      * Model
@@ -826,7 +826,7 @@ abstract class Model
      *
      * @return null
      */
-    private function _processReferencesChanged()
+    protected function _processReferencesChanged()
     {
         $cache = $this->_cache;
         $attrs = $this->getAttrs();
@@ -846,7 +846,7 @@ abstract class Model
      *
      * @return null
      */
-    private function _processEmbedsChanged()
+    protected function _processEmbedsChanged()
     {
         $cache = $this->_cache;
         $attrs = $this->getAttrs();
@@ -1095,7 +1095,7 @@ abstract class Model
      *
      * @return null
      */
-    private function _unset($key)
+    protected function _unset($key)
     {
         $this->__unset($key);
     }
