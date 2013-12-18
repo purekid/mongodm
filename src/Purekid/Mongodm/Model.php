@@ -103,7 +103,7 @@ abstract class Model
     /**
      *  record exists in the database
      */
-    private $exist = false;
+    protected $exist = false;
 
     /**
      * Model

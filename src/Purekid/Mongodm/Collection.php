@@ -17,7 +17,6 @@
 
 namespace Purekid\Mongodm;
 
-use Purekid\Mongodm\Model;
 
 /**
  * Collection
