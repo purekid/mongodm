@@ -26,6 +26,10 @@ abstract class PhactoryTestCase extends \PHPUnit_Framework_TestCase
     self::$db->connect();
 
     if (!self::$phactory) {
+      if (!self::$db->getDB() instanceof \MongoDB) {
+        throw new \Exception('Could not connect to MongoDB');
+      }
+      
       self::$phactory = new Phactory(self::$db->getDB());
       self::$phactory->reset();
     }
