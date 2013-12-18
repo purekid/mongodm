@@ -65,11 +65,6 @@ abstract class Model
     public $cleanData = array();
 
     /**
-     *  exists in the database
-     */
-    public $exists = false;
-
-    /**
      * section choosen in the config
      */
     protected static $config = 'default';
@@ -106,12 +101,18 @@ abstract class Model
     protected $_tempId = null;
 
     /**
+     *  record exists in the database
+     */
+    private $exist = false;
+
+    /**
      * Model
      *
      * @param array $data      data
-     * @param bool  $mapFields map the field names
+     * @param bool $mapFields  map the field names
+     * @param bool $exists     record exists in DB
      */
-    public function __construct( $data = array(), $mapFields = false)
+    public function __construct( $data = array(), $mapFields = false, $exists = false)
     {
         if ($mapFields === true) {
             $data = self::mapFields($data, true);
@@ -121,19 +122,21 @@ abstract class Model
             if (isset($this::$config)) {
                 $config = $this::$config;
             } else {
-                $config = self::config;
+                $config = self::$config;
             }
             $this->_connection = MongoDB::instance($config);
         }
 
         $this->update($data, true);
-        if (isset($data['_id']) && $data['_id'] instanceof \MongoId) {
-            $this->exists = true;
+
+        if ($exists) {
+            $this->exist = true;
         } else {
             $this->initAttrs();
         }
-         $this->initTypes();
-         $this->__init();
+
+        $this->initTypes();
+        $this->__init();
 
     }
 
@@ -220,7 +223,7 @@ abstract class Model
     {
         $this->__preDelete();
 
-        if ($this->exists) {
+        if ($this->exist) {
             $deleted =  $this->_connection->remove($this->collectionName(), array("_id" => $this->getId() ), $options);
             if ($deleted) {
                 $this->exists = false;
@@ -250,11 +253,11 @@ abstract class Model
 
         /* if no changes then do nothing */
 
-        if ($this->exists and empty($this->dirtyData) and empty($this->unsetData)) return true;
+        if ($this->exist and empty($this->dirtyData) and empty($this->unsetData)) return true;
 
         $this->__preSave();
 
-        if ($this->exists) {
+        if ($this->exist) {
             $this->__preUpdate();
             $updateQuery = array();
 
@@ -274,7 +277,7 @@ abstract class Model
             $insert = $this->_connection->insert($this->collectionName(), $data, $options);
             $success = !is_null($this->cleanData['_id'] = $insert['_id']);
             if ($success) {
-                $this->exists = true ;
+                $this->exist = true ;
                 $this->__postInsert();
             }
 
@@ -313,9 +316,9 @@ abstract class Model
      *
      * @return integer
      */
-    public function exist()
+    public function exists()
     {
-        return $this->exists;
+        return $this->exist;
     }
 
     /**
@@ -446,7 +449,7 @@ abstract class Model
         }
         $result = self::connection()->find_one(static::$collection, $params, $fields);
         if ($result) {
-            return  Hydrator::hydrate(get_called_class(), $result, "one");
+            return  Hydrator::hydrate(get_called_class(), $result, "one" , true);
         }
 
         return null;
@@ -488,7 +491,7 @@ abstract class Model
             $results->sort($sort);
         }
 
-        return Hydrator::hydrate(get_called_class(), $results);
+        return Hydrator::hydrate(get_called_class(), $results , 'collection' , true);
 
     }
 
@@ -639,7 +642,7 @@ abstract class Model
         $this->_isEmbed = $is_embed;
         if ($is_embed) {
             unset($this->_connection);
-            unset($this->exists);
+            unset($this->exist);
         }
     }
 

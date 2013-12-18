@@ -32,7 +32,6 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
 {
 
     private $_items = array();
-    private $_items_id = array();
 
     /**
      * Make a collection from a arrry of Model
@@ -47,7 +46,7 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
         $i = 0;
         foreach ($models as $model) {
             if (! ($model instanceof Model)) continue;
-            if ($model->exists) {
+            if ($model->exists()) {
                 $id = (string) $model->getId();
             } elseif ($model->getIsEmbed()) {
                 $id = $i++;

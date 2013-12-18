@@ -38,22 +38,21 @@ class Hydrator
      *
      * @return Model|null
      */
-    public static function hydrate($class, $results, $type = "set")
+    public static function hydrate($class, $results, $type = "collection" , $exists = false)
     {
 
         if (!class_exists($class)) {
             throw new \Exception("class {$class} not exists!");
-        } elseif ($type == "set") {
+        } elseif ($type == "collection") {
             $models = array();
             foreach ($results as $result) {
-                $model = self::pack($class, $result);
+                $model = self::pack($class, $result , $exists);
                 $models[] = $model;
             }
 
             return Collection::make($models);
         } else {
-            $model = self::pack($class, $results);
-
+            $model = self::pack($class, $results , $exists);
             return $model;
         }
 
@@ -71,15 +70,10 @@ class Hydrator
      *
      * @return type
      */
-    protected static function pack($class, $result)
+    protected static function pack($class, $result, $exists = false)
     {
-        $model = new $class($result, true);
-        if (isset($model->cleanData['_id'])) {
-            $id = (string) $model->cleanData['_id'];
-        }
-
+        $model = new $class($result, true , $exists);
         return $model;
-
     }
 
     /**
