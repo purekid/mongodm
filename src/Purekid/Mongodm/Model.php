@@ -685,6 +685,29 @@ abstract class Model
     }
 
     /**
+     * Return the connection
+     * 
+     * @return MongoDB|null
+     */
+    public function _getConnection()
+    {
+        return $this->_connection;
+    }
+
+    /**
+     * Return the current MongoCollection
+     * 
+     * @return \MongoCollection|null
+     */
+    public function _getCollection()
+    {
+        if($this->_getConnection()) {
+            return $this->_getConnection()->getDB()->{$this->collectionName()};
+        }
+        return null;
+    }
+
+    /**
      * Initialize the "_type" attribute for the model
      *
      * @return null
