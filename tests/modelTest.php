@@ -21,6 +21,24 @@ class ModelTest extends PhactoryTestCase
 
     }
 
+    public function testGetConection()
+    {
+        $user = new User();
+
+        $connection = $user->_getConnection();
+
+        $this->assertInstanceOf('\\Purekid\\Mongodm\\MongoDB', $connection);
+    }
+
+    public function testGetCollection()
+    {
+        $user = new User();
+
+        $collection = $user->_getCollection();
+
+        $this->assertInstanceOf('\\MongoCollection', $collection);
+    }
+
     public function testSaveModelWithMongoId()
     {
 
