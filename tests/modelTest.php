@@ -8,7 +8,7 @@ use Purekid\Mongodm\Test\Model\Book;
 use Purekid\Mongodm\Test\Model\User;
 use Purekid\Mongodm\Collection;
 
-class BaseTest extends PhactoryTestCase
+class ModelTest extends PhactoryTestCase
 {
     public function testCreate()
     {
