@@ -22,12 +22,8 @@ abstract class PhactoryTestCase extends \PHPUnit_Framework_TestCase
       )
     ));
 
-    MongoDB::instance('testing')->connect();
-
-    if (!self::$db || !method_exists(self::$db, 'getDB') || !self::$db->getDB() instanceof MongoDB) {
-      self::$db = MongoDB::instance('testing');
-      self::$db->connect();
-    }
+    self::$db = MongoDB::instance('testing');
+    self::$db->connect();
 
     if (!self::$phactory) {
       self::$phactory = new Phactory(self::$db->getDB());
