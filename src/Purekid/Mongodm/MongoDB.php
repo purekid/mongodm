@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Purekid\Mongodm;
 
@@ -532,5 +532,18 @@ class MongoDB
 		}
 		
 	}
+
+    /**
+     * Mongo aggregate
+     *
+     * @param string $collection_name string
+     * @param array $query array
+     *
+     * @return array
+     * */
+    public function aggregate($collection_name, $query)
+    {
+        return $this->_db->selectCollection($collection_name)->aggregate($query);
+    }
 	
 }
