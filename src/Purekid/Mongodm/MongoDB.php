@@ -490,6 +490,9 @@ class MongoDB
 			case 'remove_file':
 				$r = $this->gridFS()->remove($criteria, $options);
 				break;
+            case 'aggregate':
+                $r = call_user_func_array(array($c, 'aggregate'), $ops);
+                break;
 		}
 
 		return $r;
@@ -536,14 +539,16 @@ class MongoDB
     /**
      * Mongo aggregate
      *
-     * @param string $collection_name string
-     * @param array $query array
-     *
      * @return array
      * */
-    public function aggregate($collection_name, $query)
+    public function aggregate()
     {
-        return $this->_db->selectCollection($collection_name)->aggregate($query);
+        $ops = func_get_args();
+        $collection_name = array_shift($ops);
+        return $this->_call('aggregate', array(
+            'collection_name'   => $collection_name,
+            'ops'               => $ops
+        ));
     }
 	
 }
