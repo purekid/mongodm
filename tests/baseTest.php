@@ -7,7 +7,6 @@ use Purekid\Mongodm\Test\TestCase\PhactoryTestCase;
 use Purekid\Mongodm\Test\Model\Book;
 use Purekid\Mongodm\Test\Model\User;
 use Purekid\Mongodm\Collection;
-use RandomLib\Source\MicroTime;
 
 class BaseTest extends PhactoryTestCase {
 
