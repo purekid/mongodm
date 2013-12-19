@@ -16,7 +16,13 @@ class User extends Base
 		'hobbies' => array('default'=>array('love'),'type'=>'array'),
 		'family'=>array('type'=>'object'),
         'pet' => array( 'model'=>'Purekid\Mongodm\Test\Model\Pet' , 'type'=>'embed'),
-        'pets_fav' => array( 'model'=>'Purekid\Mongodm\Test\Model\Pet' , 'type'=>'embeds')
+        'pets_fav' => array( 'model'=>'Purekid\Mongodm\Test\Model\Pet' , 'type'=>'embeds'),
+
+		'fieldMapping' => array('type'=>'string', 'field'=>'field_mapping'),
+		'fieldMappingRef' => array('model'=>'Purekid\Mongodm\Test\Model\Book','type'=>'reference', 'field' => 'field_mapping_ref'),
+		'fieldMappingRefs' => array('model'=>'Purekid\Mongodm\Test\Model\Book','type'=>'references', 'field' => 'field_mapping_refs'),
+    'fieldMappingEmbed' => array( 'model'=>'Purekid\Mongodm\Test\Model\Pet' , 'type'=>'embed', 'field' => 'field_mapping_embed'),
+    'fieldMappingEmbeds' => array( 'model'=>'Purekid\Mongodm\Test\Model\Pet' , 'type'=>'embeds', 'field' => 'field_mapping_embeds')
 
 	);
 

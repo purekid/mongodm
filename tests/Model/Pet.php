@@ -11,6 +11,9 @@ class Pet extends Base
 
         'name' => array('type'=>'string' ,'default'=>'Puppy'),
 
+        'fieldMappingEmbed' => array('type'=>'string', 'field' => 'field_mapping_embed'),
+        'fieldMappingEmbeds' => array('type'=>'string', 'field' => 'field_mapping_embeds'),
+
     );
 
 }

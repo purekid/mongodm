@@ -15,18 +15,34 @@ abstract class Model
 {
 
   const DATA_TYPE_ARRAY      = 'array';
+
+  const DATA_TYPE_BOOL       = 'bool';
   const DATA_TYPE_BOOLEAN    = 'boolean';
+
   const DATA_TYPE_DATE       = 'date';
+
+  const DATA_TYPE_DBL        = 'dbl';
   const DATA_TYPE_DOUBLE     = 'double';
+  const DATA_TYPE_FLT        = 'flt';
+  const DATA_TYPE_FLOAT      = 'float';
+
   const DATA_TYPE_EMBED      = 'embed';
   const DATA_TYPE_EMBEDS     = 'embeds';
+
   const DATA_TYPE_INT        = 'int';
   const DATA_TYPE_INTEGER    = 'integer';
+
   const DATA_TYPE_MIXED      = 'mixed';
+
   const DATA_TYPE_REFERENCE  = 'reference';
   const DATA_TYPE_REFERENCES = 'references';
+
+  const DATA_TYPE_STR        = 'str';
   const DATA_TYPE_STRING     = 'string';
+
   const DATA_TYPE_TIMESTAMP  = 'timestamp';
+
+  const DATA_TYPE_OBJ        = 'obj';
   const DATA_TYPE_OBJECT     = 'object';
 
 	public $cleanData = array();
@@ -72,8 +88,12 @@ abstract class Model
      */
     private $_tempId = null;
 	
-	public function __construct( $data = array())
+	public function __construct( $data = array(), $mapFields = false)
 	{
+        if($mapFields === true) {
+          $data = self::mapFields($data, true);
+        }
+
 		if (is_null($this->_connection))
 		{
 			if(isset($this::$config)){
@@ -106,7 +126,7 @@ abstract class Model
 			$attrs = $this->getAttrs();
 			foreach($cleanData as $key => $value){
 				if(($value instanceof Model) && isset($attrs[$key]) && isset($attrs[$key]['type']) 
-			    	&& ( $attrs[$key]['type'] == 'reference' or $attrs[$key]['type'] == 'references' )){
+			    	&& ( $attrs[$key]['type'] == self::DATA_TYPE_REFERENCE or $attrs[$key]['type'] == self::DATA_TYPE_REFERENCES )){
 					$value = $this->setRef($key,$value);
 				} 
 				$this->cleanData[$key] = $value;
@@ -206,20 +226,23 @@ abstract class Model
 		{
 			$this->__preUpdate();
             $updateQuery = array();
+
             if(!empty($this->dirtyData)){
-                $updateQuery['$set'] = $this->dirtyData;
+                $updateQuery['$set'] = self::mapFields($this->dirtyData);
             };
 
             if(!empty($this->unsetData)){
-                $updateQuery['$unset'] = $this->unsetData;
+                $updateQuery['$unset'] = self::mapFields($this->unsetData);
             }
+
 			$success = $this->_connection->update($this->collectionName(), array('_id' => $this->getId()), $updateQuery , $options);
 			$this->__postUpdate();
 		}
 		else
 		{
 			$this->__preInsert();
-			$insert = $this->_connection->insert($this->collectionName(), $this->cleanData, $options);
+            $data = self::mapFields($this->cleanData);
+			$insert = $this->_connection->insert($this->collectionName(), $data, $options);
 			$success = !is_null($this->cleanData['_id'] = $insert['_id']);
 			if($success){
 				$this->exists = true ;
@@ -273,6 +296,77 @@ abstract class Model
 		$ref = \MongoDBRef::create($this->collectionName(), $this->getId());
 		return $ref;
 	}
+
+  /**
+   * Cache attrs map
+   */
+  protected static function cacheAttrsMap() {
+    $class = get_called_class();
+    $attrs = $class::getAttrs();
+    $private =& $class::getPrivateData();
+
+    if(!isset($private['attrsMapCache'])) {
+        $private['attrsMapCache'] = array();
+    }
+    $cache =& $private['attrsMapCache'];
+
+    if(empty($cache)) {
+      $cache = array(
+        'db' => array(),
+        'model' => array()
+      );
+
+      foreach($class::getAttrs() as $key => $value) {
+        if(isset($value['field'])) {
+          $cache['db'][$key] = $value['field'];
+          $cache['model'][$value['field']] = $key;
+        }
+      }
+    }
+  }
+
+  /**
+   * Map fields
+   * 
+   * @
+   */
+  public static function mapFields($array, $toModel = false) {
+    $class = get_called_class();
+
+    $class::cacheAttrsMap();
+    $attrs = $class::getAttrs();
+    $private =& $class::getPrivateData();
+    $map =& $private['attrsMapCache']['db'];
+
+    if($toModel === true) {
+        $map =& $private['attrsMapCache']['model'];
+    }
+
+    foreach($map as $from => $to) {
+        if(isset($array[$from])) {
+
+            // Map embeds
+            $key = $toModel ? $to : $from;
+            if(isset($attrs[$key], $attrs[$key]['type'])) {
+                if($attrs[$key]['type'] === $class::DATA_TYPE_EMBED) {
+                    $array[$from] = call_user_func(array($attrs[$key]['model'], 'mapFields'), $array[$from], $toModel);
+                }
+                if(is_array($array[$from]) && $attrs[$key]['type'] === $class::DATA_TYPE_EMBEDS) {
+                    $embedArray = array();
+                    foreach($array[$from] as $item) {
+                        $embedArray[] = call_user_func(array($attrs[$key]['model'], 'mapFields'), $item, $toModel);
+                    }
+                    $array[$from] = $embedArray;
+                }
+            }
+
+            $array[$to] = $array[$from];
+            unset($array[$from]);
+        }
+    }
+
+    return $array;
+  }
 	
 	/**
 	 * Retrieve a record by MongoId
@@ -560,21 +654,21 @@ abstract class Model
 		}
 		else if(isset($attrs[$key]) && isset($attrs[$key]['type'])) {
 			switch($attrs[$key]['type']) {
-        case "int":
-				case "integer":
+        case self::DATA_TYPE_INT:
+				case self::DATA_TYPE_INTEGER:
 					$value = (integer) $value;
 				break;
-        case "str":
-				case "string":
+        case self::DATA_TYPE_STR:
+				case self::DATA_TYPE_STRING:
 					$value = (string) $value;
 					break;
-        case "flt":
-        case "float":
-        case "dbl";
-				case "double":
+        case self::DATA_TYPE_FLT:
+        case self::DATA_TYPE_FLOAT:
+        case self::DATA_TYPE_DBL;
+				case self::DATA_TYPE_DOUBLE:
 					$value = (float) $value;
 					break;
-				case "timestamp":
+				case self::DATA_TYPE_TIMESTAMP:
 					if(! ($value instanceof \MongoTimestamp)){
             try {
 						  $value = new \MongoTimestamp($value);
@@ -584,7 +678,7 @@ abstract class Model
             }
 					}
 					break;
-        case "date":
+        case self::DATA_TYPE_DATE:
           if(! ($value instanceof \MongoDate)) {
             try {
               if(!$value instanceof \MongoDate) {
@@ -602,28 +696,28 @@ abstract class Model
             }
           }
           break;
-        case "bool":
-				case "boolean":
+        case self::DATA_TYPE_BOOL:
+				case self::DATA_TYPE_BOOLEAN:
 					$value = (boolean) $value;
 					break;
-        case "obj":
-				case "object":
+        case self::DATA_TYPE_OBJ:
+				case self::DATA_TYPE_OBJECT:
 					if(!empty($value) && !is_array($value) && !is_object($value)){
 						throw new InvalidDataTypeException("[$key] is not an object");
 					}
 					$value = (object) $value;
 					break;
-				case "array":
+				case self::DATA_TYPE_ARRAY:
 					if(!empty($value) && !is_array($value)){
 						throw new InvalidDataTypeException("[$key] is not an array");
 					}
 					$value = (array) $value;
 					break;
-        case "embed":
-        case "embeds";
-        case "mixed":
-        case "reference":
-        case "references":
+        case self::DATA_TYPE_EMBED:
+        case self::DATA_TYPE_EMBEDS:
+        case self::DATA_TYPE_MIXED:
+        case self::DATA_TYPE_REFERENCE:
+        case self::DATA_TYPE_REFERENCES:
           break;
 				default:
           throw new InvalidDataTypeException("{$attrs[$key]['type']} is not a valid type");
@@ -643,9 +737,9 @@ abstract class Model
         foreach($cache as $key => $item){
             if(!isset($attrs[$key])) continue;
             $attr = $attrs[$key];
-            if($attr['type'] == 'references'){
+            if($attr['type'] == self::DATA_TYPE_REFERENCES){
                 if( $item instanceof Collection && $this->cleanData[$key] !== $item->makeRef()){
-                    $this->__set($key,$item);
+                    $this->__setter($key,$item);
                 }
             }
         }
@@ -662,13 +756,13 @@ abstract class Model
         foreach($cache as $key => $item){
             if(!isset($attrs[$key])) continue;
             $attr = $attrs[$key];
-            if($attr['type'] == 'embed'){
+            if($attr['type'] == self::DATA_TYPE_EMBED){
                 if( $item instanceof Model && $this->cleanData[$key] !== $item->toArray()){
-                    $this->__set($key,$item);
+                    $this->__setter($key,$item);
                 }
-            }else if($attr['type'] == 'embeds'){
+            }else if($attr['type'] == self::DATA_TYPE_EMBEDS){
                 if( $item instanceof Collection && $this->cleanData[$key] !== $item->toEmbedsArray()){
-                    $this->__set($key,$item);
+                    $this->__setter($key,$item);
                 }
             }
         }
@@ -687,7 +781,7 @@ abstract class Model
 		$model = $reference['model'];
 		$type = $reference['type'];
 
-		if($type == "reference"){
+		if($type == self::DATA_TYPE_REFERENCE){
 			$model = $reference['model'];
 			$type = $reference['type'];
 			if($value instanceof $model){
@@ -699,7 +793,7 @@ abstract class Model
 				throw new \Exception ("{$key} is not instance of '$model'");
 			}
 				
-		}else if($type == "references"){
+		}else if($type == self::DATA_TYPE_REFERENCES){
 			$arr = array();
 			if(is_array($value)){
 				foreach($value as $item){
@@ -733,7 +827,7 @@ abstract class Model
         $model = $embed['model'];
         $type = $embed['type'];
 
-        if($type == "embed"){
+        if($type == self::DATA_TYPE_EMBED){
             $model = $embed['model'];
             $type = $embed['type'];
             if($value instanceof $model){
@@ -745,7 +839,7 @@ abstract class Model
                 throw new \Exception ("{$key} is not instance of '$model'");
             }
 
-        }else if($type == "embeds"){
+        }else if($type == self::DATA_TYPE_EMBEDS){
             $arr = array();
             if(is_array($value)){
                 foreach($value as $item){
@@ -789,7 +883,7 @@ abstract class Model
             return $obj;
         }else{
             if(class_exists($model)){
-                if($type == "embed"){
+                if($type == self::DATA_TYPE_EMBED){
                     if($value){
                         $data = $value;
                         $object = new $model($data);
@@ -798,7 +892,7 @@ abstract class Model
                         return $object;
                     }
                     return null;
-                }else if($type == "embeds"){
+                }else if($type == self::DATA_TYPE_EMBEDS){
                     $res = array();
                     if(!empty($value)){
                         foreach($value as $item){
@@ -841,14 +935,14 @@ abstract class Model
 			return $obj;
 		}else{
 			if(class_exists($model)){
-				if($type == "reference"){
+				if($type == self::DATA_TYPE_REFERENCE){
 					if(\MongoDBRef::isRef($value)){
 						$object = $model::id($value['$id']);
 						$cache[$key] = $object;
 						return $object;
 					}
 					return null;
-				}else if($type == "references"){
+				}else if($type == self::DATA_TYPE_REFERENCES){
 					$res = array();
 					if(!empty($value)){
 						foreach($value as $item){
@@ -869,29 +963,11 @@ abstract class Model
 
     /**
      * unset a attribute
+     * @deprecated see __unset magic method and __unsetter
      * @param $key
      */
-    private function _unset( $key ){
-        if(is_array($key)){
-            foreach($key as $item){
-                $this->_unset($item);
-            }
-        }else{
-            if(strpos($key,".") !== false){
-                throw new \Exception('The key to unset can\'t contains "." ');
-            }
-
-            if(isset($this->cleanData[$key] )){
-                unset($this->cleanData[$key]);
-            }
-
-            if(isset($this->dirtyData[$key] )){
-                unset($this->dirtyData[$key]);
-            }
-
-            $this->unsetData[$key] = 1;
-        }
-
+    private function _unset( $key ) {
+      $this->__unset($key);
     }
 
     /**
@@ -922,8 +998,20 @@ abstract class Model
             $attrs = $class::$attrs;
         }
         if(empty($attrs)) $attrs = array();
-        return $attrs;
+        return array_diff_key($attrs, array('__private__'));
 
+    }
+
+    /**
+     * Get private data
+     * @return array
+     */
+    protected static function &getPrivateData() {
+        $class = get_called_class();
+        if(!isset($class::$attrs['__private__'])) {
+            $class::$attrs['__private__'] = array();
+        }
+        return $class::$attrs['__private__'];
     }
 
     /**
@@ -1078,6 +1166,50 @@ abstract class Model
       $this->__setter($key, $value);
     }
   }
+  
+  /**
+   * Interface for __unset magic method
+   *
+   * @param string $key
+   */
+  public function __unsetter($key)
+  {
+    $attrs = $this->getAttrs();
+    if(strpos($key, ".") !== false) {
+      throw new \Exception('The key to unset can\'t contain a "." ');
+    }
+
+    if(isset($this->cleanData[$key])) {
+      unset($this->cleanData[$key]);
+    }
+
+    if(isset($this->dirtyData[$key])) {
+      unset($this->dirtyData[$key]);
+    }
+
+    $this->unsetData[$key] = 1;
+  }
+
+  /**
+   * @param string $key
+   * @param mixed $value 
+   */
+  public function __unset($key)
+  {
+    if(is_array($key)) {
+      foreach($key as $item) {
+        $this->__unset($item);
+      }
+    }
+    else {
+      if(method_exists($this, 'unset'.ucfirst($key))) {
+        return call_user_func(array($this, 'unset'.ucfirst($key)));
+      }
+      else {
+        $this->__unsetter($key);
+      }
+    }
+  }
 
   /**
    * 
@@ -1096,8 +1228,8 @@ abstract class Model
    * @param mixed $args
    */
   public function __call($func, $args){
-    if($func == 'unset'){
-      call_user_func_array( array($this,"_unset") , $args);
+    if($func == 'unset' && isset($args[0])) {
+      $this->__unset($args[0]);
     }
 
     if(strpos($func, 'get') === 0 && strlen($func) > 3) {
