@@ -8,7 +8,7 @@ use Purekid\Mongodm\Test\Model\Book;
 use Purekid\Mongodm\Test\Model\User;
 use Purekid\Mongodm\Collection;
 
-class BaseTest extends PhactoryTestCase
+class ModelTest extends PhactoryTestCase
 {
     public function testCreate()
     {
@@ -19,6 +19,24 @@ class BaseTest extends PhactoryTestCase
         $this->assertEquals("michael", $user->name);
         $this->assertInstanceOf("\MongoId", $user->getId());
 
+    }
+
+    public function testGetConection()
+    {
+        $user = new User();
+
+        $connection = $user->_getConnection();
+
+        $this->assertInstanceOf('\\Purekid\\Mongodm\\MongoDB', $connection);
+    }
+
+    public function testGetCollection()
+    {
+        $user = new User();
+
+        $collection = $user->_getCollection();
+
+        $this->assertInstanceOf('\\MongoCollection', $collection);
     }
 
     public function testSaveModelWithMongoId()
