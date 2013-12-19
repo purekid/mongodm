@@ -193,6 +193,11 @@ class MongoDB
             throw new \Exception('No database specified in MangoDB Config');
         }
         $this->_db = $this->_connection->selectDB($config['database']);
+
+        if(!$this->_db instanceof \MongoDB) {
+            throw new \Exception('Unable to connect to database :: $_db is ' . gettype($this->_db));
+        }
+
         $this->_connected = true;
 
         return true;
