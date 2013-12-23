@@ -750,6 +750,9 @@ class MongoDB
         case 'remove_file':
             $r = $this->gridFS()->remove($criteria, $options);
             break;
+        case 'aggregate':
+            $r = call_user_func_array(array($c, 'aggregate'), $ops);
+            break;
         }
 
         return $r;
@@ -817,4 +820,16 @@ class MongoDB
 
     }
 
+    /**
+     * @return array
+     */
+    public function aggregate()
+    {
+        $ops = func_get_args();
+        $collection_name = array_shift($ops);
+        return $this->_call('aggregate', array(
+            'collection_name'   => $collection_name,
+            'ops'               => $ops
+        ));
+    }
 }

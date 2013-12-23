@@ -367,10 +367,10 @@ class BaseTest extends PhactoryTestCase {
         $user3 = new User(array("time" => $time,"name"=>"John3", "money" => 100));
         $user3->save();
 
-        $user4 = new User(array("age"=>40,"name"=>"John4", "money" => 100));
+        $user4 = new User(array("age" => 40,"name"=>"John4", "money" => 100));
         $user4->save();
 
-        $user5 = new User(array("time" => $time,"name"=>"John5", "money" => 100));
+        $user5 = new User(array("time" => $time,"name"=>"John6", "money" => 100));
         $user5->save();
 
         $user6 = new User(array("time" => $time,"name"=>"John6", "money" => 100));
