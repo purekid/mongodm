@@ -8,8 +8,9 @@ $use_local_config = true;
  * **/
 $local_config_file = __DIR__."/../../../../application/config/mongodm.php";
 
-if($use_local_config && file_exists($local_config_file)){
+if ($use_local_config && file_exists($local_config_file)) {
     $array = require $local_config_file;
+
     return $array;
 }
 
@@ -23,32 +24,31 @@ if($use_local_config && file_exists($local_config_file)){
 return array(
 
    /* Configuration section name*/
-	'default' => array(
-		'connection' => array(
-			'hostnames' => 'localhost',
-			'database'  => 'default',
+    'default' => array(
+        'connection' => array(
+            'hostnames' => 'localhost',
+            'database'  => 'default',
 // 			'username'  => ''
 // 			'password'  => ''
-		)
-	),
-	'development' => array(
-		'connection' => array(
-			'hostnames' => 'localhost',
-			'database'  => 'development_db'
-		)
-	),
-	'testing' => array(
-		'connection' => array(
-			'hostnames' => 'localhost',
+        )
+    ),
+    'development' => array(
+        'connection' => array(
+            'hostnames' => 'localhost',
+            'database'  => 'development_db'
+        )
+    ),
+    'testing' => array(
+        'connection' => array(
+            'hostnames' => 'localhost',
 //          'hostnames' => 'localhost,192.168.1.2',
-			'database'  => 'test_db'
-		)
-	),
-	'production' => array(
+            'database'  => 'test_db'
+        )
+    ),
+    'production' => array(
         'connection' => array(
             'hostnames' => 'localhost',
             'database'  => 'production_db'
         )
-	)
+    )
 );
-

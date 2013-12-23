@@ -8,8 +8,8 @@ use Purekid\Mongodm\Test\Model\Pet;
 use Purekid\Mongodm\Test\Model\Book;
 use Purekid\Mongodm\Test\Model\User;
 
-class FieldMapTest extends PhactoryTestCase {
-
+class FieldMapTest extends PhactoryTestCase
+{
     public function testSet()
     {
         $expected = 'field';
@@ -90,7 +90,7 @@ class FieldMapTest extends PhactoryTestCase {
         $this->assertEquals($expected.'2', $userRaw['field_mapping_embeds'][1]['field_mapping_embeds']);
 
     }
-    
+
     public function testReference()
     {
         $expected = 'field';
@@ -98,18 +98,18 @@ class FieldMapTest extends PhactoryTestCase {
         $user = new User();
         $user->save();
         $id = $user->getId();
-        
+
         $ref = new Book();
         $ref->fieldMappingRef = $expected;
-        $ref->fieldMappingRef = $expected; 
+        $ref->fieldMappingRef = $expected;
         $ref->save();
-        
+
         $user->fieldMappingRef = $ref;
         $user->save();
-        
+
         $user = User::id($id);
         $book_fav = $user->book_fav;
-        
+
         $this->assertEquals($expected, $user->fieldMappingRef->fieldMappingRef, 'Reference was not mapped');
         $this->assertEquals($expected, $user->fieldMappingRef->fieldMappingRef, 'Reference\'s field was not mapped');
 
@@ -122,29 +122,29 @@ class FieldMapTest extends PhactoryTestCase {
         $this->assertEquals($ref->getId(), $userRaw['field_mapping_ref']['$id'], 'Field `fieldMappingRef` was not mapped correctly');
         $this->assertEquals($expected, $bookRaw['field_mapping_ref']);
     }
-    
+
     public function testReferences()
     {
         $expected = 'field';
-        
+
         $user = new User();
         $user->save();
         $id = $user->getId();
-    
+
         $ref1 = new Book();
         $ref1->fieldMappingRefs = $expected;
         $ref1->save();
-        
+
         $ref2 = new Book();
         $ref2->fieldMappingRefs = $expected.'2';
         $ref2->save();
-    
+
         $user->fieldMappingRefs = Collection::make(array($ref1, $ref2));
         $user->save();
-    
+
         $user = User::id($id);
         $refs = $user->fieldMappingRefs;
-    
+
         $this->assertEquals(2, $refs->count());
         $this->assertEquals($expected, $refs->get((string) $ref1->getId() )->fieldMappingRefs);
         $this->assertEquals($expected.'2', $refs->get((string) $ref2->getId() )->fieldMappingRefs);
@@ -153,7 +153,7 @@ class FieldMapTest extends PhactoryTestCase {
         $book1Raw = self::$db->getDB()->{Book::$collection}->findOne(array('_id' => $ref1->getId()));
         $book2Raw = self::$db->getDB()->{Book::$collection}->findOne(array('_id' => $ref2->getId()));
         $this->assertArrayHasKey('field_mapping_refs', $userRaw, 'Field `fieldMappingRefs` was not mapped correctly');
-        
+
         $this->assertArrayHasKey('$ref', $userRaw['field_mapping_refs'][0], 'Field `fieldMappingRefs.0` was not mapped correctly');
         $this->assertArrayHasKey('$id', $userRaw['field_mapping_refs'][0], 'Field `fieldMappingRefs.0` was not mapped correctly');
         $this->assertEquals(Book::$collection, $userRaw['field_mapping_refs'][0]['$ref'], 'Field `fieldMappingRef` was not mapped correctly');

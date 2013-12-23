@@ -5,7 +5,7 @@ namespace Purekid\Mongodm\Test\Model;
 class DataType extends Base
 {
 
-  static $collection = "dataType";
+  public static $collection = "dataType";
 
   protected static $attrs = array(
     \Purekid\Mongodm\Model::DATA_TYPE_ARRAY      => array('type'=>\Purekid\Mongodm\Model::DATA_TYPE_ARRAY,      'default'=>array(1,2,3)),
@@ -24,5 +24,5 @@ class DataType extends Base
     \Purekid\Mongodm\Model::DATA_TYPE_OBJECT     => array('type'=>\Purekid\Mongodm\Model::DATA_TYPE_OBJECT,     'default'=>array('a' => 'A')),
     'invalid'                                    => array('type'=>'invalid')
   );
-  
+
 }

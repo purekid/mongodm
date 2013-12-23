@@ -3,7 +3,6 @@
 namespace Purekid\Mongodm\Test;
 
 use Purekid\Mongodm\Test\TestCase\PhactoryTestCase;
-use Purekid\Mongodm\MongoDB;
 
 class GridFsTest extends PhactoryTestCase
 {
