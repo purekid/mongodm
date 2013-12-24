@@ -145,9 +145,8 @@ class MongoDB
     public function connect()
     {
         if ($this->_connection) {
-            return;
+            return true;
         }
-
         /**
          * Add required variables
          * Clear the connection parameters for security
@@ -192,6 +191,7 @@ class MongoDB
         if (!isset($config['database'])) {
             throw new \Exception('No database specified in MangoDB Config');
         }
+
         $this->_db = $this->_connection->selectDB($config['database']);
 
         if(!$this->_db instanceof \MongoDB) {
