@@ -512,7 +512,7 @@ abstract class Model
             $params['_type'] = $class::get_class_name(false);
         }
 
-        return self::find($params, $fields, $sort);
+        return self::find($params, $sort , $fields);
 
     }
 
