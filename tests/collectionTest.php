@@ -328,6 +328,16 @@ class CollectionTest extends PhactoryTestCase
         $this->assertInstanceOf('\Purekid\Mongodm\Test\Model\Book', $result);
     }
 
+    public function testOffsetUnsetRemovesModelForIntegerIndex()
+    {
+        $this->givenAnOrderCollectionOfBooks();
+        $id = 1;
+
+        unset($this->ordered_books[$id]);
+
+        $this->assertSame(3, $this->ordered_books->count());
+    }
+
     protected function givenAnOrderCollectionOfBooks()
     {
         $this->ordered_books = $this->createBooksCollection(
