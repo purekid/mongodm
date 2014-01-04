@@ -348,6 +348,15 @@ class CollectionTest extends PhactoryTestCase
         $this->assertSame(3, $this->ordered_books->count());
     }
 
+    /**
+     * @expectedException Exception
+     */
+    public function testCannotSetModelWithOffsetSet()
+    {
+        $this->givenAnOrderCollectionOfBooks();
+        $this->ordered_books[1] = $this->createBook(array('name' => 'e'));
+    }
+
     protected function givenAnOrderCollectionOfBooks()
     {
         $this->ordered_books = $this->createBooksCollection(
