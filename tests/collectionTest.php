@@ -9,22 +9,13 @@ use Purekid\Mongodm\Test\Model\User;
 
 class CollectionTest extends PhactoryTestCase
 {
+    protected $ordered_books;
+
     public function testCollectionFunction()
     {
-        $book1 = new Book();
-        $book1->name = "book1";
-        $book1->price = 5;
-        $book1->save();
-
-        $book2 = new Book();
-        $book2->name = "book2";
-        $book2->price = 10;
-        $book2->save();
-
-        $book3 = new Book();
-        $book3->name = "book3";
-        $book3->price = 15;
-        $book3->save();
+        $book1 = $this->createBook(array('name' => 'book1', 'price' => 5));
+        $book2 = $this->createBook(array('name' => 'book2', 'price' => 10));
+        $book3 = $this->createBook(array('name' => 'book3', 'price' => 15));
 
         $books = Book::find(array('price'=>5));
         $books_count = $books->count();
@@ -46,17 +37,15 @@ class CollectionTest extends PhactoryTestCase
         $user = new User(array('name'=>'michael'));
         $user->save();
 
-        $book = new Book(array('name'=>'book1'));
-        $book->save();
+        $book = $this->createBook(array('name' => 'book1', 'price' => 5));
 
         $books = array($book);
 
         $user->books = $books;
         $user->save();
 
-        $book_2 = new Book(array('name'=>'book2'));
+        $book_2 = $this->createBook(array('name' => 'book2', 'price' => 10));
 
-        $book_2->save();
         $user->books->add($book_2);
         $user->save();
 
@@ -68,8 +57,7 @@ class CollectionTest extends PhactoryTestCase
 
         $user = User::id($id);
 
-        $book_3 = new Book(array('name'=>'book3'));
-        $book_3->save();
+        $book_3 = $this->createBook(array('name' => 'book3', 'price' => 15));
         $user->books->add($book_3);
 
         $this->assertEquals($user->books->count(),3);
@@ -90,11 +78,8 @@ class CollectionTest extends PhactoryTestCase
 
         $user_id = $user->getId();
 
-        $book = new Book(array('name'=>'book1'));
-        $book->save();
-
-        $book2 = new Book(array('name'=>'book2'));
-        $book2->save();
+        $book = $this->createBook(array('name' => 'book1', 'price' => 5));
+        $book2 = $this->createBook(array('name' => 'book2', 'price' => 10));
 
         $books = array($book,$book2);
 
@@ -124,27 +109,28 @@ class CollectionTest extends PhactoryTestCase
     {
         $books = $this->createBooksCollection(array(
             array('name' => 'b', 'price' => 3), 
-            array('name' => 'c', 'price' => 1), 
-            array('name' => 'a', 'price' => 2), 
+            array('name' => 'c', 'price' => 10),
+            array('name' => 'a', 'price' => 18),
+            array('name' => 'd', 'price' => 21),
         ));
 
-        $this->assertEquals($books->get(0)->name , 'b');
+        $this->assertEquals($books->get(0)->name, 'b');
 
         $books->sortBy(function ($book) { return $book->name; });
 
-        $this->assertEquals($books->get(0)->name , 'c');
+        $this->assertEquals($books->get(0)->name, 'd');
 
         $books->sortBy(function ($book) { return $book->name; } , true);
 
-        $this->assertEquals($books->get(0)->name , 'a');
+        $this->assertEquals($books->get(0)->name, 'a');
 
         $books->reverse();
 
-        $this->assertEquals($books->get(0)->name , 'c');
+        $this->assertEquals($books->get(0)->name, 'd');
 
         $books->sortBy(function ($book) { return $book->price; } , true);
 
-        $this->assertEquals($books->get(0)->price , 1);
+        $this->assertEquals($books->get(0)->price, 3);
     }
 
     public function testFilter()
@@ -201,18 +187,18 @@ class CollectionTest extends PhactoryTestCase
 
     public function testSlice()
     {
-        $books = $this->createBooksCollection(array(array('name' => 'a'), array('name' => 'b'), array('name' => 'c'), array('name' => 'd')));
+        $this->givenAnOrderCollectionOfBooks();
 
-        $slice1 = $books->slice(0,1);
+        $slice1 = $this->ordered_books->slice(0,1);
         $this->assertEquals( $slice1->count(),1);
         $this->assertEquals( $slice1->first()->name,'a');
 
-        $slice = $books->slice(1,3);
+        $slice = $this->ordered_books->slice(1,3);
         $this->assertEquals( $slice->count(),3);
         $this->assertEquals( $slice->first()->name,'b');
         $this->assertEquals( $slice->get(2)->name,'d');
 
-        $slice = $books->slice(2,4);
+        $slice = $this->ordered_books->slice(2,4);
         $this->assertEquals( $slice->count(),2);
         $this->assertEquals( $slice->first()->name,'c');
         $this->assertEquals( $slice->last()->name,'d');
@@ -220,9 +206,9 @@ class CollectionTest extends PhactoryTestCase
 
     public function testTake()
     {
-        $books = $this->createBooksCollection(array(array('name' => 'a'), array('name' => 'b'), array('name' => 'c'), array('name' => 'd')));
+        $this->givenAnOrderCollectionOfBooks();
 
-        $take = $books->take(3);
+        $take = $this->ordered_books->take(3);
 
         $this->assertEquals( $take->count(),3);
         $this->assertEquals( $take->first()->name,'a');
@@ -232,41 +218,57 @@ class CollectionTest extends PhactoryTestCase
     public function testGetReturnsNullWhenIndexTooHigh()
     {
         $collection = Collection::make(array());
+
         $value = $collection->get(1);
         $this->assertNull($value);
     }
 
     public function testGetReturnsNullWhenStringIndexNotFound()
     {
-        $collection = $this->createBooksCollection(array(array('name' => 'a')));
-        $value = $collection->get('b');
+        $this->givenAnOrderCollectionOfBooks();
+
+        $value = $this->ordered_books->get('e');
+
         $this->assertNull($value);
     }
    
     public function testIsEmptyReturnsTrueWhenCollectionHasNoContents()
     {
         $collection = Collection::make(array());
+
         $this->assertTrue($collection->isEmpty(), "Expected empty Collection to return true for isEmpty()");
     }
 
     public function testGetIteratorReturnsAnIterator()
     {
-        $books = $this->createBooksCollection(array(array('name' => 'a'), array('name' => 'b'), array('name' => 'c'), array('name' => 'd')));
-        $it = $books->getIterator();
+        $this->givenAnOrderCollectionOfBooks();
+
+        $it = $this->ordered_books->getIterator();
+
         $this->assertInstanceOf('ArrayIterator', $it);
         foreach($it as $book) {
             $this->assertInstanceOf('\Purekid\Mongodm\Test\Model\Book', $book);
         }
     }
 
+    protected function givenAnOrderCollectionOfBooks()
+    {
+        $this->ordered_books = $this->createBooksCollection(array(array('name' => 'a'), array('name' => 'b'), array('name' => 'c'), array('name' => 'd')));
+    }
+
     protected function createBooksCollection(array $data)
     {
         $books = array();
         foreach($data as $item){
-            $book = new Book($item);
-            $book->save();
-            $books []= $book;
+            $books []= $this->createBook($item);
         }
         return Collection::make($books);
+    }
+
+    protected function createBook(array $item)
+    {
+        $book = new Book($item);
+        $book->save();
+        return $book;
     }
 }
