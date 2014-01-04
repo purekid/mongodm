@@ -128,17 +128,11 @@ class CollectionTest extends PhactoryTestCase
 
     public function testSort()
     {
-
-        $book = new Book( array('name'=>'b','price'=>3));
-        $book->save();
-
-        $book1 = new Book( array('name'=>'c','price'=>1));
-        $book1 -> save();
-
-        $book2 = new Book( array('name'=>'a','price'=>2));
-        $book2->save();
-
-        $books = Collection::make(array($book,$book1,$book2));
+        $books = $this->createBooksCollection(array(
+            array('name' => 'b', 'price' => 3), 
+            array('name' => 'c', 'price' => 1), 
+            array('name' => 'a', 'price' => 2), 
+        ));
 
         $this->assertEquals($books->get(0)->name , 'b');
 
@@ -163,19 +157,12 @@ class CollectionTest extends PhactoryTestCase
     public function testFilter()
     {
 
-        $book = new Book( array('name'=>'b','price'=>3));
-        $book->save();
-
-        $book1 = new Book( array('name'=>'c','price'=>10));
-        $book1 -> save();
-
-        $book2 = new Book( array('name'=>'a','price'=>18));
-        $book2->save();
-
-        $book3 = new Book( array('name'=>'d','price'=>21));
-        $book3->save();
-
-        $books = Collection::make(array($book,$book1,$book2,$book3));
+        $books = $this->createBooksCollection(array(
+            array('name' => 'b', 'price' => 3), 
+            array('name' => 'c', 'price' => 10), 
+            array('name' => 'a', 'price' => 18), 
+            array('name' => 'd', 'price' => 21), 
+        ));
 
         $books_filter_1 = $books->filter(function ($book) {   if($book->price > 10) return true;  });
 
@@ -195,19 +182,12 @@ class CollectionTest extends PhactoryTestCase
     public function testMap()
     {
 
-        $book = new Book( array('name'=>'b','price'=>3));
-        $book->save();
-
-        $book1 = new Book( array('name'=>'c','price'=>10));
-        $book1 -> save();
-
-        $book2 = new Book( array('name'=>'a','price'=>18));
-        $book2->save();
-
-        $book3 = new Book( array('name'=>'d','price'=>21));
-        $book3->save();
-
-        $books = Collection::make(array($book,$book1,$book2,$book3));
+        $books = $this->createBooksCollection(array(
+            array('name' => 'b', 'price' => 3), 
+            array('name' => 'c', 'price' => 10), 
+            array('name' => 'a', 'price' => 18), 
+            array('name' => 'd', 'price' => 21), 
+        ));
 
         $books_map_1 = $books->map(function ($book) {   if ($book->price > 10) { $book->price = 99; }  return $book;   });
 
@@ -229,19 +209,7 @@ class CollectionTest extends PhactoryTestCase
 
     public function testSlice()
     {
-        $book = new Book( array('name'=>'a'));
-        $book->save();
-
-        $book1 = new Book( array('name'=>'b'));
-        $book1 -> save();
-
-        $book2 = new Book( array('name'=>'c'));
-        $book2->save();
-
-        $book3 = new Book( array('name'=>'d'));
-        $book3->save();
-
-        $books = Collection::make(array($book,$book1,$book2,$book3));
+        $books = $this->createBooksCollection(array(array('name' => 'a'), array('name' => 'b'), array('name' => 'c'), array('name' => 'd')));
 
         $slice1 = $books->slice(0,1);
         $this->assertEquals( $slice1->count(),1);
@@ -261,25 +229,38 @@ class CollectionTest extends PhactoryTestCase
 
     public function testTake()
     {
-        $book = new Book( array('name'=>'a'));
-        $book->save();
-
-        $book1 = new Book( array('name'=>'b'));
-        $book1 -> save();
-
-        $book2 = new Book( array('name'=>'c'));
-        $book2->save();
-
-        $book3 = new Book( array('name'=>'d'));
-        $book3->save();
-
-        $books = Collection::make(array($book,$book1,$book2,$book3));
+        $books = $this->createBooksCollection(array(array('name' => 'a'), array('name' => 'b'), array('name' => 'c'), array('name' => 'd')));
 
         $take = $books->take(3);
+
         $this->assertEquals( $take->count(),3);
         $this->assertEquals( $take->first()->name,'a');
         $this->assertEquals( $take->last()->name,'c');
 
     }
 
+    public function testGetReturnsNullWhenIndexTooHigh()
+    {
+        $collection = Collection::make(array());
+        $value = $collection->get(1);
+        $this->assertNull($value);
+    }
+
+    public function testGetReturnsNullWhenStringIndexNotFound()
+    {
+        $collection = $this->createBooksCollection(array(array('name' => 'a')));
+        $value = $collection->get('b');
+        $this->assertNull($value);
+    }
+    
+    protected function createBooksCollection(array $data)
+    {
+        $books = array();
+        foreach($data as $item){
+            $book = new Book($item);
+            $book->save();
+            $books []= $book;
+        }
+        return Collection::make($books);
+    }
 }
