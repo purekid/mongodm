@@ -452,7 +452,7 @@ abstract class Model
         if (count($types) > 1) {
             $params['_type'] = $class::get_class_name(false);
         }
-        $result = self::connection()->find_one(static::$collection, $params, $fields);
+        $result = self::connection()->find_one(static::$collection, $params, self::mapFields($fields));
         if ($result) {
             return  Hydrator::hydrate(get_called_class(), $result, "one" , true);
         }
@@ -480,7 +480,7 @@ abstract class Model
             $params['_type'] = $class::get_class_name(false);
         }
 
-        $results =  self::connection()->find(static::$collection, $params, $fields);
+        $results =  self::connection()->find(static::$collection, $params, self::mapFields($fields));
 
         $count = $results->count();
 
@@ -493,7 +493,7 @@ abstract class Model
         }
 
         if ( ! empty($sort)) {
-            $results->sort($sort);
+            $results->sort(self::mapFields($sort));
         }
 
         return Hydrator::hydrate(get_called_class(), $results , 'collection' , true);
@@ -517,7 +517,7 @@ abstract class Model
             $params['_type'] = $class::get_class_name(false);
         }
 
-        return self::find($params, $sort , $fields);
+        return self::find($params, self::mapFields($sort), self::mapFields($fields));
 
     }
 
