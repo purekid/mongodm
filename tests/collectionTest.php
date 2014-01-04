@@ -357,6 +357,15 @@ class CollectionTest extends PhactoryTestCase
         $this->ordered_books[1] = $this->createBook(array('name' => 'e'));
     }
 
+    public function testIssetReturnsTrueForItemInCollectionWithIntegerIndex()
+    {
+        $this->givenAnOrderCollectionOfBooks();
+
+        $result = isset($this->ordered_books[3]);
+
+        $this->assertTrue($result, "Expected isset() to return true");
+    }
+
     protected function givenAnOrderCollectionOfBooks()
     {
         $this->ordered_books = $this->createBooksCollection(
