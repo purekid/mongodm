@@ -263,6 +263,16 @@ class CollectionTest extends PhactoryTestCase
         }
     }
 
+    public function testHasAcceptsMongoId()
+    {
+        $this->givenAnOrderCollectionOfBooks();
+        $id = $this->ordered_books->get(0)->getId();
+
+        $result = $this->ordered_books->has($id);
+        $this->assertTrue($result, "Expected has() to return true for existing Book id");
+
+    }
+
     protected function givenAnOrderCollectionOfBooks()
     {
         $this->ordered_books = $this->createBooksCollection(
