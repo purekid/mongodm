@@ -14,7 +14,8 @@ $map = array(
         'Purekid\Mongodm\Test\Model\Book'=> __DIR__."/Model/Book.php",
         'Purekid\Mongodm\Test\Model\Student'=> __DIR__."/Model/Student.php",
         'Purekid\Mongodm\Test\Model\Pupil'=> __DIR__."/Model/Pupil.php",
-        'Purekid\Mongodm\Test\Model\Pet'=> __DIR__."/Model/Pet.php"
+        'Purekid\Mongodm\Test\Model\Pet'=> __DIR__."/Model/Pet.php",
+        'Purekid\Mongodm\Test\Model\DataType'=> __DIR__."/Model/DataType.php"
     );
 $loader->addClassMap($map);
 
