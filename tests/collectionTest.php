@@ -266,6 +266,7 @@ class CollectionTest extends PhactoryTestCase
     public function testToArrayReturnsArrayWithNonNumericIndexes()
     {
         $this->givenAnOrderCollectionOfBooks();
+
         $result = $this->ordered_books->toArray(false, false);
 
         foreach ($result as $key => $book) {
@@ -278,6 +279,7 @@ class CollectionTest extends PhactoryTestCase
     public function testToArrayReturnsArrayOfArraysWithNonNumericIndexes()
     {
         $this->givenAnOrderCollectionOfBooks();
+
         $result = $this->ordered_books->toArray(false, true);
 
         foreach ($result as $key => $book) {
@@ -290,6 +292,7 @@ class CollectionTest extends PhactoryTestCase
     public function testHasAcceptsMongoId()
     {
         $this->givenAnOrderCollectionOfBooks();
+
         $id = $this->ordered_books->get(0)->getId();
 
         $result = $this->ordered_books->has($id);
@@ -303,6 +306,16 @@ class CollectionTest extends PhactoryTestCase
 
         $result = $this->ordered_books->has($id);
         $this->assertFalse($result, "Expected has() to return false for missing id");
+    }
+
+    public function testOffsetGetReturnsModelForIntegerIndex()
+    {
+        $this->givenAnOrderCollectionOfBooks();
+        $id = 1;
+
+        $result = $this->ordered_books[$id];
+
+        $this->assertInstanceOf('\Purekid\Mongodm\Test\Model\Book', $result);
     }
 
     protected function givenAnOrderCollectionOfBooks()
