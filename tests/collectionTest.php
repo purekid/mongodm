@@ -318,6 +318,16 @@ class CollectionTest extends PhactoryTestCase
         $this->assertInstanceOf('\Purekid\Mongodm\Test\Model\Book', $result);
     }
 
+    public function testOffsetGetReturnsModelForStringIndex()
+    {
+        $this->givenAnOrderCollectionOfBooks();
+        $id = $this->ordered_books->get(1)->getId();
+
+        $result = $this->ordered_books[$id];
+
+        $this->assertInstanceOf('\Purekid\Mongodm\Test\Model\Book', $result);
+    }
+
     protected function givenAnOrderCollectionOfBooks()
     {
         $this->ordered_books = $this->createBooksCollection(
