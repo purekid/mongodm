@@ -11,7 +11,6 @@ class CollectionTest extends PhactoryTestCase
 {
     public function testCollectionFunction()
     {
-
         $book1 = new Book();
         $book1->name = "book1";
         $book1->price = 5;
@@ -40,12 +39,10 @@ class CollectionTest extends PhactoryTestCase
         $this->assertTrue(! $books->has($book3) );
 
         $this->assertEquals($books_count - 1, $books->count());
-
     }
 
     public function testReferencesChangedDirectly()
     {
-
         $user = new User(array('name'=>'michael'));
         $user->save();
 
@@ -84,12 +81,10 @@ class CollectionTest extends PhactoryTestCase
         $user = User::id($id);
 
         $this->assertEquals($user->books->count(),2);
-
     }
 
     public function testEach()
     {
-
         $user = new User(array('name'=>'michael'));
         $user->save();
 
@@ -123,7 +118,6 @@ class CollectionTest extends PhactoryTestCase
         foreach ($names as $name) {
             $this->assertEquals($name,1);
         }
-
     }
 
     public function testSort()
@@ -151,12 +145,10 @@ class CollectionTest extends PhactoryTestCase
         $books->sortBy(function ($book) { return $book->price; } , true);
 
         $this->assertEquals($books->get(0)->price , 1);
-
     }
 
     public function testFilter()
     {
-
         $books = $this->createBooksCollection(array(
             array('name' => 'b', 'price' => 3), 
             array('name' => 'c', 'price' => 10), 
@@ -176,12 +168,10 @@ class CollectionTest extends PhactoryTestCase
 
         $this->assertEquals( $books_filter_2->get(1)->name , 'a' );
         $this->assertEquals( $books_filter_2->get(2)->name , 'd' );
-
     }
 
-    public function testMap()
+    public function testMapChangesCollectionItems()
     {
-
         $books = $this->createBooksCollection(array(
             array('name' => 'b', 'price' => 3), 
             array('name' => 'c', 'price' => 10), 
@@ -201,10 +191,12 @@ class CollectionTest extends PhactoryTestCase
         $books_map_2 = $books->map(function ($book) {   if ($book->price > 10) { $book->price = 99; return $book;}     });
 
         $this->assertEquals( $books_map_2->count() , 2);
+        
+        $this->assertEquals( $books_map_2->get(0)->price , 99 );
+        $this->assertEquals( $books_map_2->get(0)->name , 'a' );
 
         $this->assertEquals( $books_map_2->get(1)->price , 99 );
         $this->assertEquals( $books_map_2->get(1)->name , 'd' );
-
     }
 
     public function testSlice()
@@ -224,7 +216,6 @@ class CollectionTest extends PhactoryTestCase
         $this->assertEquals( $slice->count(),2);
         $this->assertEquals( $slice->first()->name,'c');
         $this->assertEquals( $slice->last()->name,'d');
-
     }
 
     public function testTake()
@@ -236,7 +227,6 @@ class CollectionTest extends PhactoryTestCase
         $this->assertEquals( $take->count(),3);
         $this->assertEquals( $take->first()->name,'a');
         $this->assertEquals( $take->last()->name,'c');
-
     }
 
     public function testGetReturnsNullWhenIndexTooHigh()
@@ -252,7 +242,7 @@ class CollectionTest extends PhactoryTestCase
         $value = $collection->get('b');
         $this->assertNull($value);
     }
-    
+
     protected function createBooksCollection(array $data)
     {
         $books = array();
