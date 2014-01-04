@@ -242,6 +242,12 @@ class CollectionTest extends PhactoryTestCase
         $value = $collection->get('b');
         $this->assertNull($value);
     }
+   
+    public function testIsEmptyReturnsTrueWhenCollectionHasNoContents()
+    {
+        $collection = Collection::make(array());
+        $this->assertTrue($collection->isEmpty(), "Expected empty Collection to return true for isEmpty()");
+    }
 
     protected function createBooksCollection(array $data)
     {
