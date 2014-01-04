@@ -1,8 +1,8 @@
 <?php
-
+use Purekid\Mongodm\Test\TestCase\PhactoryTestCase;
 use Purekid\Mongodm\Test\Model\User;
 
-class MutatorTest extends PHPUnit_Framework_TestCase
+class MutatorTest extends PhactoryTestCase
 {
   public function testMutate()
   {
