@@ -275,6 +275,18 @@ class CollectionTest extends PhactoryTestCase
         }
     }
 
+    public function testToArrayReturnsArrayOfArraysWithNonNumericIndexes()
+    {
+        $this->givenAnOrderCollectionOfBooks();
+        $result = $this->ordered_books->toArray(false, true);
+
+        foreach ($result as $key => $book) {
+            $this->assertInternalType('string', $key);
+            $this->assertInternalType('array', $book);
+            $this->assertSame($key, (string) $book['_id']);
+        }
+    }
+
     public function testHasAcceptsMongoId()
     {
         $this->givenAnOrderCollectionOfBooks();
