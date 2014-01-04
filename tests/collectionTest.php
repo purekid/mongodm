@@ -251,6 +251,18 @@ class CollectionTest extends PhactoryTestCase
         }
     }
 
+    public function testToArrayConvertsItemToArray()
+    {
+        $this->givenAnOrderCollectionOfBooks();
+
+        $result = $this->ordered_books->toArray(true, true);
+
+        foreach ($result as $item) {
+            $this->assertInternalType('array', $item);
+            $this->assertInstanceOf('MongoId', $item['_id']);
+        }
+    }
+
     protected function givenAnOrderCollectionOfBooks()
     {
         $this->ordered_books = $this->createBooksCollection(array(array('name' => 'a'), array('name' => 'b'), array('name' => 'c'), array('name' => 'd')));
