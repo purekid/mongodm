@@ -270,7 +270,15 @@ class CollectionTest extends PhactoryTestCase
 
         $result = $this->ordered_books->has($id);
         $this->assertTrue($result, "Expected has() to return true for existing Book id");
+    }
 
+    public function testHasReturnsFalseForMissingMongoId()
+    {
+        $this->givenAnOrderCollectionOfBooks();
+        $id = new \MongoId;
+
+        $result = $this->ordered_books->has($id);
+        $this->assertFalse($result, "Expected has() to return false for missing id");
     }
 
     protected function givenAnOrderCollectionOfBooks()
