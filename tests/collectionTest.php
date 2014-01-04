@@ -265,7 +265,14 @@ class CollectionTest extends PhactoryTestCase
 
     protected function givenAnOrderCollectionOfBooks()
     {
-        $this->ordered_books = $this->createBooksCollection(array(array('name' => 'a'), array('name' => 'b'), array('name' => 'c'), array('name' => 'd')));
+        $this->ordered_books = $this->createBooksCollection(
+            array(
+                array('name' => 'a', 'price' => 5),
+                array('name' => 'b', 'price' => 10),
+                array('name' => 'c', 'price' => 15),
+                array('name' => 'd', 'price' => 20),
+            )
+        );
     }
 
     protected function createBooksCollection(array $data)
