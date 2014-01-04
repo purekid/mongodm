@@ -357,22 +357,75 @@ class CollectionTest extends PhactoryTestCase
         $this->ordered_books[1] = $this->createBook(array('name' => 'e'));
     }
 
-    public function testIssetReturnsTrueForItemInCollectionWithIntegerIndex()
+    public function getOffsetFixtures()
     {
-        $this->givenAnOrderCollectionOfBooks();
-
-        $result = isset($this->ordered_books[3]);
-
-        $this->assertTrue($result, "Expected isset() to return true");
+        return array(
+            array(3, true),
+            array(17, false),
+        );
     }
 
-    public function testIssetReturnsFalseForItemNotInCollectionWithIntegerIndex()
+    /**
+     * @dataProvider getOffsetFixtures
+     */
+    public function testIssetWithIntegerIndex($index, $exists)
     {
         $this->givenAnOrderCollectionOfBooks();
 
-        $result = isset($this->ordered_books[17]);
+        $result = isset($this->ordered_books[$index]);
 
-        $this->assertFalse($result, "Expected isset() to return false");
+        $this->assertSame($result, $exists, "Expected isset() to return $exists");
+    }
+
+    /**
+     * @dataProvider getOffsetFixtures
+     */
+    public function testIssetWithModelIndex($index, $exists)
+    {
+        $this->givenAnOrderCollectionOfBooks();
+        if ($exists){
+            $model = $this->ordered_books->get($index);
+        } else {
+            $model = $this->createBook(array('name' => 'g'));
+        }
+
+        $result = isset($this->ordered_books[$model]);
+
+        $this->assertSame($result, $exists, "Expected isset() to return $exists");
+    }
+
+    /**
+     * @dataProvider getOffsetFixtures
+     */
+    public function testIssetWithMongoIdIndex($index, $exists)
+    {
+        $this->givenAnOrderCollectionOfBooks();
+        if ($exists) {
+            $id = $this->ordered_books->get($index)->getId();
+        } else {
+            $id = new \MongoId;
+        }
+
+        $result = isset($this->ordered_books[$id]);
+
+        $this->assertSame($result, $exists, "Expected isset() to return $exists");
+    }
+
+    /**
+     * @dataProvider getOffsetFixtures
+     */
+    public function testIssetWithStringIdIndex($index, $exists)
+    {
+        $this->givenAnOrderCollectionOfBooks();
+        if ($exists) {
+            $id = (string) $this->ordered_books->get($index)->getId();
+        } else {
+            $id = 'abcdef123';
+        }
+
+        $result = isset($this->ordered_books[$id]);
+
+        $this->assertSame($result, $exists, "Expected isset() to return $exists");
     }
 
     protected function givenAnOrderCollectionOfBooks()
