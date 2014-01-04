@@ -249,6 +249,16 @@ class CollectionTest extends PhactoryTestCase
         $this->assertTrue($collection->isEmpty(), "Expected empty Collection to return true for isEmpty()");
     }
 
+    public function testGetIteratorReturnsAnIterator()
+    {
+        $books = $this->createBooksCollection(array(array('name' => 'a'), array('name' => 'b'), array('name' => 'c'), array('name' => 'd')));
+        $it = $books->getIterator();
+        $this->assertInstanceOf('ArrayIterator', $it);
+        foreach($it as $book) {
+            $this->assertInstanceOf('\Purekid\Mongodm\Test\Model\Book', $book);
+        }
+    }
+
     protected function createBooksCollection(array $data)
     {
         $books = array();
