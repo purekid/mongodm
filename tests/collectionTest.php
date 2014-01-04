@@ -338,6 +338,16 @@ class CollectionTest extends PhactoryTestCase
         $this->assertSame(3, $this->ordered_books->count());
     }
 
+    public function testOffsetUnsetRemovesModelForModelIndex()
+    {
+        $this->givenAnOrderCollectionOfBooks();
+        $id = $this->ordered_books->get(0);
+
+        unset($this->ordered_books[$id]);
+
+        $this->assertSame(3, $this->ordered_books->count());
+    }
+
     protected function givenAnOrderCollectionOfBooks()
     {
         $this->ordered_books = $this->createBooksCollection(
