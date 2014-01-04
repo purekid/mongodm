@@ -200,10 +200,8 @@ class ModelTest extends PhactoryTestCase
 
     public function testFindOne()
     {
-
         $user = User::one(array('name'=>'michael'));
         $this->assertEquals("michael", $user->name);
-
     }
 
     public function testUpdate()
@@ -404,4 +402,24 @@ class ModelTest extends PhactoryTestCase
 
     }
 
+    public function getInvalidModelIds() {
+        return array(
+            array(null),
+            array('abcdef'),
+            array(2),
+            array(''),
+        );
+    }
+
+    /**
+     * @dataProvider getInvalidModelIds
+     *
+     * @param mixed $id
+     */
+    public function testIdReturnsNullForInvalidId($id)
+    {
+        $user = new User(array('name' => 'Brian'));
+        $result = User::id($id);
+        $this->assertNull($result);
+    }
 }
