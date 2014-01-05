@@ -180,12 +180,28 @@ class ModelTest extends PhactoryTestCase
 
     }
 
+    public function testFindWithLimit()
+    {
+        $user = User::find($params = array('name'=>'michael'), $sort = array(), $fields = array(), $limit = 5);
+        $this->assertGreaterThan(0, $user->count());
+    }
+
+    public function testFindWithSkip()
+    {
+        $user = User::find($params = array('name'=>'michael'), $sort = array(), $fields = array(), $limit = null, $skip = 5);
+        $this->assertSame(0, $user->count());
+    }
+
+    public function testFindWithSort()
+    {
+        $user = User::find($params = array('name'=>'michael'), $sort = array('name'));
+        $this->assertGreaterThan(0, $user->count());
+    }
+
     public function testFindOne()
     {
-
         $user = User::one(array('name'=>'michael'));
         $this->assertEquals("michael", $user->name);
-
     }
 
     public function testUpdate()
@@ -386,4 +402,24 @@ class ModelTest extends PhactoryTestCase
 
     }
 
+    public function getInvalidModelIds() {
+        return array(
+            array(null),
+            array('abcdef'),
+            array(2),
+            array(''),
+        );
+    }
+
+    /**
+     * @dataProvider getInvalidModelIds
+     *
+     * @param mixed $id
+     */
+    public function testIdReturnsNullForInvalidId($id)
+    {
+        $user = new User(array('name' => 'Brian'));
+        $result = User::id($id);
+        $this->assertNull($result);
+    }
 }
