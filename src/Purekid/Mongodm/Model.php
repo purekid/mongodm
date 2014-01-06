@@ -84,6 +84,11 @@ abstract class Model
     protected $ignoreData = array();
 
     /**
+     * Whether to use type `_type`
+     */
+    protected static $useType = true;
+
+    /**
     * Cache for references data
     */
     protected $_cache = array();
@@ -1186,6 +1191,11 @@ abstract class Model
     protected static function getModelTypes()
     {
         $class = get_called_class();
+
+        if($class::$useType === false) {
+            return array();
+        }
+
         $class_name = $class::get_class_name(false);
         $parent = get_parent_class($class);
         if ($parent) {

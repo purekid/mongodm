@@ -529,6 +529,21 @@ Retrieve all Student records , queries with  { "_type":"Student" } because of it
     $students = Student::all();
 ```
 
+### Retrieve subclass _without_ `_type`
+
+To retrieve a record without the `_type` criteria (i.e. `{ "_type":"Student" }`) set:
+
+```php
+class Student extends \Purekid\Mongodm\Model
+{
+    protected static $useType = false;
+
+    protected static $collection = 'Student';
+}
+```
+
+_Make sure to set a collection otherwise you will get results with every `_type`._
+
 Other static methods in Model
 ----------
 ```php
