@@ -723,7 +723,9 @@ abstract class Model
         $types = $this->getModelTypes();
         $type = $this->_type;
         if (!$type || !is_array($type)) {
-            $this->_type = $types;
+            if(!empty($types)){
+                $this->_type = $types;
+            }
         } elseif (!in_array($class, $type)) {
             $type[] = $class;
             $this->_type = $type;
