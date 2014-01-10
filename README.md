@@ -125,6 +125,7 @@ You have two ways to specify section :
 
 2. With environment constanct 'APPLICATION_ENV' ,this constanct can be set by webserver,your code or shell environment.  In this case,you should set $config='default' or don't declare $config in your own model class.
 
+
 ### Create a model and enjoy it
 
 ```php       
