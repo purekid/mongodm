@@ -58,7 +58,7 @@ Installation
 Setup Database
 ----------
 
-Database config file  (By default it locates at /vendor/purekid/mongodb/config.php)
+Database config file  (By default it locates at /vendor/purekid/mongodm/config.php)
 
 ```php
 	return array(
@@ -117,7 +117,7 @@ define('MONGODM_CONFIG',__DIR__."/../config/mongodm.php");
 
 ### Choose config section with APPLICATION_ENV
 
-Which config section Mongodb use ? Mongodb choose 'default' section by default.
+Which config section Mongodm use ? Mongodm choose 'default' section by default.
 
 You have two ways to specify section :
 
