@@ -82,7 +82,7 @@ Database config file  (By default it locates at /vendor/purekid/mongodm/config.p
 
 ### Setup database in application
 
-1.  You can set up configuration using the `MongoDB::setConfigBlock` method.
+1.You can set up configuration using the `MongoDB::setConfigBlock` method.
 
 ```php
 
@@ -105,7 +105,7 @@ Database config file  (By default it locates at /vendor/purekid/mongodm/config.p
 
 ```
 
-2.  Or you can duplicate a config file into your project, then define a global constanct 'MONGODM_CONFIG' with it's location.
+2.Or you can duplicate a config file into your project, then define a global constanct 'MONGODM_CONFIG' with it's location.
 
 ```php
 
@@ -121,9 +121,9 @@ Which config section Mongodm use ? Mongodm choose 'default' section by default.
 
 You have two ways to specify section :
 
-1.  '$config' attribute in Model , you can find this attribute in example below.
+1.'$config' attribute in Model , you can find this attribute in example below.
 
-2.  With environment constanct 'APPLICATION_ENV' ,this constanct can be set by webserver,your code or shell environment.  In this case,you should set $config='default' or don't declare $config in your own model class.
+2.With environment constanct 'APPLICATION_ENV' ,this constanct can be set by webserver,your code or shell environment.  In this case,you should set $config='default' or don't declare $config in your own model class.
 
 
 ### Create a model and enjoy it
