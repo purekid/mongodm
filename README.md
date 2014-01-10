@@ -58,8 +58,8 @@ Installation
 Setup Database
 ----------
 
-### Setup database in   config/database.php
-If you want select config section with environment variable APPLICATION_ENV , you should set $config='default' or don't declare $config in your own model class.
+Database config file  (By default it locates at /vendor/purekid/mongodb/config.php)
+
 ```php
 	return array(
         'default' => array(
@@ -81,7 +81,8 @@ If you want select config section with environment variable APPLICATION_ENV , yo
 ```
 
 ### Setup database in application
-You can also set up configuration using the `MongoDB::setConfigBlock` method.
+
+1. You can set up configuration using the `MongoDB::setConfigBlock` method.
 
 ```php
 
@@ -103,6 +104,26 @@ You can also set up configuration using the `MongoDB::setConfigBlock` method.
 ));
 
 ```
+
+2. Or you can duplicate a config file into your project, then define a global constanct 'MONGODM_CONFIG' with it's location.
+
+```php
+
+//in a global initialization place
+
+define('MONGODM_CONFIG',__DIR__."/../config/mongodm.php");
+
+```
+
+### Choose config section with APPLICATION_ENV
+
+Which config section Mongodb use ? Mongodb choose 'default' section by default.
+
+You have two ways to specify section :
+
+1. '$config' attribute in Model , you can find this attribute in example below.
+
+2. With environment constanct 'APPLICATION_ENV' ,this constanct can be set by webserver,your code or shell environment.  In this case,you should set $config='default' or don't declare $config in your own model class.
 
 ### Create a model and enjoy it
 
