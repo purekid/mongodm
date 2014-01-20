@@ -224,7 +224,12 @@ class MongoDB
     public function disconnect()
     {
         if ($this->_connection) {
-            $this->_connection->close();
+            try{
+                $this->_connection->close();
+            }catch(\Exception $e){
+                
+            }
+            
         }
 
         $this->_db = $this->_connection = null;
