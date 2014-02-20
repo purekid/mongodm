@@ -3,6 +3,10 @@ Mongodm
 [![Build Status](https://secure.travis-ci.org/purekid/mongodm.png?branch=master)](http://travis-ci.org/purekid/mongodm)
 [![Coverage Status](https://coveralls.io/repos/purekid/mongodm/badge.png)](https://coveralls.io/r/purekid/mongodm)
 
+**Composer Status**
+
+[![Latest Stable Version](https://poser.pugx.org/purekid/mongodm/v/stable.png)](https://packagist.org/packages/purekid/mongodm) [![Total Downloads](https://poser.pugx.org/purekid/mongodm/downloads.png)](https://packagist.org/packages/purekid/mongodm) [![Latest Unstable Version](https://poser.pugx.org/purekid/mongodm/v/unstable.png)](https://packagist.org/packages/purekid/mongodm) [![License](https://poser.pugx.org/purekid/mongodm/license.png)](https://packagist.org/packages/purekid/mongodm)
+
 
 - [Introduction](#introduction)
 - [Features](#features)
