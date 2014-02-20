@@ -1,6 +1,7 @@
 Mongodm    
 ======= 
 [![Build Status](https://secure.travis-ci.org/purekid/mongodm.png?branch=master)](http://travis-ci.org/purekid/mongodm)
+[![Coverage Status](https://coveralls.io/repos/purekid/mongodm/badge.png)](https://coveralls.io/r/purekid/mongodm)
 
 
 - [Introduction](#introduction)
