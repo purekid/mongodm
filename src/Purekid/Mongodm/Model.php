@@ -556,6 +556,34 @@ abstract class Model
     }
 
     /**
+     * Has record
+     * 
+     * A optimized way to see if a record exists in the database. Helps
+     * the developer to avoid the extra latency of FindOne by using Find
+     * and a limit of 1.
+     * 
+     * @link https://blog.serverdensity.com/checking-if-a-document-exists-mongodb-slow-findone-vs-find/
+     *
+     * @param array $criteria criteria
+     *
+     * @return boolean
+     */
+    public static function has($criteria = array())
+    {
+        $class = get_called_class();
+        $types = $class::getModelTypes();
+        if (count($types) > 1) {
+            $criteria['_type'] = $class::get_class_name(false);
+        }
+
+        $results =  self::connection()->find(static::$collection, $criteria);
+        $results->limit(1);
+
+        if($results->count()) return true;
+        else return false;
+    }
+
+    /**
      * Count of records
      *
      * @param array $params params

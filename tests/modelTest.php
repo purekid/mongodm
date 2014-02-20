@@ -204,6 +204,17 @@ class ModelTest extends PhactoryTestCase
         $this->assertEquals("michael", $user->name);
     }
 
+    public function testHas()
+    {
+        $user = new User();
+        $user->name = "michael";
+        $user->save();
+
+        $hasUser = User::has(array('name'=>'michael'));
+
+        $this->assertTrue($hasUser);
+    }
+
     public function testUpdate()
     {
     $user = new User(array("age"=>40,"name"=>"John"));
