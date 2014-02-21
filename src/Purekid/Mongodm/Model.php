@@ -313,6 +313,26 @@ abstract class Model
             $ignore = $ignores;
         }
 
+        return array_diff_key($this->cleanData, $ignore);
+    }
+
+    /**
+     * Export datas to array recursive
+     *
+     * @param array $ignore ignore
+     *
+     * @return array
+     */
+    public function toArrayRecursive($ignore = array('_type'))
+    {
+        if (!empty($ignore)) {
+            $ignores = array();
+            foreach ($ignore as $val) {
+                $ignores[$val] = 1;
+            }
+            $ignore = $ignores;
+        }
+
         foreach ($this->cleanData as $key => $value) {
             if (is_array($value) && isset($value['$ref']) && !empty($value['$ref'])) {
                 if (isset($this->attrs[$key]['model']) &&
@@ -328,6 +348,7 @@ abstract class Model
 
         return array_diff_key($this->cleanData, $ignore);
     }
+
 
     /**
      * Determine exist in the database
