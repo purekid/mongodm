@@ -313,6 +313,19 @@ abstract class Model
             $ignore = $ignores;
         }
 
+        foreach ($this->cleanData as $key => $value) {
+            if (is_array($value) && isset($value['$ref']) && !empty($value['$ref'])) {
+                if (isset($this->attrs[$key]['model']) &&
+                    !empty($this->attrs[$key]['model'])) {
+                    $model = $this->attrs[$key]['model'];
+                    $obj = $model::id($value['$id']);
+                    if ($obj) {
+                        $this->cleanData[$key] = $obj->toArray();
+                    }
+                }
+            }
+       }
+
         return array_diff_key($this->cleanData, $ignore);
     }
 
