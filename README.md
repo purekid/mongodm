@@ -202,7 +202,7 @@ If you put a object instance into a Model attribute and this attribute is undefi
     
     $user = new User();
     $user->name = 'michael';
-    $user->myobject = $object;    // this attribute will be omit when saving to DB 
+    $user->myobject = $object;    // this attribute will be omitted when saving to DB 
     $user->save();
 
 ```
