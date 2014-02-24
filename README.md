@@ -192,6 +192,21 @@ You have two ways to specify section :
 	    'object'
 	]
 ```
+
+If you put a object instance into a Model attribute and this attribute is undefined in $attrs of Model class,the data of attribute will be omitted when Model saving.
+
+```php
+    
+    $object = new \stdClass();  
+    $object->name = 'ooobject';
+    
+    $user = new User();
+    $user->name = 'michael';
+    $user->myobject = $object;    // this attribute will be omit when saving to DB 
+    $user->save();
+
+```
+
 Model CRUD
 ---------- 
 
