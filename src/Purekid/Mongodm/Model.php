@@ -1340,8 +1340,14 @@ abstract class Model
      */
     public function __getter($key)
     {
+        if (isset($key, $this->ignoreData[$key])) {
+            return $this->ignoreData[$key];
+        }
+
         $attrs = $this->getAttrs();
+
         $value = null;
+
         if (isset($attrs[$key], $attrs[$key]['type'])) {
             if (in_array($attrs[$key]['type'], array(self::DATA_TYPE_REFERENCE, self::DATA_TYPE_REFERENCES))) {
                 return $this->loadRef($key);
@@ -1353,9 +1359,8 @@ abstract class Model
         if (isset($this->cleanData[$key])) {
             $value = $this->parseValue($key, $this->cleanData[$key]);
             return $value;
-        } elseif (isset($key, $this->ignoreData[$key])) {
-            return $this->ignoreData[$key];
         }
+
     }
 
     /**
@@ -1386,21 +1391,29 @@ abstract class Model
      */
     public function __setter($key, $value)
     {
-        $attrs = $this->getAttrs();
+        if(isset($this->ignoreData[$key])){
 
-        if (isset($attrs[$key]) && isset($attrs[$key]['type']) ) {
-            if (in_array($attrs[$key]['type'], array(self::DATA_TYPE_REFERENCE, self::DATA_TYPE_REFERENCES))) {
-                $value = $this->setRef($key, $value);
-            } elseif (in_array($attrs[$key]['type'], array(self::DATA_TYPE_EMBED, self::DATA_TYPE_EMBEDS))) {
-                $value = $this->setEmbed($key, $value);
+            $this->ignoreData[$key] = $value;
+
+        }else{
+
+            $attrs = $this->getAttrs();
+
+            if (isset($attrs[$key]) && isset($attrs[$key]['type']) ) {
+                if (in_array($attrs[$key]['type'], array(self::DATA_TYPE_REFERENCE, self::DATA_TYPE_REFERENCES))) {
+                    $value = $this->setRef($key, $value);
+                } elseif (in_array($attrs[$key]['type'], array(self::DATA_TYPE_EMBED, self::DATA_TYPE_EMBEDS))) {
+                    $value = $this->setEmbed($key, $value);
+                }
             }
-        }
 
-        $value = $this->parseValue($key, $value);
+            $value = $this->parseValue($key, $value);
 
-        if ( !isset($this->ignoreData[$key]) && (!isset($this->cleanData[$key]) || $this->cleanData[$key] !== $value) ) {
-            $this->cleanData[$key] = $value;
-            $this->dirtyData[$key] = $value;
+            if ( !isset($this->ignoreData[$key]) && ( !isset($this->cleanData[$key]) || $this->cleanData[$key] !== $value )) {
+                $this->cleanData[$key] = $value;
+                $this->dirtyData[$key] = $value;
+            }
+
         }
 
     }
