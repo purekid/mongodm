@@ -81,6 +81,9 @@ abstract class Model
      */
     protected $unsetData = array();
 
+    /**
+     * Data ignores when saving
+     */
     protected $ignoreData = array();
 
     /**
@@ -700,6 +703,9 @@ abstract class Model
                 $value = (array) $value->toArray();
             } elseif (method_exists($value, 'to_array')) {
                 $value = (array) $value->to_array();
+            }else{
+                //ingore this object when saving
+                $this->ignoreData[$key] = $value;
             }
         } elseif (isset($attrs[$key]) && isset($attrs[$key]['type'])) {
             switch ($attrs[$key]['type']) {
@@ -1346,7 +1352,6 @@ abstract class Model
 
         if (isset($this->cleanData[$key])) {
             $value = $this->parseValue($key, $this->cleanData[$key]);
-
             return $value;
         } elseif (isset($key, $this->ignoreData[$key])) {
             return $this->ignoreData[$key];
@@ -1393,10 +1398,11 @@ abstract class Model
 
         $value = $this->parseValue($key, $value);
 
-        if (!isset($this->cleanData[$key]) || $this->cleanData[$key] !== $value) {
+        if ( !isset($this->ignoreData[$key]) && (!isset($this->cleanData[$key]) || $this->cleanData[$key] !== $value) ) {
             $this->cleanData[$key] = $value;
             $this->dirtyData[$key] = $value;
         }
+
     }
 
     /**

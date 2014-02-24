@@ -433,4 +433,27 @@ class ModelTest extends PhactoryTestCase
         $result = User::id($id);
         $this->assertNull($result);
     }
+
+    public function testOmitUndefinedObjectInstance(){
+
+        $object = new \stdClass();
+
+        $object->name = 'object';
+
+        $user = User::one();
+
+        $id = $user->getId();
+
+        $user->tmpObject = $object;
+
+        $user->save();
+
+        $this->assertEquals($object,$user->tmpObject);
+
+        $user = User::id($id);
+
+        $this->assertNull($user->tmpObject);
+
+    }
+
 }
