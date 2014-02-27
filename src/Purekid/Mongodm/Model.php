@@ -81,9 +81,6 @@ abstract class Model
      */
     protected $unsetData = array();
 
-    /**
-     * Data ignores when saving
-     */
     protected $ignoreData = array();
 
     /**
@@ -256,8 +253,8 @@ abstract class Model
             return false;
         }
 
-        $this->processReferencesChanged();
-        $this->processEmbedsChanged();
+        $this->_processReferencesChanged();
+        $this->_processEmbedsChanged();
 
         /* if no changes then do nothing */
 
@@ -320,7 +317,7 @@ abstract class Model
     }
 
     /**
-     * Determine if instance exists in the database
+     * Determine exist in the database
      *
      * @return integer
      */
@@ -336,11 +333,42 @@ abstract class Model
      */
     public function makeRef()
     {
+        $model = get_called_class();
         $ref = \MongoDBRef::create($this->collectionName(), $this->getId());
 
         return $ref;
     }
 
+    /**
+     * Cache attrs map
+     *
+     * @return null
+     */
+    protected static function cacheAttrsMap()
+    {
+        $class = get_called_class();
+        $attrs = $class::getAttrs();
+        $private =& $class::getPrivateData();
+
+        if (!isset($private['attrsMapCache'])) {
+                $private['attrsMapCache'] = array();
+        }
+        $cache =& $private['attrsMapCache'];
+
+        if (empty($cache)) {
+            $cache = array(
+                'db' => array(),
+                'model' => array()
+            );
+
+            foreach ($class::getAttrs() as $key => $value) {
+                if (isset($value['field'])) {
+                    $cache['db'][$key] = $value['field'];
+                    $cache['model'][$value['field']] = $key;
+                }
+            }
+        }
+    }
 
     /**
      * Map fields
@@ -353,11 +381,11 @@ abstract class Model
     public static function mapFields($array, $toModel = false)
     {
         $class = get_called_class();
-        $class::cacheAttrsMap();
 
+        $class::cacheAttrsMap();
         $attrs = $class::getAttrs();
-        $private = & $class::getPrivateData();
-        $map = & $private['attrsMapCache']['db'];
+        $private =& $class::getPrivateData();
+        $map =& $private['attrsMapCache']['db'];
 
         if ($toModel === true) {
                 $map =& $private['attrsMapCache']['model'];
@@ -412,17 +440,19 @@ abstract class Model
     /**
      * Retrieve a record
      *
-     * @param array $criteria criteria
+     * @param array $params params
      * @param array $fields fields
      *
      * @return Model
      */
-    public static function one($criteria = array(),$fields = array())
+    public static function one($params = array(),$fields = array())
     {
-
-        self::processCriteriaWithType($criteria);
-        $result = self::connection()->find_one(static::$collection, $criteria, self::mapFields($fields));
-
+        $class = get_called_class();
+        $types = $class::getModelTypes();
+        if (count($types) > 1) {
+            $params['_type'] = $class::get_class_name(false);
+        }
+        $result = self::connection()->find_one(static::$collection, $params, $fields);
         if ($result) {
             return  Hydrator::hydrate(get_called_class(), $result, "one" , true);
         }
@@ -433,7 +463,7 @@ abstract class Model
     /**
      * Retrieve records
      *
-     * @param array $criteria criteria
+     * @param array $params params
      * @param array $sort   sort
      * @param array $fields fields
      * @param int   $limit  limit
@@ -441,12 +471,18 @@ abstract class Model
      *
      * @return Collection
      */
-    public static function find($criteria = array(), $sort = array(), $fields = array() , $limit = null , $skip = null)
+    public static function find($params = array(), $sort = array(), $fields = array() , $limit = null , $skip = null)
     {
 
-        self::processCriteriaWithType($criteria);
+        $class = get_called_class();
+        $types = $class::getModelTypes();
+        if (count($types) > 1) {
+            $params['_type'] = $class::get_class_name(false);
+        }
 
-        $results =  self::connection()->find(static::$collection, $criteria, self::mapFields($fields));
+        $results =  self::connection()->find(static::$collection, $params, $fields);
+
+        $count = $results->count();
 
         if ( ! is_null($limit)) {
             $results->limit($limit);
@@ -457,7 +493,7 @@ abstract class Model
         }
 
         if ( ! empty($sort)) {
-            $results->sort(self::mapFields($sort));
+            $results->sort($sort);
         }
 
         return Hydrator::hydrate(get_called_class(), $results , 'collection' , true);
@@ -474,9 +510,15 @@ abstract class Model
      */
     public static function all( $sort = array() , $fields = array())
     {
-        $criteria = array();
-        self::processCriteriaWithType($criteria);
-        return self::find($criteria, self::mapFields($sort), self::mapFields($fields));
+        $class = get_called_class();
+        $types = $class::getModelTypes();
+        $params = array();
+        if (count($types) > 1) {
+            $params['_type'] = $class::get_class_name(false);
+        }
+
+        return self::find($params, $sort , $fields);
+
     }
 
     /**
@@ -509,31 +551,8 @@ abstract class Model
     public static function aggregate($query)
     {
         $rows = self::connection()->aggregate(self::collectionName(), $query);
+
         return $rows;
-    }
-
-    /**
-     * Has record
-     * 
-     * A optimized way to see if a record exists in the database. Helps
-     * the developer to avoid the extra latency of FindOne by using Find
-     * and a limit of 1.
-     * 
-     * @link https://blog.serverdensity.com/checking-if-a-document-exists-mongodb-slow-findone-vs-find/
-     *
-     * @param array $criteria criteria
-     *
-     * @return boolean
-     */
-    public static function has($criteria = array())
-    {
-        self::processCriteriaWithType($criteria);
-        $results =  self::connection()->find(static::$collection, $criteria);
-        $results->limit(1);
-
-        if($results->count()) return true;
-
-        return false;
     }
 
     /**
@@ -543,11 +562,17 @@ abstract class Model
      *
      * @return integer
      */
-    public static function count($criteria = array())
+    public static function count($params = array())
     {
-        self::processCriteriaWithType($criteria);
-        $count = self::connection()->count(self::collectionName(), $criteria);
+        $class = get_called_class();
+        $types = $class::getModelTypes();
+        if (count($types) > 1) {
+            $params['_type'] = $class::get_class_name(false);
+        }
+        $count = self::connection()->count(self::collectionName(), $params);
+
         return $count;
+
     }
 
     /**
@@ -611,9 +636,9 @@ abstract class Model
 
 
     /**
-     * Set the embed status of model.
+     * set is embed
      *
-     * @param bool $is_embed
+     * @param bool $is_embed is embed
      *
      * @return null
      */
@@ -627,7 +652,7 @@ abstract class Model
     }
 
     /**
-     * Determine if the model instance is emeded
+     * Get is emeded
      *
      * @return bool
      */
@@ -688,100 +713,6 @@ abstract class Model
     }
 
     /**
-     * Parse value with specific definition in $attrs
-     *
-     * @param string $key   key
-     * @param mixed  $value value
-     *
-     * @return mixed
-     */
-    public  function parseValue($key, $value)
-    {
-        $attrs = $this->getAttrs();
-        if (!isset($attrs[$key]) && is_object($value)) {
-            if (method_exists($value, 'toArray')) {
-                $value = (array) $value->toArray();
-            } elseif (method_exists($value, 'to_array')) {
-                $value = (array) $value->to_array();
-            }else{
-                //ingore this object when saving
-                $this->ignoreData[$key] = $value;
-            }
-        } elseif (isset($attrs[$key]) && isset($attrs[$key]['type'])) {
-            switch ($attrs[$key]['type']) {
-                case self::DATA_TYPE_INT:
-                case self::DATA_TYPE_INTEGER:
-                    $value = (integer) $value;
-                    break;
-                case self::DATA_TYPE_STR:
-                case self::DATA_TYPE_STRING:
-                    $value = (string) $value;
-                    break;
-                case self::DATA_TYPE_FLT:
-                case self::DATA_TYPE_FLOAT:
-                case self::DATA_TYPE_DBL;
-                case self::DATA_TYPE_DOUBLE:
-                    $value = (float) $value;
-                    break;
-                case self::DATA_TYPE_TIMESTAMP:
-                    if (! ($value instanceof \MongoTimestamp)) {
-                        try {
-                            $value = new \MongoTimestamp($value);
-                        } catch (\Exception $e) {
-                            throw new InvalidDataTypeException('$key cannot be parsed by \MongoTimestamp', $e->getCode(), $e);
-                        }
-                    }
-                    break;
-                case self::DATA_TYPE_DATE:
-                    if (! ($value instanceof \MongoDate)) {
-                        try {
-                            if (!$value instanceof \MongoDate) {
-                                if (is_numeric($value)) {
-                                    $value = '@'.$value;
-                                }
-                                if (!$value instanceof \DateTime) {
-                                    $value = new \DateTime($value);
-                                }
-                                $value = new \MongoDate($value->getTimestamp());
-                            }
-                        } catch (\Exception $e) {
-                            throw new InvalidDataTypeException('$key cannot be parsed by \DateTime', $e->getCode(), $e);
-                        }
-                    }
-                    break;
-                case self::DATA_TYPE_BOOL:
-                case self::DATA_TYPE_BOOLEAN:
-                    $value = (boolean) $value;
-                    break;
-                case self::DATA_TYPE_OBJ:
-                case self::DATA_TYPE_OBJECT:
-                    if (!empty($value) && !is_array($value) && !is_object($value)) {
-                        throw new InvalidDataTypeException("[$key] is not an object");
-                    }
-                    $value = (object) $value;
-                    break;
-                case self::DATA_TYPE_ARRAY:
-                    if (!empty($value) && !is_array($value)) {
-                        throw new InvalidDataTypeException("[$key] is not an array");
-                    }
-                    $value = (array) $value;
-                    break;
-                case self::DATA_TYPE_EMBED:
-                case self::DATA_TYPE_EMBEDS:
-                case self::DATA_TYPE_MIXED:
-                case self::DATA_TYPE_REFERENCE:
-                case self::DATA_TYPE_REFERENCES:
-                    break;
-                default:
-                    throw new InvalidDataTypeException("{$attrs[$key]['type']} is not a valid type");
-                    break;
-            }
-        }
-
-        return $value;
-    }
-
-    /**
      * Initialize the "_type" attribute for the model
      *
      * @return null
@@ -791,7 +722,6 @@ abstract class Model
         $class = $this->get_class_name(false);
         $types = $this->getModelTypes();
         $type = $this->_type;
-
         if (!$type || !is_array($type)) {
             if(!empty($types)){
                 $this->_type = $types;
@@ -800,7 +730,6 @@ abstract class Model
             $type[] = $class;
             $this->_type = $type;
         }
-
     }
 
     /**
@@ -814,38 +743,6 @@ abstract class Model
         $config = $class::$config;
 
         return MongoDB::instance($config);
-    }
-
-    /**
-     * Cache attrs map
-     *
-     * @return null
-     */
-    protected static function cacheAttrsMap()
-    {
-        $class = get_called_class();
-        $attrs = $class::getAttrs();
-        $private = & $class::getPrivateData();
-
-        if (!isset($private['attrsMapCache'])) {
-            $private['attrsMapCache'] = array();
-        }
-
-        $cache = & $private['attrsMapCache'];
-
-        if (empty($cache)) {
-            $cache = array(
-                'db' => array(),
-                'model' => array()
-            );
-
-            foreach ($attrs as $key => $value) {
-                if (isset($value['field'])) {
-                    $cache['db'][$key] = $value['field'];
-                    $cache['model'][$value['field']] = $key;
-                }
-            }
-        }
     }
 
     /**
@@ -867,11 +764,102 @@ abstract class Model
     }
 
     /**
+     * Parse value with specific definition in $attrs
+     *
+     * @param string $key   key
+     * @param mixed  $value value
+     *
+     * @return mixed
+     */
+    public function parseValue($key, $value)
+    {
+        $attrs = $this->getAttrs();
+        if (!isset($attrs[$key]) && is_object($value)) {
+            if (method_exists($value, 'toArray')) {
+                $value = (array) $value->toArray();
+            } elseif (method_exists($value, 'to_array')) {
+                $value = (array) $value->to_array();
+            }
+        } elseif (isset($attrs[$key]) && isset($attrs[$key]['type'])) {
+            switch ($attrs[$key]['type']) {
+            case self::DATA_TYPE_INT:
+            case self::DATA_TYPE_INTEGER:
+                $value = (integer) $value;
+                break;
+            case self::DATA_TYPE_STR:
+            case self::DATA_TYPE_STRING:
+                $value = (string) $value;
+                break;
+            case self::DATA_TYPE_FLT:
+            case self::DATA_TYPE_FLOAT:
+            case self::DATA_TYPE_DBL;
+            case self::DATA_TYPE_DOUBLE:
+                $value = (float) $value;
+                break;
+            case self::DATA_TYPE_TIMESTAMP:
+                if (! ($value instanceof \MongoTimestamp)) {
+                    try {
+                        $value = new \MongoTimestamp($value);
+                    } catch (\Exception $e) {
+                        throw new InvalidDataTypeException('$key cannot be parsed by \MongoTimestamp', $e->getCode(), $e);
+                    }
+                }
+                break;
+            case self::DATA_TYPE_DATE:
+                if (! ($value instanceof \MongoDate)) {
+                    try {
+                        if (!$value instanceof \MongoDate) {
+                            if (is_numeric($value)) {
+                                $value = '@'.$value;
+                            }
+                            if (!$value instanceof \DateTime) {
+                                $value = new \DateTime($value);
+                            }
+                            $value = new \MongoDate($value->getTimestamp());
+                        }
+                    } catch (\Exception $e) {
+                        throw new InvalidDataTypeException('$key cannot be parsed by \DateTime', $e->getCode(), $e);
+                    }
+                }
+                break;
+            case self::DATA_TYPE_BOOL:
+            case self::DATA_TYPE_BOOLEAN:
+                $value = (boolean) $value;
+                break;
+            case self::DATA_TYPE_OBJ:
+            case self::DATA_TYPE_OBJECT:
+                if (!empty($value) && !is_array($value) && !is_object($value)) {
+                    throw new InvalidDataTypeException("[$key] is not an object");
+                }
+                $value = (object) $value;
+                break;
+            case self::DATA_TYPE_ARRAY:
+                if (!empty($value) && !is_array($value)) {
+                    throw new InvalidDataTypeException("[$key] is not an array");
+                }
+                $value = (array) $value;
+                break;
+            case self::DATA_TYPE_EMBED:
+            case self::DATA_TYPE_EMBEDS:
+            case self::DATA_TYPE_MIXED:
+            case self::DATA_TYPE_REFERENCE:
+            case self::DATA_TYPE_REFERENCES:
+                break;
+            default:
+                throw new InvalidDataTypeException("{$attrs[$key]['type']} is not a valid type");
+                break;
+            }
+        }
+
+        return $value;
+    }
+
+    /**
      * Update the 'references' attribute for model's instance when that 'references' data  has changed.
      *
      * @return null
      */
-    protected function processReferencesChanged()
+    protected function _processReferencesChanged()
     {
         $cache = $this->_cache;
         $attrs = $this->getAttrs();
@@ -879,7 +867,7 @@ abstract class Model
             if(!isset($attrs[$key])) continue;
             $attr = $attrs[$key];
             if ($attr['type'] == self::DATA_TYPE_REFERENCES) {
-                if ($item instanceof Collection && $this->cleanData[$key] !== $item->makeRef()) {
+                if ($item instanceof Collection && (!isset($this->cleanData[$key]) || $this->cleanData[$key] !== $item->makeRef())) {
                     $this->__setter($key, $item);
                 }
             }
@@ -891,7 +879,7 @@ abstract class Model
      *
      * @return null
      */
-    protected function processEmbedsChanged()
+    protected function _processEmbedsChanged()
     {
         $cache = $this->_cache;
         $attrs = $this->getAttrs();
@@ -908,20 +896,6 @@ abstract class Model
                 }
             }
         }
-    }
-
-    /**
-     * Process the criteria , add _type to criteria in some cases.
-     * @param $criteria Criteria to process
-     */
-    protected static function processCriteriaWithType(&$criteria){
-
-        $class = get_called_class();
-        $types = $class::getModelTypes();
-        if (count($types) > 1) {
-            $criteria['_type'] = $class::get_class_name(false);
-        }
-
     }
 
     /**
@@ -977,7 +951,7 @@ abstract class Model
     }
 
     /**
-     * Set the Embed attribute.
+     * Tthe attribute of $key is a Embed
      *
      * @param string $key   key
      * @param string $value value
@@ -1030,7 +1004,7 @@ abstract class Model
     }
 
     /**
-     * Load the embed attribute
+     * Load embed
      *
      * @param string $key key
      *
@@ -1340,14 +1314,8 @@ abstract class Model
      */
     public function __getter($key)
     {
-        if (isset($key, $this->ignoreData[$key])) {
-            return $this->ignoreData[$key];
-        }
-
         $attrs = $this->getAttrs();
-
         $value = null;
-
         if (isset($attrs[$key], $attrs[$key]['type'])) {
             if (in_array($attrs[$key]['type'], array(self::DATA_TYPE_REFERENCE, self::DATA_TYPE_REFERENCES))) {
                 return $this->loadRef($key);
@@ -1358,9 +1326,11 @@ abstract class Model
 
         if (isset($this->cleanData[$key])) {
             $value = $this->parseValue($key, $this->cleanData[$key]);
-            return $value;
-        }
 
+            return $value;
+        } elseif (isset($key, $this->ignoreData[$key])) {
+            return $this->ignoreData[$key];
+        }
     }
 
     /**
@@ -1391,31 +1361,22 @@ abstract class Model
      */
     public function __setter($key, $value)
     {
-        if(isset($this->ignoreData[$key])){
+        $attrs = $this->getAttrs();
 
-            $this->ignoreData[$key] = $value;
-
-        }else{
-
-            $attrs = $this->getAttrs();
-
-            if (isset($attrs[$key]) && isset($attrs[$key]['type']) ) {
-                if (in_array($attrs[$key]['type'], array(self::DATA_TYPE_REFERENCE, self::DATA_TYPE_REFERENCES))) {
-                    $value = $this->setRef($key, $value);
-                } elseif (in_array($attrs[$key]['type'], array(self::DATA_TYPE_EMBED, self::DATA_TYPE_EMBEDS))) {
-                    $value = $this->setEmbed($key, $value);
-                }
+        if (isset($attrs[$key]) && isset($attrs[$key]['type']) ) {
+            if (in_array($attrs[$key]['type'], array(self::DATA_TYPE_REFERENCE, self::DATA_TYPE_REFERENCES))) {
+                $value = $this->setRef($key, $value);
+            } elseif (in_array($attrs[$key]['type'], array(self::DATA_TYPE_EMBED, self::DATA_TYPE_EMBEDS))) {
+                $value = $this->setEmbed($key, $value);
             }
-
-            $value = $this->parseValue($key, $value);
-
-            if ( !isset($this->ignoreData[$key]) && ( !isset($this->cleanData[$key]) || $this->cleanData[$key] !== $value )) {
-                $this->cleanData[$key] = $value;
-                $this->dirtyData[$key] = $value;
-            }
-
         }
 
+        $value = $this->parseValue($key, $value);
+
+        if (!isset($this->cleanData[$key]) || $this->cleanData[$key] !== $value) {
+            $this->cleanData[$key] = $value;
+            $this->dirtyData[$key] = $value;
+        }
     }
 
     /**
