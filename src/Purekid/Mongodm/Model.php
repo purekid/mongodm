@@ -938,6 +938,14 @@ abstract class Model
         $attrs = $this->getAttrs();
         $cache = &$this->_cache;
         $reference = $attrs[$key];
+
+        if(!isset($reference['model'])) {
+            throw new \Exception("{$key} does not have a defined model");
+        }
+        if(!isset($reference['type'])) {
+            throw new \Exception("{$key} does not have a defined type");
+        }
+
         $model = $reference['model'];
         $type = $reference['type'];
 
