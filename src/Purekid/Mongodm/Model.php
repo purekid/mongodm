@@ -303,10 +303,12 @@ abstract class Model
      * Export datas to array
      *
      * @param array $ignore ignore
+     * @param bool $recursive
+     * @param int $deep
      *
      * @return array
      */
-    public function toArray($ignore = array('_type'))
+    public function toArray($ignore = array('_type'), $recursive = false, $deep = 3)
     {
         if (!empty($ignore)) {
             $ignores = array();
@@ -315,10 +317,44 @@ abstract class Model
             }
             $ignore = $ignores;
         }
-
+        if ($recursive == true && $deep > 0) {
+            $attrs = $this->getAttrs();
+            foreach ($this->cleanData as $key => $value) {
+                if (isset($attrs[$key])
+                    && isset($attrs[$key]['type'])
+                    && ( $attrs[$key]['type'] == self::DATA_TYPE_REFERENCE or $attrs[$key]['type'] == self::DATA_TYPE_REFERENCES )
+                ) {
+                    if ($attrs[$key]['type'] == self::DATA_TYPE_REFERENCE &&
+                        isset($attrs[$key]['model']) && !empty($attrs[$key]['model'])) {
+                        $model = $attrs[$key]['model'];
+                        if (!is_array($value)) {
+                            $value = (array)$value;
+                        }
+                        $obj = $model::id($value['$id']);
+                        if ($obj) {
+                            $this->cleanData[$key] = $obj->toArray($ignore, $recursive, --$deep);
+                        }
+                    } else if ($attrs[$key]['type'] == self::DATA_TYPE_REFERENCES &&
+                        isset($attrs[$key]['model']) && !empty($attrs[$key]['model'])) {
+                        $model = $attrs[$key]['model'];
+                        $data = array();
+                        foreach($value as $item) {
+                            if (!is_array($item)) {
+                                $item = (array)$item;
+                            }
+                            $obj = $model::id($item['$id']);
+                            if ($obj) {
+                               $data[]  = $obj->toArray($ignore, $recursive, --$deep);
+                            }
+                        }
+                        if (!empty($data))
+                            $this->cleanData[$key] = $data;
+                    }
+                }
+            }
+        }
         return array_diff_key($this->cleanData, $ignore);
     }
-
     /**
      * Determine if instance exists in the database
      *

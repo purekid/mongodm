@@ -455,4 +455,25 @@ class CollectionTest extends PhactoryTestCase
         $book->save();
         return $book;
     }
+
+    public function testToArrayRecursive()
+    {
+        $user = new User(array('name'=>'michael'));
+        $user->save();
+
+        $book = $this->createBook(array('name' => 'book1', 'price' => 5));
+        $books = array($book);
+
+        $user->books = $books;
+        $user->save();
+
+        $id = $user->getId();
+
+        $user1 = User::id($id);
+
+        $result = $user1->toArray(array('_type'), true);
+
+        $this->assertEquals($result['books'][0]['name'], 'book1');
+        $this->assertNotEquals(count($result['books'][0]), count($user->books[0]));
+    }
 }
