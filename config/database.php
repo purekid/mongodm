@@ -27,7 +27,7 @@ return array(
    /* Configuration section name*/
     'default' => array(
         'connection' => array(
-            'hostnames' => 'localhost',
+            'hostnames' => '127.0.0.1',
             'database'  => 'default',
 // 			'username'  => ''
 // 			'password'  => ''
@@ -35,20 +35,20 @@ return array(
     ),
     'development' => array(
         'connection' => array(
-            'hostnames' => 'localhost',
+            'hostnames' => '127.0.0.1',
             'database'  => 'development_db'
         )
     ),
     'testing' => array(
         'connection' => array(
-            'hostnames' => 'localhost',
+            'hostnames' => '127.0.0.1',
 //          'hostnames' => 'localhost,192.168.1.2',
             'database'  => 'test_db'
         )
     ),
     'production' => array(
         'connection' => array(
-            'hostnames' => 'localhost',
+            'hostnames' => '127.0.0.1',
             'database'  => 'production_db'
         )
     )

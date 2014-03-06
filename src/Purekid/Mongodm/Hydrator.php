@@ -56,12 +56,10 @@ class Hydrator
             return $model;
         }
 
-        return null;
-
     }
 
     /**
-     * Pack
+     * Pack record to a Mongodm instance
      *
      * @param string $class  class
      * @param array  $result result
@@ -74,38 +72,6 @@ class Hydrator
     {
         $model = new $class($result, true , $exists);
         return $model;
-    }
-
-    /**
-     * Hydrate ref
-     *
-     * @param string $class   class
-     * @param array  $results results
-     * @param string $type    type
-     *
-     * @return type
-     */
-    public static function hydrateRefs($class, $results,$type = "set")
-    {
-
-        if (!class_exists($class)) {
-            throw new \Exception("class {$class} not exists!");
-        } elseif ($type == "set") {
-            $models = array();
-            foreach ($results as $result) {
-                $model = self::pack($class, $result);
-                $models[] = $model;
-            }
-
-            return self::makeSet($models);
-        } else {
-            $model = self::pack($class, $results);
-
-            return $model;
-        }
-
-        return null;
-
     }
 
 }
