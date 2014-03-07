@@ -296,6 +296,18 @@ class MongoDB
     }
 
     /**
+     * distinct
+     *
+     * @param array $data data
+     *
+     * @return string|null
+     */
+    public function distinct(array $data)
+    {
+        return $this->command($data);
+    }
+    
+    /**
      * execute
      *
      * @param string $code code
