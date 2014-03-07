@@ -549,6 +549,21 @@ abstract class Model
     }
 
     /**
+     * Distinct records
+     *
+     * @param array $criteria criteria
+     *
+     * @return Distinct Records
+     */
+    public static function distinct($criteria = array())
+    {
+        self::processCriteriaWithType($criteria);
+ 
+        return self::connection()->distinct($criteria);
+
+    }
+    
+    /**
      * Has record
      *
      * A optimized way to see if a record exists in the database. Helps
