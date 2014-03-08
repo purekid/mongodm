@@ -306,7 +306,7 @@ class MongoDB
     {
         return $this->command($data);
     }
-    
+
     /**
      * execute
      *
@@ -708,68 +708,68 @@ class MongoDB
         }
 
         switch ($command) {
-        case 'ensure_index':
-            $r = $c->ensureIndex($keys, $options);
-            break;
-        case 'create_collection':
-            $r = $this->_db->createCollection($name, $capped, $size, $max);
-            break;
-        case 'drop_collection':
-            $r = $this->_db->dropCollection($name);
-            break;
-        case 'command':
-            $r = $this->_db->command($values);
-            break;
-        case 'execute':
-            $r = $this->_db->execute($code, $args);
-            break;
-        case 'batch_insert':
-            $r = $c->batchInsert($values);
-            break;
-        case 'count':
-            $r = $c->count($query);
-            break;
-        case 'find_one':
-            $r = $c->findOne($query, $fields);
-            break;
-        case 'find':
-            $r = $c->find($query, $fields);
-            break;
-        case 'group':
-            $r = $c->group($keys, $initial, $reduce, $condition);
-            break;
-        case 'update':
-            $r = $c->update($criteria, $values, $options);
-            break;
-        case 'insert':
-            $r = $c->insert($values, $options);
+            case 'ensure_index':
+                $r = $c->ensureIndex($keys, $options);
+                break;
+            case 'create_collection':
+                $r = $this->_db->createCollection($name, $capped, $size, $max);
+                break;
+            case 'drop_collection':
+                $r = $this->_db->dropCollection($name);
+                break;
+            case 'command':
+                $r = $this->_db->command($values);
+                break;
+            case 'execute':
+                $r = $this->_db->execute($code, $args);
+                break;
+            case 'batch_insert':
+                $r = $c->batchInsert($values);
+                break;
+            case 'count':
+                $r = $c->count($query);
+                break;
+            case 'find_one':
+                $r = $c->findOne($query, $fields);
+                break;
+            case 'find':
+                $r = $c->find($query, $fields);
+                break;
+            case 'group':
+                $r = $c->group($keys, $initial, $reduce, $condition);
+                break;
+            case 'update':
+                $r = $c->update($criteria, $values, $options);
+                break;
+            case 'insert':
+                $r = $c->insert($values, $options);
 
-            return $values;
-            break;
-        case 'remove':
-            $r = $c->remove($criteria, $options);
-            break;
-        case 'save':
-            $r = $c->save($values, $options);
-            break;
-        case 'get_file':
-            $r = $this->gridFS()->findOne($criteria);
-            break;
-        case 'get_files':
-            $r = $this->gridFS()->find($query, $fields);
-            break;
-        case 'set_file_bytes':
-            $r = $this->gridFS()->storeBytes($bytes, $extra, $options);
-            break;
-        case 'set_file':
-            $r = $this->gridFS()->storeFile($filename, $extra, $options);
-            break;
-        case 'remove_file':
-            $r = $this->gridFS()->remove($criteria, $options);
-            break;
-        case 'aggregate':
-            $r = call_user_func_array(array($c, 'aggregate'), $ops);
-            break;
+                return $values;
+                break;
+            case 'remove':
+                $r = $c->remove($criteria, $options);
+                break;
+            case 'save':
+                $r = $c->save($values, $options);
+                break;
+            case 'get_file':
+                $r = $this->gridFS()->findOne($criteria);
+                break;
+            case 'get_files':
+                $r = $this->gridFS()->find($query, $fields);
+                break;
+            case 'set_file_bytes':
+                $r = $this->gridFS()->storeBytes($bytes, $extra, $options);
+                break;
+            case 'set_file':
+                $r = $this->gridFS()->storeFile($filename, $extra, $options);
+                break;
+            case 'remove_file':
+                $r = $this->gridFS()->remove($criteria, $options);
+                break;
+            case 'aggregate':
+                $r = call_user_func_array(array($c, 'aggregate'), $ops);
+                break;
         }
 
         return $r;

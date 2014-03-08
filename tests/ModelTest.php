@@ -456,4 +456,39 @@ class ModelTest extends PhactoryTestCase
 
     }
 
+    public function testDistinct(){
+
+        $key = time() . mt_rand(1000,9999);
+
+        $res = User::distinct( $key , array() ) ;
+
+        $this->assertArrayHasKey('values' , $res );
+
+        $this->assertEquals( 0 , count($res['values']));
+
+        $user = User::one();
+        $user->age = 20;
+        $user->$key = (string) $user->getId();
+        $user->save();
+
+        $res = User::distinct( $key , array('age'=>20) ) ;
+        $this->assertEquals( 1 , count($res['values']));
+
+        $res = User::distinct( $key , array('age'=>21) ) ;
+        $this->assertEquals( 0 , count($res['values']));
+
+        $user = new User();
+        $user->age = 21;
+        $user->save();
+        $user->$key = (string) $user->getId();
+        $user->save();
+
+        $res = User::distinct( $key , array() ) ;
+        $this->assertEquals( 2 , count($res['values']));
+
+        $res = User::distinct( $key , array('age'=>20) ) ;
+        $this->assertEquals( 1 , count($res['values']));
+
+    }
+
 }

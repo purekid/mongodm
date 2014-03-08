@@ -551,15 +551,17 @@ abstract class Model
     /**
      * Distinct records
      *
+     * @param string $key key distinct key
      * @param array $criteria criteria
      *
      * @return Distinct Records
      */
-    public static function distinct($criteria = array())
+    public static function distinct( $key , $criteria = array() )
     {
+
         self::processCriteriaWithType($criteria);
- 
-        return self::connection()->distinct($criteria);
+        $query = array('distinct'=>self::collectionName() , 'key' => $key , 'query' => $criteria);
+        return self::connection()->distinct($query);
 
     }
     
