@@ -7,7 +7,17 @@ php:
     - 5.5
 
 before_script:
+    # Test MongoDB connection; Fails after tries
+    - |
+      echo "Testing MongoDB connection...";tries=4;
+      i=0;
+      while [ $i -lt $tries ]; do fail=$(mongo --eval db 2>&1 >/dev/null | grep "connect failed");
+        if [ "$fail" ] && [ $[ $i+1 ] -eq $tries ] ; then echo "Error: Could not connect to mongodb"; exit 1;
+        elif [ "$fail" ]; then sleep 3; i=$[ $i+1 ];
+        else echo "OK"; i=$tries; fi;
+      done
+    - echo "... MongoDB OK"
     # Install MongoDB driver
     - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
     # Install dev requirements
-    - composer install 
+    - composer self-update; composer install 
