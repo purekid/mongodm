@@ -7,6 +7,9 @@ in 1.x versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.4.0...v2.4.1
 
+* 1.4.1 (2014-03-19)
+    - fix issue with undefined fields which are of known type being ignored
+    - add distinct feature (440f8b4120)
 * 1.4.0 (2014-03-06)
     - fix many bugs
     - fix some tests
