@@ -752,13 +752,21 @@ abstract class Model
     {
         $attrs = $this->getAttrs();
         if (!isset($attrs[$key]) && is_object($value)) {
-            if (method_exists($value, 'toArray')) {
-                $value = (array) $value->toArray();
-            } elseif (method_exists($value, 'to_array')) {
-                $value = (array) $value->to_array();
-            }else{
-                //ingore this object when saving
-                $this->ignoreData[$key] = $value;
+            // Handle dates
+            if (!$value instanceof \MongoDate
+                || !$value instanceof \MongoId
+                || !$value instanceof \MongoDBRef) {
+
+                if ($value instanceof \DateTime) {
+                    $value = new \MongoDate($value->getTimestamp());
+                } else if (method_exists($value, 'toArray')) {
+                    $value = (array) $value->toArray();
+                } elseif (method_exists($value, 'to_array')) {
+                    $value = (array) $value->to_array();
+                }else{
+                    //ingore this object when saving
+                    $this->ignoreData[$key] = $value;
+                }
             }
         } elseif (isset($attrs[$key]) && isset($attrs[$key]['type'])) {
             switch ($attrs[$key]['type']) {
