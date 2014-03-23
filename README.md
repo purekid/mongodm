@@ -183,6 +183,7 @@ You have two ways to specify section :
 	    'int',  // alias of 'integer'
 	    'double',     // float 
 	    'timestamp',  // store as MongoTimestamp in Mongodb
+	    'date',  // store as DateTime
 	    'boolean',    // true or false
 	    'array',    
 	    'object'
