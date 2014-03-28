@@ -181,14 +181,15 @@ abstract class Model
      * Mutate data by direct query
      *
      * @param array $updateQuery update query
-     * @param array $options     options
+     * @param array $options options
      *
+     * @throws \Exception
      * @return boolean
      */
     public function mutate($updateQuery, $options = array())
     {
-        if(!is_array($updateQuery)) throw new Exception('$updateQuery should be an array');
-        if(!is_array($options)) throw new Exception('$options should be an array');
+        if(!is_array($updateQuery)) throw new \Exception('$updateQuery should be an array');
+        if(!is_array($options)) throw new \Exception('$options should be an array');
 
         $default = array(
             'w' => 1
@@ -207,7 +208,7 @@ abstract class Model
     /**
      * get MongoId of this record
      *
-     * @return MongoId Object
+     * @return \MongoId Object
      */
     public function getId()
     {
@@ -523,7 +524,7 @@ abstract class Model
      * @param mixed $initial initial
      * @param mixed $reduce  reduce
      *
-     * @return type
+     * @return mixed
      */
     public static function group(array $keys, array $query, $initial = null, $reduce = null)
     {
@@ -538,7 +539,7 @@ abstract class Model
     /**
      * aggreate
      *
-     * @param arary $query query
+     * @param array $query query
      *
      * @return array
      */
@@ -554,7 +555,7 @@ abstract class Model
      * @param string $key key distinct key
      * @param array $criteria criteria
      *
-     * @return Distinct Records
+     * @return string Records
      */
     public static function distinct( $key , $criteria = array() )
     {
@@ -592,7 +593,7 @@ abstract class Model
     /**
      * Count of records
      *
-     * @param array $params params
+     * @param array $criteria
      *
      * @return integer
      */
@@ -693,7 +694,7 @@ abstract class Model
     /**
      * Set temp id
      *
-     * @param id $tempId temp id
+     * @param $tempId int id
      *
      * @return null
      */
@@ -743,9 +744,10 @@ abstract class Model
     /**
      * Parse value with specific definition in $attrs
      *
-     * @param string $key   key
-     * @param mixed  $value value
+     * @param string $key key
+     * @param mixed $value value
      *
+     * @throws Exception\InvalidDataTypeException
      * @return mixed
      */
     public  function parseValue($key, $value)
@@ -973,7 +975,9 @@ abstract class Model
 
     /**
      * Process the criteria , add _type to criteria in some cases.
-     * @param $criteria Criteria to process
+     * @param $criteria array Criteria to process
+     *
+     * @return null
      */
     protected static function processCriteriaWithType(&$criteria){
 
@@ -989,10 +993,11 @@ abstract class Model
      *  If the attribute of $key is a reference ,
      *  save the attribute into database as MongoDBRef
      *
-     * @param string $key   key
+     * @param string $key key
      * @param string $value value
      *
-     * @return null
+     * @throws \Exception
+     * @return array|null
      */
     protected function setRef($key, $value)
     {
@@ -1048,10 +1053,11 @@ abstract class Model
     /**
      * Set the Embed attribute.
      *
-     * @param string $key   key
+     * @param string $key key
      * @param string $value value
      *
-     * @return null
+     * @throws \Exception
+     * @return array|null
      */
     protected function setEmbed($key, $value)
     {
@@ -1237,8 +1243,8 @@ abstract class Model
     {
         $attrs = self::getAttrs();
         foreach ($attrs as $key => $attr) {
-            if(! isset($attr['default'])) continue;
-            if ( !isset($this->cleanData[$key])) {
+            if (! isset($attr['default'])) continue;
+            if (! isset($this->cleanData[$key])) {
                 $this->$key = $attr['default'];
             }
         }
@@ -1509,6 +1515,7 @@ abstract class Model
      *
      * @param string $key key
      *
+     * @throws \Exception
      * @return null
      */
     public function __unsetter($key)

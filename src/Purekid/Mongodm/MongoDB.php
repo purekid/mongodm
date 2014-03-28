@@ -53,7 +53,7 @@ class MongoDB
      *
      * @static
      *
-     * @return MangoDB
+     * @return MongoDB
     */
     public static function instance($name = 'default', array $config = null)
     {
@@ -86,14 +86,14 @@ class MongoDB
     /**
      * Raw server connection
      *
-     * @var Mongo
+     * @var \Mongo
      */
     protected $_connection;
 
     /**
      * Raw database connection
      *
-     * @var Mongo Database
+     * @var \Mongo Database
      */
     protected $_db;
 
@@ -140,6 +140,7 @@ class MongoDB
     /**
      * Connect to MongoDB, select database
      *
+     * @throws \Exception
      * @return bool
      */
     public function connect()
@@ -208,7 +209,7 @@ class MongoDB
      *
      * @param array $ref ref
      *
-     * @return MongoDBRef
+     * @return \MongoDBRef
      */
     public function getRef(array $ref)
     {
@@ -311,7 +312,7 @@ class MongoDB
      * execute
      *
      * @param string $code code
-     * @param arary  $args array
+     * @param array  $args array
      *
      * @return string|null
      */
@@ -687,7 +688,7 @@ class MongoDB
     /**
      * _call
      *
-     * @param command    $command   command
+     * @param string     $command   command
      * @param array      $arguments arguments
      * @param array|null $values    values
      *
@@ -803,8 +804,9 @@ class MongoDB
     /**
      * config
      *
-     * @param array $config_block config_block
+     * @param string $config_block config_block
      *
+     * @throws \Exception
      * @return null
      */
     public static function config($config_block)
