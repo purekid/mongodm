@@ -35,7 +35,9 @@ class Hydrator
      * @param string $class   class
      * @param array  $results results
      * @param string $type    type
+     * @param bool $exists
      *
+     * @throws \Exception
      * @return Model|null
      */
     public static function hydrate($class, $results, $type = "collection" , $exists = false)
@@ -63,10 +65,11 @@ class Hydrator
      *
      * @param string $class  class
      * @param array  $result result
+     * @param bool   $exists
      *
      * @static
      *
-     * @return type
+     * @return object type
      */
     protected static function pack($class, $result, $exists = false)
     {

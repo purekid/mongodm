@@ -118,7 +118,7 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
     /**
      * Remove a record from the collection
      *
-     * @param int|MongoID|Model $param model to remove
+     * @param int|\MongoID|Model $param model to remove
      *
      * @return boolean
      */
@@ -180,7 +180,7 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
     /**
      * Determine if a record exists in the collection
      *
-     * @param int|MongoID|object $param param
+     * @param int|\MongoID|object $param param
      *
      * @return boolean
      */
@@ -205,7 +205,7 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
     /**
      * Run a map over the collection using the given Closure and return a new collection
      *
-     * @param Closure $callback callback
+     * @param \Closure $callback callback
      *
      * @return \Purekid\Mongodm\Collection
      */
@@ -217,7 +217,7 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
     /**
      * Filter the collection using the given Closure and return a new collection
      *
-     * @param Closure $callback callback
+     * @param \Closure $callback callback
      *
      * @return \Purekid\Mongodm\Collection
      */
@@ -229,7 +229,7 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
     /**
      * Sort the collection using the given Closure
      *
-     * @param Closure $callback callback
+     * @param \Closure $callback callback
      * @param boolean $asc      asc
      *
      * @return \Purekid\Mongodm\Collection
@@ -307,7 +307,7 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
     /**
      * Execute a callback over each item.
      *
-     * @param Closure $callback callback
+     * @param \Closure $callback callback
      *
      * @return \Purekid\Mongodm\Collection
      */
@@ -390,7 +390,7 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
     /**
      * make a MongoRefs array of items
      *
-     * @return \MongoRef[]
+     * @return \MongoDbRef[]
      */
     public function makeRef()
     {
