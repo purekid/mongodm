@@ -136,7 +136,7 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
             }
         }
 
-        return true;
+        return $this;
 
     }
 
@@ -203,7 +203,7 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
     }
 
     /**
-     * Run a map over the collection using the given Closure and return a new collection
+     * Run a map over the collection using the given Closure
      *
      * @param \Closure $callback callback
      *
@@ -211,7 +211,10 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
      */
     public function map(\Closure $callback)
     {
-        return new static(array_map($callback, $this->_items));
+
+        $this->_items = array_map($callback, $this->_items);
+
+        return $this;
     }
 
     /**
@@ -285,7 +288,7 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
     }
 
     /**
-     * First
+     * First item
      *
      * @return Model
      */
@@ -295,7 +298,7 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
     }
 
     /**
-     * Last
+     * Last item
      *
      * @return Model
      */
@@ -319,7 +322,7 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
     }
 
     /**
-     * Count
+     * Count items
      *
      * @return int
      */
@@ -455,6 +458,43 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
     public function offsetUnset($index)
     {
         $this->remove($index);
+    }
+
+    /**
+     * Save items
+     *
+     * @return \Purekid\Mongodm\Collection
+     */
+    public function save(){
+
+        foreach($this->_items as $item){
+            if($item->exists()){
+                $item->save();
+            }
+        }
+
+        return $this;
+
+    }
+
+    /**
+     * Delete items
+     *
+     * @return \Purekid\Mongodm\Collection
+     */
+    public function delete(){
+
+        foreach($this->_items as $key => $item){
+            if($item->exists()){
+                $deleted = $item->delete();
+                if($deleted){
+                   unset($this->_items[$key]);
+                }
+            }
+        }
+
+        return $this;
+
     }
 
 }

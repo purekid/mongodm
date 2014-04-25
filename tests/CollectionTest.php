@@ -165,7 +165,9 @@ class CollectionTest extends PhactoryTestCase
             array('name' => 'd', 'price' => 21), 
         ));
 
-        $books_map_1 = $books->map(function ($book) {   if ($book->price > 10) { $book->price = 99; }  return $book;   });
+        $books_map_1 = $books_map_2 = $books;
+
+        $books_map_1 ->map(function ($book) {   if ($book->price > 10) { $book->price = 99; }  return $book;   });
 
         $this->assertEquals( $books->get(2)->price , 99);
 
@@ -174,15 +176,15 @@ class CollectionTest extends PhactoryTestCase
         $this->assertEquals( $books_map_1->get(2)->price , 99 );
         $this->assertEquals( $books_map_1->get(2)->name , 'a' );
 
-        $books_map_2 = $books->map(function ($book) {   if ($book->price > 10) { $book->price = 99; return $book;}     });
+        $books_map_2->map(function ($book) {   if ($book->price > 10) { $book->price = 99;} return $book;    });
 
-        $this->assertEquals( $books_map_2->count() , 2);
-        
-        $this->assertEquals( $books_map_2->get(0)->price , 99 );
-        $this->assertEquals( $books_map_2->get(0)->name , 'a' );
+        $this->assertEquals( $books_map_2->count() , 4);
 
-        $this->assertEquals( $books_map_2->get(1)->price , 99 );
-        $this->assertEquals( $books_map_2->get(1)->name , 'd' );
+        $this->assertEquals( $books_map_2->get(0)->price , 3 );
+        $this->assertEquals( $books_map_2->get(0)->name , 'b' );
+
+        $this->assertEquals( $books_map_2->get(2)->price , 99 );
+        $this->assertEquals( $books_map_2->get(2)->name , 'a' );
     }
 
     public function testSlice()
@@ -458,6 +460,7 @@ class CollectionTest extends PhactoryTestCase
 
     public function testToArrayRecursive()
     {
+
         $user = new User(array('name'=>'michael'));
         $user->save();
 
@@ -475,5 +478,40 @@ class CollectionTest extends PhactoryTestCase
 
         $this->assertEquals($result['books'][0]['name'], 'book1');
         $this->assertNotEquals(count($result['books'][0]), count($user->books[0]));
+
     }
+
+    public function testSave(){
+
+        $nid = mt_rand(0,999999);
+
+        for($i = 0;$i<10;$i++){
+
+           $book = new Book(array('name'=>'test_save','nid'=>$nid));
+           $book->save() ;
+
+        }
+
+        $books = Book::find(array('nid'=>$nid));
+        $books->map(function($book){ $book->age = 10; return $book; })->save();
+
+        $this->assertEquals(10,$books->get(0)->age);
+
+        $books = Book::find(array('nid'=>$nid));
+        $this->assertEquals(10,$books->get(0)->age);
+
+    }
+
+    public function testDelete(){
+
+       $books = Book::all();
+
+       $this->assertNotEmpty($books->count());
+
+       $books->delete();
+
+       $this->assertEquals($books->count(),0);
+
+    }
+
 }
