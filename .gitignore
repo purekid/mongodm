@@ -1,3 +1,4 @@
 *.svn
+.idea
 .DS_Store
 /vendor

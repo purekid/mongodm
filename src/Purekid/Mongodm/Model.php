@@ -174,7 +174,7 @@ abstract class Model
             }
         }
 
-        return true;
+        return $this;
     }
 
     /**
@@ -278,8 +278,9 @@ abstract class Model
                 $updateQuery['$unset'] = self::mapFields($this->unsetData);
             }
 
-            $success = $this->_connection->update($this->collectionName(), array('_id' => $this->getId()), $updateQuery, $options);
+            $this->_connection->update($this->collectionName(), array('_id' => $this->getId()), $updateQuery, $options);
             $this->__postUpdate();
+
         } else {
             $this->__preInsert();
             $data = self::mapFields($this->cleanData);
@@ -296,7 +297,7 @@ abstract class Model
         $this->unsetData = array();
         $this->__postSave();
 
-        return $success;
+        return $this;
 
     }
 
@@ -565,7 +566,7 @@ abstract class Model
         return self::connection()->distinct($query);
 
     }
-    
+
     /**
      * Has record
      *
