@@ -379,6 +379,14 @@ $users is instance of Collection
 	$users = User::find(  array( 'name'=>'Michael','books'=>array('$size'=>2) ) );    
 	$users_other = User::find(  array( 'name'=>'John','books'=>array('$size'=>2) ) );   
 ```	
+Save
+```php
+    $users->save() ;  // foreach($users as $user) { $user->save(); }
+```
+Delete
+```php
+    $users->delete() ;  // foreach($users as $user) { $user->delete(); }
+```
 Count 
 ```php  
 	$users->count();  
@@ -419,13 +427,12 @@ Map
 	$func = function($user){
 		  		if( $user->age >= 18 ){
 		    		$user->is_adult = true;
-		    		return $user;
 	        	}
+	            return $user;
 			};
 	
-	$adults = $users->map($func);   
+	$users->map($func)->save();   
 	
-	// Notice:  1. $adults is a new collection   2. In original $users , data has changed at the same time. 
 ```	
 Filter 
 ```php  
