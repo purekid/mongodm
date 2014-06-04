@@ -1205,9 +1205,11 @@ abstract class Model
                     $res = array();
                     if (!empty($value)) {
                         foreach ($value as $item) {
-                            $record = $model::id($item['$id']);
-                            if ($record) {
-                                $res[] = $record;
+                            if(isset($item['$id'], $item['$ref'])) {
+                                $record = $model::id($item['$id']);
+                                if ($record) {
+                                    $res[] = $record;
+                                }
                             }
                         }
                     }
