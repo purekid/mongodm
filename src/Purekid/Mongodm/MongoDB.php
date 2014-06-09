@@ -578,7 +578,7 @@ class MongoDB
     public function gridFS($arg1 = null)
     {
         try {
-            $this->_connected OR $this->connect();
+            $this->_connected || $this->connect();
         } catch (\Exception $e) {
             throw $e;
         }
@@ -697,7 +697,7 @@ class MongoDB
     protected function _call ($command, array $arguments = array(), array $values = null)
     {
         try {
-            $this->_connected OR $this->connect();
+            $this->_connected || $this->connect();
         } catch (\Exception $e) {
             throw $e;
         }
