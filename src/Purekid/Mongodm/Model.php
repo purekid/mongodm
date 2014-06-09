@@ -262,7 +262,7 @@ abstract class Model
 
         /* if no changes then do nothing */
 
-        if ($this->exist and empty($this->dirtyData) and empty($this->unsetData)) return true;
+        if ($this->exist && empty($this->dirtyData) && empty($this->unsetData)) return true;
 
         $this->__preSave();
 
@@ -324,7 +324,7 @@ abstract class Model
             foreach ($this->cleanData as $key => $value) {
                 if (isset($attrs[$key])
                     && isset($attrs[$key]['type'])
-                    && ( $attrs[$key]['type'] == self::DATA_TYPE_REFERENCE or $attrs[$key]['type'] == self::DATA_TYPE_REFERENCES )
+                    && ( $attrs[$key]['type'] == self::DATA_TYPE_REFERENCE || $attrs[$key]['type'] == self::DATA_TYPE_REFERENCES )
                 ) {
                     if ($attrs[$key]['type'] == self::DATA_TYPE_REFERENCE &&
                         isset($attrs[$key]['model']) && !empty($attrs[$key]['model'])) {
