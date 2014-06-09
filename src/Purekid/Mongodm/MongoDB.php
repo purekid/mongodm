@@ -580,7 +580,7 @@ class MongoDB
         try {
             $this->_connected OR $this->connect();
         } catch (\Exception $e) {
-            die($e->getMessage());
+            throw $e;
         }
 
         if ( ! isset($arg1)) {
@@ -699,7 +699,7 @@ class MongoDB
         try {
             $this->_connected OR $this->connect();
         } catch (\Exception $e) {
-            die($e->getMessage());
+            throw $e;
         }
 
         extract($arguments);

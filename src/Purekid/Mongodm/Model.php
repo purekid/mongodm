@@ -162,7 +162,7 @@ abstract class Model
             $attrs = $this->getAttrs();
             foreach ($cleanData as $key => $value) {
                 if (($value instanceof Model) && isset($attrs[$key]) && isset($attrs[$key]['type'])
-                    && ( $attrs[$key]['type'] == self::DATA_TYPE_REFERENCE or $attrs[$key]['type'] == self::DATA_TYPE_REFERENCES )
+                    && ( $attrs[$key]['type'] == self::DATA_TYPE_REFERENCE || $attrs[$key]['type'] == self::DATA_TYPE_REFERENCES )
                 ) {
                     $value = $this->setRef($key, $value);
                 }
@@ -1523,7 +1523,6 @@ abstract class Model
      */
     public function __unsetter($key)
     {
-        $attrs = $this->getAttrs();
         if (strpos($key, ".") !== false) {
             throw new \Exception('The key to unset can\'t contain a "." ');
         }
