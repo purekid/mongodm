@@ -1523,7 +1523,6 @@ abstract class Model
      */
     public function __unsetter($key)
     {
-        $attrs = $this->getAttrs();
         if (strpos($key, ".") !== false) {
             throw new \Exception('The key to unset can\'t contain a "." ');
         }
