@@ -179,7 +179,7 @@ abstract class Model
             }
         }
 
-        return $this;
+        return true;
     }
 
     /**
@@ -283,7 +283,7 @@ abstract class Model
                 $updateQuery['$unset'] = self::mapFields($this->unsetData);
             }
 
-            $this->_connection->update($this->collectionName(), array('_id' => $this->getId()), $updateQuery, $options);
+            $success = $this->_connection->update($this->collectionName(), array('_id' => $this->getId()), $updateQuery, $options);
             $this->__postUpdate();
 
         } else {
@@ -302,7 +302,7 @@ abstract class Model
         $this->unsetData = array();
         $this->__postSave();
 
-        return $this;
+        return $success;
 
     }
 
@@ -1587,6 +1587,13 @@ abstract class Model
      */
     public function __call($func, $args)
     {
+        // Chain methods
+        if(strrpos($func, 'Chain') && strlen($func) > 5) {
+            $func = substr($func, 0, strrpos($func, 'Chain'));
+            call_user_func_array(array($this, $func), $args);
+            return $this;
+        }
+
         if ($func == 'unset' && isset($args[0])) {
             $this->__unset($args[0]);
         }
