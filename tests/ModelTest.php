@@ -491,4 +491,24 @@ class ModelTest extends PhactoryTestCase
 
     }
 
+    public function testChainedMethods()
+    {
+        $someUser = new User();
+
+        $result = $someUser->save();
+        $this->assertTrue($result);
+
+        $someUser->val = 1;
+        $result = $someUser->saveChain();
+        $this->assertInstanceOf('\\Purekid\\Mongodm\\Model', $result);
+
+        $val = $someUser
+                    ->setValChain(2)
+                    ->saveChain()
+                    ->setValChain(5)
+                    ->saveChain()
+                    ->getVal();
+        $this->assertEquals(5, $val);
+    }
+
 }
