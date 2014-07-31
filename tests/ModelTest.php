@@ -5,6 +5,7 @@ namespace Purekid\Mongodm\Test;
 use Purekid\Mongodm\Test\Model\Pet;
 use Purekid\Mongodm\Test\TestCase\PhactoryTestCase;
 use Purekid\Mongodm\Test\Model\Book;
+use Purekid\Mongodm\Test\Model\CustomId;
 use Purekid\Mongodm\Test\Model\User;
 use Purekid\Mongodm\Collection;
 
@@ -57,6 +58,25 @@ class ModelTest extends PhactoryTestCase
             $this->assertEquals(11000,$e->getCode());
         }
 
+    }
+
+    public function testGetById()
+    {
+        $user = new User();
+        $user->value = 121;
+        $user->save();
+        $user = User::id($user->getId());
+        $this->assertInstanceOf('\\MongoId', $user->getId());
+        $this->assertEquals(121, $user->value);
+
+        $id = array('abc' => 123);
+        $customId = new CustomId(array('_id' => $id));
+        $customId->value = 120;
+        $customId->save();
+
+        $customId = CustomId::id($id);
+        $this->assertEquals($id, $customId->getId());
+        $this->assertEquals(120, $customId->value);
     }
 
     public function testDefaultAttr()
