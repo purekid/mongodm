@@ -92,6 +92,11 @@ abstract class Model
     protected static $useType = true;
 
     /**
+     * Whether `_id` is MongoId
+     */
+    protected static $customIdType = false;
+
+    /**
      * Cache for references data
      */
     protected $_cache = array();
@@ -439,8 +444,6 @@ abstract class Model
 
         if ($id  && strlen($id) == 24 ) {
             $id = new \MongoId($id);
-        } else {
-            return null;
         }
 
         return self::one(array("_id" => $id));
@@ -757,8 +760,8 @@ abstract class Model
         if (!isset($attrs[$key]) && is_object($value)) {
             // Handle dates
             if (!$value instanceof \MongoDate
-                || !$value instanceof \MongoId
-                || !$value instanceof \MongoDBRef) {
+                && !$value instanceof \MongoId
+                && !$value instanceof \MongoDBRef) {
 
                 if ($value instanceof \DateTime) {
                     $value = new \MongoDate($value->getTimestamp());
