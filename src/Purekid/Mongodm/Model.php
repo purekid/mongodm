@@ -217,7 +217,11 @@ abstract class Model
      */
     public function getId()
     {
+        $class = get_called_class();
+
         if (isset($this->cleanData['_id'])) {
+            if($class::$customIdType === true) return $this->cleanData['_id'];
+
             return new \MongoId($this->cleanData['_id']);
         } elseif (isset($this->_tempId)) {
             return $this->_tempId;
@@ -441,9 +445,12 @@ abstract class Model
      */
     public static function id($id)
     {
+        $class = get_called_class();
 
-        if ($id  && strlen($id) == 24 ) {
-            $id = new \MongoId($id);
+        if ($class::$customIdType !== true) {
+            if ($id  && strlen($id) == 24 ) {
+                $id = new \MongoId($id);
+            }
         }
 
         return self::one(array("_id" => $id));
