@@ -244,7 +244,7 @@ abstract class Model
         if ($this->_exist) {
             $deleted =  $this->_connection->remove($this->collectionName(), array("_id" => $this->getId() ), $options);
             if ($deleted) {
-                $this->_exists = false;
+                $this->_exist = false;
             }
         }
         $this->__postDelete();
