@@ -665,7 +665,7 @@ abstract class Model
      *
      * @return string Name of class with namespaces stripped
      */
-    public static function get_class_name($with_namespaces = true)
+    public static function getClassName($with_namespaces = true)
     {
         $class_name = get_called_class();
         if($with_namespaces) return $class_name;
@@ -862,7 +862,7 @@ abstract class Model
      */
     protected function initTypes()
     {
-        $class = $this->get_class_name(false);
+        $class = $this->getClassName(false);
         $types = $this->getModelTypes();
         $type = $this->_type;
 
@@ -995,7 +995,7 @@ abstract class Model
         $class = get_called_class();
         $types = $class::getModelTypes();
         if (count($types) > 1) {
-            $criteria['_type'] = $class::get_class_name(false);
+            $criteria['_type'] = $class::getClassName(false);
         }
 
     }
@@ -1312,7 +1312,7 @@ abstract class Model
             return array();
         }
 
-        $class_name = $class::get_class_name(false);
+        $class_name = $class::getClassName(false);
         $parent = get_parent_class($class);
         if ($parent) {
             $names_parent = $parent::getModelTypes();
