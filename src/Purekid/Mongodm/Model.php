@@ -116,7 +116,7 @@ abstract class Model
     /**
      *  record exists in the database
      */
-    protected $exist = false;
+    protected $_exist = false;
 
     /**
      * Model
@@ -143,7 +143,7 @@ abstract class Model
         $this->update($data, true);
 
         if ($exists) {
-            $this->exist = true;
+            $this->_exist = true;
         } else {
             $this->initAttrs();
         }
@@ -241,10 +241,10 @@ abstract class Model
     {
         $this->__preDelete();
 
-        if ($this->exist) {
+        if ($this->_exist) {
             $deleted =  $this->_connection->remove($this->collectionName(), array("_id" => $this->getId() ), $options);
             if ($deleted) {
-                $this->exists = false;
+                $this->_exists = false;
             }
         }
         $this->__postDelete();
@@ -262,7 +262,7 @@ abstract class Model
     public function save($options = array())
     {
 
-        if ($this->_isEmbed) {
+        if ($this->isEmbed()) {
             return false;
         }
 
@@ -271,11 +271,11 @@ abstract class Model
 
         /* if no changes then do nothing */
 
-        if ($this->exist && empty($this->dirtyData) && empty($this->unsetData)) return true;
+        if ($this->_exist && empty($this->dirtyData) && empty($this->unsetData)) return true;
 
         $this->__preSave();
 
-        if ($this->exist) {
+        if ($this->_exist) {
             $this->__preUpdate();
             $updateQuery = array();
 
@@ -296,7 +296,7 @@ abstract class Model
             $insert = $this->_connection->insert($this->collectionName(), $data, $options);
             $success = !is_null($this->cleanData['_id'] = $insert['_id']);
             if ($success) {
-                $this->exist = true ;
+                $this->_exist = true ;
                 $this->__postInsert();
             }
 
@@ -373,7 +373,7 @@ abstract class Model
      */
     public function exists()
     {
-        return $this->exist;
+        return $this->_exist;
     }
 
     /**
@@ -682,12 +682,12 @@ abstract class Model
      *
      * @return null
      */
-    public function setIsEmbed($is_embed)
+    public function setEmbed($is_embed)
     {
         $this->_isEmbed = $is_embed;
         if ($is_embed) {
             unset($this->_connection);
-            unset($this->exist);
+            unset($this->_exist);
         }
     }
 
@@ -696,7 +696,7 @@ abstract class Model
      *
      * @return bool
      */
-    public function getIsEmbed()
+    public function isEmbed()
     {
         return $this->_isEmbed;
 
@@ -1062,7 +1062,7 @@ abstract class Model
     }
 
     /**
-     * Set the Embed attribute.
+     * Fill the Embed attribute.
      *
      * @param string $key key
      * @param string $value value
@@ -1070,7 +1070,7 @@ abstract class Model
      * @throws \Exception
      * @return array|null
      */
-    protected function setEmbed($key, $value)
+    protected function fillEmbed($key, $value)
     {
         $attrs = $this->getAttrs();
         $cache = &$this->_cache;
@@ -1082,7 +1082,7 @@ abstract class Model
             $model = $embed['model'];
             $type = $embed['type'];
             if ($value instanceof $model) {
-                $value->setIsEmbed(true);
+                $value->embed = true;
                 $return  = $value->toArray(array('_type','_id'));
             } elseif ($value == null) {
                 $return = null;
@@ -1095,7 +1095,7 @@ abstract class Model
             if (is_array($value)) {
                 foreach ($value as $item) {
                     if(! ( $item instanceof Model ) ) continue;
-                    $item->setIsEmbed(true);
+                    $item->embed = true;
                     $arr[] = $item;
                 }
                 $value = Collection::make($arr);
@@ -1146,7 +1146,7 @@ abstract class Model
                     if ($value) {
                         $data = $value;
                         $object = new $model($data);
-                        $object->setIsEmbed(true);
+                        $object->embed = true;
                         $cache[$key] = $object;
 
                         return $object;
@@ -1159,7 +1159,7 @@ abstract class Model
                         foreach ($value as $item) {
                             $data = $item;
                             $record = new $model($data);
-                            $record->setIsEmbed(true);
+                            $record->embed = true;
                             if ($record) {
                                 $res[] = $record;
                             }
@@ -1491,7 +1491,7 @@ abstract class Model
                 if (in_array($attrs[$key]['type'], array(self::DATA_TYPE_REFERENCE, self::DATA_TYPE_REFERENCES))) {
                     $value = $this->setRef($key, $value);
                 } elseif (in_array($attrs[$key]['type'], array(self::DATA_TYPE_EMBED, self::DATA_TYPE_EMBEDS))) {
-                    $value = $this->setEmbed($key, $value);
+                    $value = $this->fillEmbed($key, $value);
                 }
             }
 

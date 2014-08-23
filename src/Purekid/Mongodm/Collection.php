@@ -47,7 +47,7 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
             if (! ($model instanceof Model)) continue;
             if ($model->exists()) {
                 $id = (string) $model->getId();
-            } elseif ($model->getIsEmbed()) {
+            } elseif ($model->isEmbed()) {
                 $id = $i++;
                 $model->setTempId($id);
             }
