@@ -829,12 +829,12 @@ class MongoDB
             if (isset($config[$config_block])) {
                 return $config[$config_block];
             } else {
-                throw new \Exception("database config section '{$config_block}' not exist!");
+                throw new \Exception("Database config section '{$config_block}' not exists.");
             }
 
             return $config['default'];
         } else {
-
+            throw new \Exception("Database config not found.");
         }
 
     }

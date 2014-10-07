@@ -980,7 +980,7 @@ abstract class Model
                 $value = Collection::make($value);
             } elseif ($value instanceof Collection) {
                 $return = $value->makeRef();
-            } elseif ($value == null) {
+            } elseif ($value === null) {
                 $return = null;
             } else {
                 throw new \Exception("{$key} is not instance of '$model'");
@@ -1664,3 +1664,4 @@ abstract class Model
     }
 
 }
+
