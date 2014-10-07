@@ -253,7 +253,7 @@ class MongoDB
      *
      * @return string|null
      */
-    public function last_error()
+    public function lastError()
     {
         return $this->_connected
             ? $this->_db->lastError()
@@ -265,7 +265,7 @@ class MongoDB
      *
      * @return string|null
      */
-    public function prev_error()
+    public function prevError()
     {
         return $this->_connected
             ? $this->_db->prevError()
@@ -277,7 +277,7 @@ class MongoDB
      *
      * @return string|null
      */
-    public function reset_error()
+    public function resetError()
     {
         return $this->_connected
             ? $this->_db->resetError()
@@ -338,7 +338,7 @@ class MongoDB
      *
      * @return string|null
      */
-    public function create_collection($name, $capped = false, $size = 0, $max = 0)
+    public function createCollection($name, $capped = false, $size = 0, $max = 0)
     {
         return $this->_call(
             'create_collection', array(
@@ -357,7 +357,7 @@ class MongoDB
      *
      * @return string|null
      */
-    public function drop_collection($name)
+    public function dropCollection($name)
     {
         return $this->_call(
             'drop_collection', array(
@@ -375,7 +375,7 @@ class MongoDB
      *
      * @return string|null
      */
-    public function ensure_index ($collection_name, $keys, $options = array())
+    public function ensureIndex ($collection_name, $keys, $options = array())
     {
         return $this->_call(
             'ensure_index', array(
@@ -396,7 +396,7 @@ class MongoDB
      *
      * @return string|null
      */
-    public function batch_insert($collection_name, array $a)
+    public function batchInsert($collection_name, array $a)
     {
         return $this->_call(
             'batch_insert', array(
@@ -432,7 +432,7 @@ class MongoDB
      *
      * @return mixed
      */
-    public function find_one ($collection_name, array $query = array(), array $fields = array())
+    public function findOne ($collection_name, array $query = array(), array $fields = array())
     {
         return $this->_call(
             'find_one', array(
@@ -599,7 +599,7 @@ class MongoDB
      *
      * @return mixed
      */
-    public function get_file (array $criteria = array())
+    public function getFile (array $criteria = array())
     {
         return $this->_call(
             'get_file', array(
@@ -616,7 +616,7 @@ class MongoDB
      *
      * @return mixed
      */
-    public function get_files (array $query = array(), array $fields = array())
+    public function getFiles (array $query = array(), array $fields = array())
     {
         return $this->_call(
             'get_files', array(
@@ -635,7 +635,7 @@ class MongoDB
      *
      * @return mixed
      */
-    public function set_file_bytes ($bytes, array $extra = array(), array $options = array())
+    public function setFileBytes ($bytes, array $extra = array(), array $options = array())
     {
         return $this->_call(
             'set_file_bytes', array(
@@ -655,7 +655,7 @@ class MongoDB
      *
      * @return mixed
      */
-    public function set_file ($filename, array $extra = array(), array $options = array())
+    public function setFile ($filename, array $extra = array(), array $options = array())
     {
         return $this->_call(
             'set_file', array(
@@ -674,7 +674,7 @@ class MongoDB
      *
      * @return mixed
      */
-    public function remove_file (array $criteria = array(), array $options = array())
+    public function removeFile (array $criteria = array(), array $options = array())
     {
         return $this->_call(
             'remove_file', array(

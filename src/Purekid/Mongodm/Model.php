@@ -31,6 +31,7 @@ use \Purekid\Mongodm\Exception\InvalidDataTypeException;
 abstract class Model
 {
 
+
     const DATA_TYPE_ARRAY      = 'array';
 
     const DATA_TYPE_BOOL       = 'bool';
@@ -328,7 +329,7 @@ abstract class Model
             }
             $ignore = $ignores;
         }
-        if ($recursive == true && $deep > 0) {
+        if ($recursive === true && $deep > 0) {
             $attrs = $this->getAttrs();
             foreach ($this->cleanData as $key => $value) {
                 if (isset($attrs[$key])
@@ -469,7 +470,7 @@ abstract class Model
     {
 
         self::processCriteriaWithType($criteria);
-        $result = self::connection()->find_one(static::$collection, $criteria, self::mapFields($fields));
+        $result = self::connection()->findOne(static::$collection, $criteria, self::mapFields($fields));
 
         if ($result) {
             return  Hydrator::hydrate(get_called_class(), $result, "one" , true);
@@ -637,7 +638,7 @@ abstract class Model
     {
         $class = get_called_class();
 
-        return self::connection()->drop_collection($class::collectionName());
+        return self::connection()->dropCollection($class::collectionName());
     }
 
     /**
@@ -716,25 +717,58 @@ abstract class Model
 
     /**
      * Ensure index
-     *
+     * @deprecated use ensureIndex instead
      * @param mixed $keys    keys
      * @param array $options options
      *
      * @return boolean
      */
-    public static function ensure_index ($keys, $options = array())
+    public static function ensure_index($keys, $options = array())
     {
+       return self::ensureIndex($keys,$options);
+    }
+
+    /**
+     * Ensure index
+     * @param mixed $keys    keys
+     * @param array $options options
+     *
+     * @return boolean
+     */
+    public static function ensureIndex($keys, $options = array()){
+
         $result = self::connection()->ensure_index(self::collectionName(), $keys, $options);
 
         return $result;
+
+    }
+
+    /**
+     * @deprecated use getConnection instead
+     * @return null|MongoDB
+     */
+    public function _getConnection()
+    {
+        return $this->getConnection();
+    }
+
+    /**
+     * @deprecated use getCollection instead
+     * Return the current MongoCollection
+     *
+     * @return \MongoCollection|null
+     */
+    public function _getCollection()
+    {
+        return $this->getCollection();
     }
 
     /**
      * Return the connection
      *
      * @return MongoDB|null
-     */
-    public function _getConnection()
+     L*/
+    public function getConnection()
     {
         return $this->_connection;
     }
@@ -744,116 +778,14 @@ abstract class Model
      *
      * @return \MongoCollection|null
      */
-    public function _getCollection()
+    public function getCollection()
     {
-        if($this->_getConnection()) {
-            return $this->_getConnection()->getDB()->{$this->collectionName()};
+        if($this->getConnection()) {
+            return $this->getConnection()->getDB()->{$this->collectionName()};
         }
         return null;
     }
 
-    /**
-     * Parse value with specific definition in $attrs
-     *
-     * @param string $key key
-     * @param mixed $value value
-     *
-     * @throws Exception\InvalidDataTypeException
-     * @return mixed
-     */
-    public  function parseValue($key, $value)
-    {
-        $attrs = $this->getAttrs();
-        if (!isset($attrs[$key]) && is_object($value)) {
-            // Handle dates
-            if (!$value instanceof \MongoDate
-                && !$value instanceof \MongoId
-                && !$value instanceof \MongoDBRef) {
-
-                if ($value instanceof \DateTime) {
-                    $value = new \MongoDate($value->getTimestamp());
-                } else if (method_exists($value, 'toArray')) {
-                    $value = (array) $value->toArray();
-                } elseif (method_exists($value, 'to_array')) {
-                    $value = (array) $value->to_array();
-                }else{
-                    //ingore this object when saving
-                    $this->ignoreData[$key] = $value;
-                }
-            }
-        } elseif (isset($attrs[$key]) && isset($attrs[$key]['type'])) {
-            switch ($attrs[$key]['type']) {
-                case self::DATA_TYPE_INT:
-                case self::DATA_TYPE_INTEGER:
-                    $value = (integer) $value;
-                    break;
-                case self::DATA_TYPE_STR:
-                case self::DATA_TYPE_STRING:
-                    $value = (string) $value;
-                    break;
-                case self::DATA_TYPE_FLT:
-                case self::DATA_TYPE_FLOAT:
-                case self::DATA_TYPE_DBL;
-                case self::DATA_TYPE_DOUBLE:
-                    $value = (float) $value;
-                    break;
-                case self::DATA_TYPE_TIMESTAMP:
-                    if (! ($value instanceof \MongoTimestamp)) {
-                        try {
-                            $value = new \MongoTimestamp($value);
-                        } catch (\Exception $e) {
-                            throw new InvalidDataTypeException('$key cannot be parsed by \MongoTimestamp', $e->getCode(), $e);
-                        }
-                    }
-                    break;
-                case self::DATA_TYPE_DATE:
-                    if (! ($value instanceof \MongoDate)) {
-                        try {
-                            if (!$value instanceof \MongoDate) {
-                                if (is_numeric($value)) {
-                                    $value = '@'.$value;
-                                }
-                                if (!$value instanceof \DateTime) {
-                                    $value = new \DateTime($value);
-                                }
-                                $value = new \MongoDate($value->getTimestamp());
-                            }
-                        } catch (\Exception $e) {
-                            throw new InvalidDataTypeException('$key cannot be parsed by \DateTime', $e->getCode(), $e);
-                        }
-                    }
-                    break;
-                case self::DATA_TYPE_BOOL:
-                case self::DATA_TYPE_BOOLEAN:
-                    $value = (boolean) $value;
-                    break;
-                case self::DATA_TYPE_OBJ:
-                case self::DATA_TYPE_OBJECT:
-                    if (!empty($value) && !is_array($value) && !is_object($value)) {
-                        throw new InvalidDataTypeException("[$key] is not an object");
-                    }
-                    $value = (object) $value;
-                    break;
-                case self::DATA_TYPE_ARRAY:
-                    if (!empty($value) && !is_array($value)) {
-                        throw new InvalidDataTypeException("[$key] is not an array");
-                    }
-                    $value = (array) $value;
-                    break;
-                case self::DATA_TYPE_EMBED:
-                case self::DATA_TYPE_EMBEDS:
-                case self::DATA_TYPE_MIXED:
-                case self::DATA_TYPE_REFERENCE:
-                case self::DATA_TYPE_REFERENCES:
-                    break;
-                default:
-                    throw new InvalidDataTypeException("{$attrs[$key]['type']} is not a valid type");
-                    break;
-            }
-        }
-
-        return $value;
-    }
 
     /**
      * Initialize the "_type" attribute for the model
@@ -1028,11 +960,10 @@ abstract class Model
 
         if ($type == self::DATA_TYPE_REFERENCE) {
             $model = $reference['model'];
-            $type = $reference['type'];
             if ($value instanceof $model) {
                 $ref = $value->makeRef();
                 $return = $ref;
-            } elseif ($value == null) {
+            } elseif ($value === null) {
                 $return = null;
             } else {
                 throw new \Exception("{$key} is not instance of '$model'");
@@ -1080,11 +1011,10 @@ abstract class Model
 
         if ($type == self::DATA_TYPE_EMBED) {
             $model = $embed['model'];
-            $type = $embed['type'];
             if ($value instanceof $model) {
                 $value->embed = true;
                 $return  = $value->toArray(array('_type','_id'));
-            } elseif ($value == null) {
+            } elseif ($value === null) {
                 $return = null;
             } else {
                 throw new \Exception("{$key} is not instance of '$model'");
@@ -1103,7 +1033,7 @@ abstract class Model
 
             if ($value instanceof Collection) {
                 $return = $value->toEmbedsArray();
-            } elseif ($value == null) {
+            } elseif ($value === null) {
                 $return = null;
             } else {
                 throw new \Exception("{$key} is not instance of '$model'");
@@ -1325,7 +1255,114 @@ abstract class Model
 
     }
 
-    /*********** Hooks ***********/
+
+    /**
+     * Parse value with specific definition in $attrs
+     *
+     * @param string $key key
+     * @param mixed $value value
+     *
+     * @throws Exception\InvalidDataTypeException
+     * @return mixed
+     */
+    public function parseValue($key, $value)
+    {
+        $attrs = $this->getAttrs();
+
+        if (!isset($attrs[$key]) && is_object($value)) {
+            // Handle dates
+            if (!$value instanceof \MongoDate
+                && !$value instanceof \MongoId
+                && !$value instanceof \MongoDBRef) {
+
+                if ($value instanceof \DateTime) {
+                    $value = new \MongoDate($value->getTimestamp());
+                } else if (method_exists($value, 'toArray')) {
+                    $value = (array) $value->toArray();
+                } elseif (method_exists($value, 'to_array')) {
+                    $value = (array) $value->to_array();
+                }else{
+                    //ingore this object when saving
+                    $this->ignoreData[$key] = $value;
+                }
+            }
+        } elseif (isset($attrs[$key]) && isset($attrs[$key]['type'])) {
+
+            switch ($attrs[$key]['type']) {
+                case self::DATA_TYPE_INT:
+                case self::DATA_TYPE_INTEGER:
+                    $value = (integer) $value;
+                    break;
+                case self::DATA_TYPE_STR:
+                case self::DATA_TYPE_STRING:
+                    $value = (string) $value;
+                    break;
+                case self::DATA_TYPE_FLT:
+                case self::DATA_TYPE_FLOAT:
+                case self::DATA_TYPE_DBL;
+                case self::DATA_TYPE_DOUBLE:
+                    $value = (float) $value;
+                    break;
+                case self::DATA_TYPE_TIMESTAMP:
+                    if (! ($value instanceof \MongoTimestamp)) {
+                        try {
+                            $value = new \MongoTimestamp($value);
+                        } catch (\Exception $e) {
+                            throw new InvalidDataTypeException('$key cannot be parsed by \MongoTimestamp', $e->getCode(), $e);
+                        }
+                    }
+                    break;
+                case self::DATA_TYPE_DATE:
+                    if (! ($value instanceof \MongoDate)) {
+                        try {
+                            if (!$value instanceof \MongoDate) {
+                                if (is_numeric($value)) {
+                                    $value = '@'.$value;
+                                }
+                                if (!$value instanceof \DateTime) {
+                                    $value = new \DateTime($value);
+                                }
+                                $value = new \MongoDate($value->getTimestamp());
+                            }
+                        } catch (\Exception $e) {
+                            throw new InvalidDataTypeException('$key cannot be parsed by \DateTime', $e->getCode(), $e);
+                        }
+                    }
+                    break;
+                case self::DATA_TYPE_BOOL:
+                case self::DATA_TYPE_BOOLEAN:
+                    $value = (boolean) $value;
+                    break;
+                case self::DATA_TYPE_OBJ:
+                case self::DATA_TYPE_OBJECT:
+                    if (!empty($value) && !is_array($value) && !is_object($value)) {
+                        throw new InvalidDataTypeException("[$key] is not an object");
+                    }
+                    $value = (object) $value;
+                    break;
+                case self::DATA_TYPE_ARRAY:
+                    if (!empty($value) && !is_array($value)) {
+                        throw new InvalidDataTypeException("[$key] is not an array");
+                    }
+                    $value = (array) $value;
+                    break;
+                case self::DATA_TYPE_EMBED:
+                case self::DATA_TYPE_EMBEDS:
+                case self::DATA_TYPE_MIXED:
+                case self::DATA_TYPE_REFERENCE:
+                case self::DATA_TYPE_REFERENCES:
+                    break;
+                default:
+                    throw new InvalidDataTypeException("{$attrs[$key]['type']} is not a valid type");
+                    break;
+            }
+        }
+
+        return $value;
+    }
+
+
+    /*** ----------- Hooks ----------- ***/
 
     /**
      * init hook
@@ -1417,7 +1454,8 @@ abstract class Model
         return true;
     }
 
-    /*********** Magic methods ************/
+
+    /*** ----------- Magic Methods ----------- ***/
 
     /**
      * Interface for __get magic method
@@ -1445,7 +1483,7 @@ abstract class Model
         }
 
         if (isset($this->cleanData[$key])) {
-            $value = $this->parseValue($key, $this->cleanData[$key]);
+            $value = $this->parseValue($key, $this->cleanData[$key],$this->getAttrs());
             return $value;
         }
 
@@ -1495,7 +1533,7 @@ abstract class Model
                 }
             }
 
-            $value = $this->parseValue($key, $value);
+            $value = $this->parseValue($key, $value, $this->getAttrs());
 
             if ( !isset($this->ignoreData[$key]) && ( !isset($this->cleanData[$key]) || $this->cleanData[$key] !== $value )) {
                 $this->cleanData[$key] = $value;
@@ -1505,6 +1543,7 @@ abstract class Model
         }
 
     }
+
 
     /**
      * __set
@@ -1623,4 +1662,5 @@ abstract class Model
             return $this->__set($key, isset($args[0]) ? $args[0] : null);
         }
     }
+
 }
