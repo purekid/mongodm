@@ -265,7 +265,9 @@ Update attributes by array
 Unset attributes
 ```php  	
 	$user->unset('age');
-	$user->unset( array('age','hobbies') )
+	$user->unset( array('age','hobbies') );
+	//or
+	unset($user->age);
 ```
 ### Retrieve single record
 ```php  
