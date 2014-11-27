@@ -1016,6 +1016,10 @@ abstract class Model
                 $return  = $value->toArray(array('_type','_id'));
             } elseif ($value === null) {
                 $return = null;
+            } elseif (isset($value, $value['$ref'], $value['$id'])) {
+                $value = $model::id($value['$id']);
+                $ref = $value->makeRef();
+                $return = $ref;
             } else {
                 throw new \Exception("{$key} is not instance of '$model'");
             }
