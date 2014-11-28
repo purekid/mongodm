@@ -905,6 +905,7 @@ abstract class Model
             if(!isset($attrs[$key])) continue;
             $attr = $attrs[$key];
             if ($attr['type'] == self::DATA_TYPE_EMBED) {
+                $item->processEmbedsChanged();
                 if ( $item instanceof Model && $this->cleanData[$key] !== $item->toArray()) {
                     $this->__setter($key, $item);
                 }
