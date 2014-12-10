@@ -145,7 +145,8 @@ class MongoDB
      */
     public function connect()
     {
-        if ($this->_connection) {
+
+        if ($this->_connection && $this->_connection->connect()) {
             return true;
         }
         /**
