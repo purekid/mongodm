@@ -158,7 +158,7 @@ class MongoDB
         );
 
         unset($this->_config['connection']);
-
+        
         /* Add Username & Password to server string */
         if (isset($config['username']) && isset($config['password'])) {
             $config['hostnames'] = $config['username'] . ':' . $config['password'] . '@' . $config['hostnames'] . '/' . $config['database'];
@@ -198,6 +198,12 @@ class MongoDB
 
         if(!$this->_db instanceof \MongoDB) {
             throw new \Exception('Unable to connect to database :: $_db is ' . gettype($this->_db));
+        }
+        
+        if (isset($config['options']['username']) && isset($config['options']['password'])) {
+            $this->_db->authenticate($config['options']['username'], $config['options']['password']);
+        } elseif (isset($config['username']) && isset($config['password'])) {
+            $this->_db->authenticate($config['username'], $config['password']);
         }
 
         $this->_connected = true;
