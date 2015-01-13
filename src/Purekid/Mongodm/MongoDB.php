@@ -158,7 +158,7 @@ class MongoDB
         );
 
         unset($this->_config['connection']);
-    
+
         /* Add Username & Password to server string */
         if (isset($config['username']) && isset($config['password'])) {
             $config['hostnames'] = $config['username'] . ':' . $config['password'] . '@' . $config['hostnames'] . '/' . $config['database'];
