@@ -200,12 +200,6 @@ class MongoDB
             throw new \Exception('Unable to connect to database :: $_db is ' . gettype($this->_db));
         }
         
-        if (isset($config['options']['username']) && isset($config['options']['password'])) {
-            $this->_db->authenticate($config['options']['username'], $config['options']['password']);
-        } elseif (isset($config['username']) && isset($config['password'])) {
-            $this->_db->authenticate($config['username'], $config['password']);
-        }
-
         $this->_connected = true;
 
         return true;
