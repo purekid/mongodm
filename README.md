@@ -81,6 +81,16 @@ Database config file  (By default it locates at /vendor/purekid/mongodm/config.p
     	)
     );
 ```
+#### Authentication
+Authentication information is passed in via the options array.  If you do not specifiy authSource, then the PHP Mongo Driver will choose the "admin" database.
+
+```
+$config =  array( 'connection' => array(
+      'hostnames' => '<host>:<port>',
+      'database'  => '<databasename>',
+      'options'  => [ "connectTimeoutMS" => 500 , "username" => "admin", "password" => "<password>", "authSource" => "admin"] )
+  );
+```
 
 ### Setup database in application
 
