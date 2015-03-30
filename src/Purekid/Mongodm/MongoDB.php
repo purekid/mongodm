@@ -55,10 +55,10 @@ class MongoDB
      *
      * @return MongoDB
     */
-    public static function instance($name = 'default', array $config = null)
+    public static function instance($name = 'default', array $config = array())
     {
         if ( ! isset(self::$instances[$name])) {
-            if ($config === null) {
+            if (empty($config)) {
                 // Load the configuration for this database
                 $config = self::config($name);
             }
