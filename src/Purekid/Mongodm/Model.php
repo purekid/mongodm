@@ -767,7 +767,7 @@ abstract class Model
      * Return the connection
      *
      * @return MongoDB|null
-     L*/
+     */
     public function getConnection()
     {
         return $this->_connection;
