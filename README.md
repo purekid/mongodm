@@ -1,4 +1,4 @@
-![image](http://blog.missyi.com/wp-content/uploads/2014/09/mongodm.png)
+![image](https://gist.github.com/purekid/d3fc0980914209ff436b/raw/6719d0b5346aa45f50a4c19ea3d38e619638d3e1/mongodm.png)
 ======= 
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/a6ae6cc6-fe3a-4cb8-85af-86529a0cb4c2/mini.png)](https://insight.sensiolabs.com/projects/a6ae6cc6-fe3a-4cb8-85af-86529a0cb4c2)
