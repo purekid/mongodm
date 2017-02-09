@@ -33,7 +33,7 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
     private $_items = array();
 
     /**
-     * Make a collection from a arrry of Model
+     * Make a collection from a array of Model
      *
      * @param array $models models to add to the collection
      */
@@ -62,7 +62,7 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
     /**
      * Add a model item or model array or ModelSet to this set
      *
-     * @param mixed $items model item or arry or ModelSet to add
+     * @param mixed $items model item or array or ModelSet to add
      *
      * @return $this
      */
@@ -275,7 +275,7 @@ class Collection  implements \IteratorAggregate, \ArrayAccess, \Countable
     }
 
     /**
-     * Make a collection from a arrry of Model
+     * Make a collection from a array of Model
      *
      * @param array $models models
      *
