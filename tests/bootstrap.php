@@ -6,6 +6,8 @@ if ( ! file_exists($file = __DIR__.'/../vendor/autoload.php')) {
     exit(1);
 }
 
+date_default_timezone_set('UTC');
+
 $loader = require_once $file;
 
 $map = array(
