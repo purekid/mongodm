@@ -28,7 +28,7 @@ namespace Purekid\Mongodm;
  * @license  https://github.com/purekid/mongodm/blob/master/LICENSE.md MIT Licence
  * @link     https://github.com/purekid/mongodm
  */
-class MongoDB
+class ConnectionManager
 {
 
     /**
@@ -238,11 +238,11 @@ class MongoDB
     }
 
     /**
-     * Get db
+     * Get MongoDB Instance
      *
      * @return MongoDB || null
      */
-    public function getDB()
+    public function getMongoDB()
     {
         return $this->_db;
     }
@@ -817,7 +817,7 @@ class MongoDB
         }
 
         $config_file = "database.php";
-        $path = __DIR__ . "/../../../config/" .$config_file;
+        $path = __DIR__ . "/../config/" .$config_file;
 
         $env =  (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : '');
 

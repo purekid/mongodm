@@ -57,13 +57,15 @@ class ParseValueTest extends \Purekid\Mongodm\Test\TestCase\PhactoryTestCase
 
   public function testTimestamp()
   {
+
     $data = time();
     $actual = $this->model->parseValue('timestamp', $data);
-    $this->assertInstanceOf('\MongoTimestamp', $actual);
+    $this->assertInstanceOf(\MongoTimestamp::class, $actual);
+    $this->assertEquals($data, $actual->sec);
+//    $this->setExpectedException(\Purekid\Mongodm\Exception\InvalidDataTypeException::class);
+//    $data = 'today';
+//    $actual = $this->model->parseValue('timestamp', $data);
 
-    $this->setExpectedException('\Purekid\Mongodm\Exception\InvalidDataTypeException');
-    $data = 'today';
-    $actual = $this->model->parseValue('timestamp', $data);
   }
 
   public function testDate()
@@ -80,7 +82,7 @@ class ParseValueTest extends \Purekid\Mongodm\Test\TestCase\PhactoryTestCase
     $actual = $this->model->parseValue('date', $data);
     $this->assertInstanceOf('\MongoDate', $actual);
 
-    $this->setExpectedException('\Purekid\Mongodm\Exception\InvalidDataTypeException');
+    $this->setExpectedException(\Purekid\Mongodm\Exception\InvalidDataTypeException::class);
     $data = 'a random string';
     $actual = $this->model->parseValue('date', $data);
   }
