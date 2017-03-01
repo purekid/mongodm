@@ -28,6 +28,8 @@ namespace Purekid\Mongodm;
  */
 class Hydrator
 {
+    const TYPE_COLLECTION = 0;
+    const TYPE_SINGLE = 1;
 
     /**
      * Hydrate
@@ -40,12 +42,12 @@ class Hydrator
      * @throws \Exception
      * @return Model|null
      */
-    public static function hydrate($class, $results, $type = "collection" , $exists = false)
+    public static function hydrate($class, $results, $type = self::TYPE_COLLECTION , $exists = false)
     {
 
         if (!class_exists($class)) {
             throw new \Exception("class {$class} not exists!");
-        } elseif ($type == "collection") {
+        } elseif ($type == self::TYPE_COLLECTION) {
             $models = array();
             foreach ($results as $result) {
                 $model = self::pack($class, $result , $exists);

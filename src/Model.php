@@ -473,7 +473,7 @@ abstract class Model
         $result = self::connection()->findOne(static::$collection, $criteria, self::mapFields($fields));
 
         if ($result) {
-            return  Hydrator::hydrate(get_called_class(), $result, "one" , true);
+            return  Hydrator::hydrate(get_called_class(), $result, Hydrator::TYPE_SINGLE , true);
         }
 
         return null;
@@ -510,7 +510,7 @@ abstract class Model
             $results->sort(self::mapFields($sort));
         }
 
-        return Hydrator::hydrate(get_called_class(), $results , 'collection' , true);
+        return Hydrator::hydrate(get_called_class(), $results , Hydrator::TYPE_COLLECTION , true);
 
     }
 
