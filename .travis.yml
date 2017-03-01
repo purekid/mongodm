@@ -21,5 +21,6 @@ before_script:
     - echo "... MongoDB OK"
     # Install MongoDB driver
     - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+    - echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
     # Install dev requirements
     - composer self-update; composer install 
