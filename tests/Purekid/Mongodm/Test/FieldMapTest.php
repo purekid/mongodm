@@ -19,7 +19,7 @@ class FieldMapTest extends PhactoryTestCase
         $user->save();
 
         // Get raw data
-        $userRaw = self::$db->getDB()->{User::$collection}->findOne(array('_id' => $user->getId()));
+        $userRaw = self::$db->getMongoDB()->{User::$collection}->findOne(array('_id' => $user->getId()));
         $this->assertArrayHasKey('field_mapping', $userRaw, 'Field `fieldMapping` was not mapped correctly');
         $this->assertEquals($expected, $userRaw['field_mapping']);
     }
@@ -55,7 +55,7 @@ class FieldMapTest extends PhactoryTestCase
         $user = User::id($id);
         $this->assertEquals($expected, $user->fieldMappingEmbed->fieldMappingEmbed);
 
-        $userRaw = self::$db->getDB()->{User::$collection}->findOne(array('_id' => $id));
+        $userRaw = self::$db->getMongoDB()->{User::$collection}->findOne(array('_id' => $id));
         $this->assertArrayHasKey('field_mapping_embed', $userRaw, 'Field `fieldMappingEmbed` was not mapped correctly');
         $this->assertArrayHasKey('field_mapping_embed', $userRaw['field_mapping_embed'], 'Field `fieldMappingEmbed.fieldMappingEmbed` was not mapped correctly');
         $this->assertEquals($expected, $userRaw['field_mapping_embed']['field_mapping_embed']);
@@ -82,7 +82,7 @@ class FieldMapTest extends PhactoryTestCase
         $this->assertEquals(2, $user->fieldMappingEmbeds->count() );
         $this->assertEquals($expected, $user->fieldMappingEmbeds->get(0)->fieldMappingEmbeds );
 
-        $userRaw = self::$db->getDB()->{User::$collection}->findOne(array('_id' => $id));
+        $userRaw = self::$db->getMongoDB()->{User::$collection}->findOne(array('_id' => $id));
         $this->assertArrayHasKey('field_mapping_embeds', $userRaw, 'Field `fieldMappingEmbeds` was not mapped correctly');
         $this->assertArrayHasKey('field_mapping_embeds', $userRaw['field_mapping_embeds'][0], 'Embeded 1 `fieldMappingEmbeds.0.fieldMappingEmbeds` was not mapped correctly');
         $this->assertEquals($expected, $userRaw['field_mapping_embeds'][0]['field_mapping_embeds']);
@@ -113,8 +113,8 @@ class FieldMapTest extends PhactoryTestCase
         $this->assertEquals($expected, $user->fieldMappingRef->fieldMappingRef, 'Reference was not mapped');
         $this->assertEquals($expected, $user->fieldMappingRef->fieldMappingRef, 'Reference\'s field was not mapped');
 
-        $userRaw = self::$db->getDB()->{User::$collection}->findOne(array('_id' => $id));
-        $bookRaw = self::$db->getDB()->{Book::$collection}->findOne(array('_id' => $ref->getId()));
+        $userRaw = self::$db->getMongoDB()->{User::$collection}->findOne(array('_id' => $id));
+        $bookRaw = self::$db->getMongoDB()->{Book::$collection}->findOne(array('_id' => $ref->getId()));
         $this->assertArrayHasKey('field_mapping_ref', $userRaw, 'Field `fieldMappingRef` was not mapped correctly');
         $this->assertArrayHasKey('$ref', $userRaw['field_mapping_ref'], 'Field `fieldMappingRef` was not mapped correctly');
         $this->assertArrayHasKey('$id', $userRaw['field_mapping_ref'], 'Field `fieldMappingRef` was not mapped correctly');
@@ -149,9 +149,9 @@ class FieldMapTest extends PhactoryTestCase
         $this->assertEquals($expected, $refs->get((string) $ref1->getId() )->fieldMappingRefs);
         $this->assertEquals($expected.'2', $refs->get((string) $ref2->getId() )->fieldMappingRefs);
 
-        $userRaw = self::$db->getDB()->{User::$collection}->findOne(array('_id' => $id));
-        $book1Raw = self::$db->getDB()->{Book::$collection}->findOne(array('_id' => $ref1->getId()));
-        $book2Raw = self::$db->getDB()->{Book::$collection}->findOne(array('_id' => $ref2->getId()));
+        $userRaw = self::$db->getMongoDB()->{User::$collection}->findOne(array('_id' => $id));
+        $book1Raw = self::$db->getMongoDB()->{Book::$collection}->findOne(array('_id' => $ref1->getId()));
+        $book2Raw = self::$db->getMongoDB()->{Book::$collection}->findOne(array('_id' => $ref2->getId()));
         $this->assertArrayHasKey('field_mapping_refs', $userRaw, 'Field `fieldMappingRefs` was not mapped correctly');
 
         $this->assertArrayHasKey('$ref', $userRaw['field_mapping_refs'][0], 'Field `fieldMappingRefs.0` was not mapped correctly');

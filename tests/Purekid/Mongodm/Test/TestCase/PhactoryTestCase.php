@@ -3,7 +3,7 @@
 namespace Purekid\Mongodm\Test\TestCase;
 
 use Phactory\Mongo\Phactory;
-use Purekid\Mongodm\MongoDB;
+use Purekid\Mongodm\ConnectionManager;
 
 /**
  * Test Case Base Class for using Phactory *
@@ -15,22 +15,22 @@ abstract class PhactoryTestCase extends \PHPUnit_Framework_TestCase
 
   public static function setUpBeforeClass()
   {
-    MongoDB::setConfigBlock('testing', array(
+    ConnectionManager::setConfigBlock('testing', array(
       'connection' => array(
         'hostnames' => 'localhost',
         'database'  => 'test_db'
       )
     ));
 
-    self::$db = MongoDB::instance('testing');
+    self::$db = ConnectionManager::instance('testing');
     self::$db->connect();
 
     if (!self::$phactory) {
-      if (!self::$db->getDB() instanceof \MongoDB) {
-        throw new \Exception('Could not connect to MongoDB');
+      if (! (self::$db->getMongoDB() instanceof \MongoDB)) {
+        throw new \Exception('Could not connect to ConnectionManager');
       }
       
-      self::$phactory = new Phactory(self::$db->getDB());
+      self::$phactory = new Phactory(self::$db->getMongoDB());
       self::$phactory->reset();
     }
 
@@ -40,8 +40,8 @@ abstract class PhactoryTestCase extends \PHPUnit_Framework_TestCase
 
   public static function tearDownAfterClass()
   {
-    foreach (self::$db->getDB()->getCollectionNames() as $collection) {
-      self::$db->getDB()->$collection->drop();
+    foreach (self::$db->getMongoDB()->getCollectionNames() as $collection) {
+      self::$db->getMongoDB()->$collection->drop();
     }
   }
 
