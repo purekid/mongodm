@@ -6,7 +6,10 @@ php:
     - 5.4
     - 5.5
     - 5.6
-    - 7
+    - '7.0'
+    - '7.1'
+    - hhvm
+    - nightly
 
 before_script:
     # Test MongoDB connection; Fails after tries
@@ -20,7 +23,6 @@ before_script:
       done
     - echo "... MongoDB OK"
     # Install MongoDB driver
-    - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
     - echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
     # Install dev requirements
     - composer self-update; composer install 
