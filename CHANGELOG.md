@@ -7,6 +7,10 @@ in 1.x versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.4.0...v2.4.1
 
+* 1.5.0 (2016-03-01)
+    - support for php 7
+    - fix some tests
+
 * 1.4.2 (2014-07-31)
     - feature add chain support (9ea74a9937)
     - fix issue with invalid ref in db (cfbe12c3a8)
