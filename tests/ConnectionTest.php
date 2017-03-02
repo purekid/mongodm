@@ -2,6 +2,7 @@
 
 namespace Purekid\Mongodm\Test;
 
+use Purekid\Mongodm\ConnectionManager;
 use Purekid\Mongodm\MongoDB;
 
 class ConnectionTest extends \PHPUnit_Framework_TestCase
@@ -14,8 +15,9 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
                 'options'  => array('w' => 2)
             )
         );
-        MongoDB::setConfigBlock($env, $options);
-        $i = MongoDB::instance($env);
+
+        ConnectionManager::setConfigBlock($env, $options);
+        $i = ConnectionManager::instance($env);
         $instanceOptions = $i->config($env);
         $this->assertEquals(
             $options['connection']['options'],

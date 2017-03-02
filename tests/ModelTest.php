@@ -2,6 +2,7 @@
 
 namespace Purekid\Mongodm\Test;
 
+use Purekid\Mongodm\ConnectionManager;
 use Purekid\Mongodm\Test\Model\Pet;
 use Purekid\Mongodm\Test\TestCase\PhactoryTestCase;
 use Purekid\Mongodm\Test\Model\Book;
@@ -26,9 +27,9 @@ class ModelTest extends PhactoryTestCase
     {
         $user = new User();
 
-        $connection = $user->_getConnection();
+        $connection = $user->getConnectionManager();
 
-        $this->assertInstanceOf('\\Purekid\\Mongodm\\MongoDB', $connection);
+        $this->assertInstanceOf(ConnectionManager::class, $connection);
     }
 
     public function testGetCollection()
@@ -214,8 +215,10 @@ class ModelTest extends PhactoryTestCase
 
     public function testFindWithSort()
     {
-        $user = User::find($params = array('name'=>'michael'), $sort = array('name'));
+
+        $user = User::find($params = array('name'=>'michael'), $sort = array('name'=>-1));
         $this->assertGreaterThan(0, $user->count());
+
     }
 
     public function testFindOne()

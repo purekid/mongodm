@@ -138,7 +138,7 @@ abstract class Model
             } else {
                 $config = self::$config;
             }
-            $this->_connection = MongoDB::instance($config);
+            $this->_connection = ConnectionManager::instance($config);
         }
 
         $this->update($data, true);
@@ -473,7 +473,7 @@ abstract class Model
         $result = self::connection()->findOne(static::$collection, $criteria, self::mapFields($fields));
 
         if ($result) {
-            return  Hydrator::hydrate(get_called_class(), $result, "one" , true);
+            return  Hydrator::hydrate(get_called_class(), $result, Hydrator::TYPE_SINGLE , true);
         }
 
         return null;
@@ -495,6 +495,7 @@ abstract class Model
 
         self::processCriteriaWithType($criteria);
 
+
         $results =  self::connection()->find(static::$collection, $criteria, self::mapFields($fields));
 
         if ( ! is_null($limit)) {
@@ -509,7 +510,7 @@ abstract class Model
             $results->sort(self::mapFields($sort));
         }
 
-        return Hydrator::hydrate(get_called_class(), $results , 'collection' , true);
+        return Hydrator::hydrate(get_called_class(), $results , Hydrator::TYPE_COLLECTION , true);
 
     }
 
@@ -744,15 +745,6 @@ abstract class Model
     }
 
     /**
-     * @deprecated use getConnection instead
-     * @return null|MongoDB
-     */
-    public function _getConnection()
-    {
-        return $this->getConnection();
-    }
-
-    /**
      * @deprecated use getCollection instead
      * Return the current MongoCollection
      *
@@ -766,9 +758,9 @@ abstract class Model
     /**
      * Return the connection
      *
-     * @return MongoDB|null
+     * @return ConnectionManager|null
      */
-    public function getConnection()
+    public function getConnectionManager()
     {
         return $this->_connection;
     }
@@ -780,8 +772,8 @@ abstract class Model
      */
     public function getCollection()
     {
-        if($this->getConnection()) {
-            return $this->getConnection()->getDB()->{$this->collectionName()};
+        if($this->getConnectionManager()) {
+            return $this->getConnectionManager()->getMongoDB()->{$this->collectionName()};
         }
         return null;
     }
@@ -819,7 +811,7 @@ abstract class Model
         $class = get_called_class();
         $config = $class::$config;
 
-        return MongoDB::instance($config);
+        return ConnectionManager::instance($config);
     }
 
     /**
@@ -859,12 +851,13 @@ abstract class Model
      *
      * @return string
      */
+
     protected function dbName()
     {
 
         $dbName = "default";
         $config = $this::$config;
-        $configs = MongoDB::config($config);
+        $configs = ConnectionManager::config($config);
         if ($configs) {
             $dbName = $configs['connection']['database'];
         }
@@ -1293,6 +1286,7 @@ abstract class Model
             }
         } elseif (isset($attrs[$key]) && isset($attrs[$key]['type'])) {
 
+
             switch ($attrs[$key]['type']) {
                 case self::DATA_TYPE_INT:
                 case self::DATA_TYPE_INTEGER:
@@ -1313,6 +1307,7 @@ abstract class Model
                         try {
                             $value = new \MongoTimestamp($value);
                         } catch (\Exception $e) {
+                            echo 'bbb';exit();
                             throw new InvalidDataTypeException('$key cannot be parsed by \MongoTimestamp', $e->getCode(), $e);
                         }
                     }
