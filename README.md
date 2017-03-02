@@ -36,7 +36,7 @@ Features
 
 Requirements
 ------------
-- PHP 5.3 or greater
+- PHP 5.3 or greater (Tested for 5.5,5.6,7.0,7.1)
 - Mongodb 1.3 or greater
 - PHP Mongo extension 
 
