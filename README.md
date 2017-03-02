@@ -141,7 +141,10 @@ You have two ways to specify section :
 ### Create a model and enjoy it
 
 ```php       
-    class User extends \Purekid\Mongodm\Model 
+    
+    use Purekid\Mongodm\Model;
+    
+    class User extends Model 
     {
     
         static $collection = "user";
@@ -153,17 +156,17 @@ You have two ways to specify section :
         protected static $attrs = array(
                 
              // 1 to 1 reference
-            'book_fav' => array('model'=>'Purekid\Mongodm\Test\Model\Book','type'=>'reference'),
+            'book_fav' => array('model'=>'Purekid\Mongodm\Test\Model\Book','type'=> Model::DATA_TYPE_REFERENCE),
              // 1 to many references
-            'books' => array('model'=>'Purekid\Mongodm\Test\Model\Book','type'=>'references'),
+            'books' => array('model'=>'Purekid\Mongodm\Test\Model\Book','type'=> Model::DATA_TYPE_REFERENCES),
             // you can define default value for attribute
-            'age' => array('default'=>16,'type'=>'integer'),
-            'money' => array('default'=>20.0,'type'=>'double'),
-            'hobbies' => array('default'=>array('love'),'type'=>'array'),
-            'born_time' => array('type'=>'timestamp'),
-            'family'=>array('type'=>'object'),
-            'pet_fav' => array('model'=>'Purekid\Mongodm\Test\Model\Pet','type'=>'embed'),
-            'pets' => array('model'=>'Purekid\Mongodm\Test\Model\Pet','type'=>'embeds'),
+            'age' => array('default'=>16,'type'=> Model::DATA_TYPE_INTEGER),
+            'money' => array('default'=>20.0,'type'=> Model::DATA_TYPE_DOUBLE),
+            'hobbies' => array('default'=>array('love'),'type'=> Model::DATA_TYPE_ARRAY),
+            'born_time' => array('type'=> Model::DATA_TYPE_TIMESTAMP),
+            'family'=>array('type'=> Model::DATA_TYPE_OBJECT),
+            'pet_fav' => array('model'=>'Purekid\Mongodm\Test\Model\Pet','type'=> Model::DATA_TYPE_EMBED),
+            'pets' => array('model'=>'Purekid\Mongodm\Test\Model\Pet','type'=> Model::DATA_TYPE_EMBEDS),
                 
         );
 
@@ -183,22 +186,55 @@ You have two ways to specify section :
 ### Types supported for model attributes
 
 ```php
-	$types = [
-	    'mixed',  // mixed type 
-	    'string',     
-	    'reference',  // 1 ： 1 reference
-	    'references', // 1 ： many references
-	    'embed', 
-	    'embeds', 
-	    'integer',  
-	    'int',  // alias of 'integer'
-	    'double',     // float 
-	    'timestamp',  // store as MongoTimestamp in Mongodb
-	    'date',  // store as DateTime
-	    'boolean',    // true or false
-	    'array',    
-	    'object'
-	]
+
+    [
+	'mixed',  // mixed type 
+	'string',     
+	'reference',  // 1 ： 1 reference
+	'references', // 1 ： many references
+	'embed', 
+	'embeds', 
+	'integer',  
+	'int',  // alias of 'integer'
+	'double',     // float 
+	'timestamp',  // store as MongoTimestamp in Mongodb
+	'date',  // store as DateTime
+	'boolean',    // true or false
+	'array',    
+	'object'
+    ];
+
+    const DATA_TYPE_ARRAY      = 'array';
+    
+    const DATA_TYPE_BOOL       = 'bool';
+    const DATA_TYPE_BOOLEAN    = 'boolean';
+
+    const DATA_TYPE_DATE       = 'date';
+
+    const DATA_TYPE_DBL        = 'dbl';
+    const DATA_TYPE_DOUBLE     = 'double';
+    const DATA_TYPE_FLT        = 'flt';
+    const DATA_TYPE_FLOAT      = 'float';
+
+    const DATA_TYPE_EMBED      = 'embed';
+    const DATA_TYPE_EMBEDS     = 'embeds';
+
+    const DATA_TYPE_INT        = 'int';
+    const DATA_TYPE_INTEGER    = 'integer';
+
+    const DATA_TYPE_MIXED      = 'mixed';
+
+    const DATA_TYPE_REFERENCE  = 'reference';
+    const DATA_TYPE_REFERENCES = 'references';
+
+    const DATA_TYPE_STR        = 'str';
+    const DATA_TYPE_STRING     = 'string';
+
+    const DATA_TYPE_TIMESTAMP  = 'timestamp';
+
+    const DATA_TYPE_OBJ        = 'obj';
+    const DATA_TYPE_OBJECT     = 'object';
+    
 ```
 
 If you put a object instance into a Model attribute and this attribute is undefined in $attrs of Model class,the data of attribute will be omitted when Model saving.
