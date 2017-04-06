@@ -738,7 +738,7 @@ abstract class Model
      */
     public static function ensureIndex($keys, $options = array()){
 
-        $result = self::connection()->ensure_index(self::collectionName(), $keys, $options);
+        $result = self::connection()->ensureIndex(self::collectionName(), $keys, $options);
 
         return $result;
 
