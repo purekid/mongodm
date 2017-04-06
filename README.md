@@ -44,7 +44,7 @@ Installation
 ----------
 
 ### 1. Setup in composer.json: 
-```yml
+```json
 	{
 		"require": {
 		    "purekid/mongodm": "dev-master"
